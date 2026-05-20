@@ -20,8 +20,8 @@ export function useLogin() {
     try {
       const response = await authenticateUser(data.email, data.password);
 
-      localStorage.setItem('@agile:user', JSON.stringify(response.user));
-      localStorage.setItem('@sicape:token', response.token);
+      localStorage.setItem('@project:user', JSON.stringify(response.user));
+      localStorage.setItem('@project:token', response.token);
 
       console.log('autenticado');
       navigate(`/dashboard`);
