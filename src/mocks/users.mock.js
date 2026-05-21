@@ -1,7 +1,7 @@
 const STORAGE_KEY = '@project:users'
 
 const defaultUsers = [
-  { id: 1, name: 'João Admin', email: 'admin@example.com', password: '123456' },
+  { id: 1, name: 'Admin', email: 'admin@example.com', password: '123456' },
 ]
 
 export function getUsers() {
@@ -10,7 +10,7 @@ export function getUsers() {
     if (stored) return JSON.parse(stored)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultUsers))
     return defaultUsers
-  } catch {
+  } catch {   
     return defaultUsers
   }
 }
@@ -25,11 +25,4 @@ export function addUser({ name, email, password }) {
 
 export function emailExists(email) {
   return getUsers().some((u) => u.email.toLowerCase() === email.toLowerCase())
-}
-
-// Backward-compatible for loginService.js
-export const mockUsers = {
-  get users() {
-    return getUsers()
-  },
 }

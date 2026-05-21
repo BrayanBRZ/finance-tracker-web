@@ -17,6 +17,6 @@ export const registerUser = async ({ name, email, password }) => {
       const { password: _, ...userData } = newUser
 
       resolve({ user: userData })
-    }, 800)
+    }, 1000)
   })
 }

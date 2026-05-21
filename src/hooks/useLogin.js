@@ -6,7 +6,6 @@ import { loginSchema } from '@/schemas/loginSchema';
 import { useNavigate } from 'react-router-dom';
 
 export function useLogin() {
-  const [authError, setAuthError] = useState('');
   const navigate = useNavigate();
 
   const form = useForm({
@@ -15,29 +14,29 @@ export function useLogin() {
   });
 
   const handleLogin = async (data) => {
-    setAuthError('');
 
     try {
       const response = await authenticateUser(data.email, data.password);
+      console.log("chegou")
+      console.log(response)
 
       localStorage.setItem('@project:user', JSON.stringify(response.user));
       localStorage.setItem('@project:token', response.token);
 
       console.log('autenticado');
       navigate(`/dashboard`);
+
     } catch (error) {
-      if (error instanceof Error) {
-        setAuthError(error.message);
-      } else {
-        setAuthError('Ocorreu um erro inesperado.');
-      }
-    } finally {
+      const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro inesperado';
+      form.setError('root', {
+        type: 'server',
+        message: errorMessage,
+      });
     }
   };
 
   return {
     form,
-    authError,
     handleLogin,
   };
 }

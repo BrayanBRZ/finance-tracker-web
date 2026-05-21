@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { Loader } from 'lucide-react'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/passwordInput'
+import { PasswordInput } from '@/components/PasswordInput'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useLogin } from '@/hooks/useLogin'
 import { Toast } from '@/components/Toast'
+import { ErrorSpan } from '@/components/ErrorSpan'
 
 export function LoginForm() {
   const navigate = useNavigate()
@@ -24,7 +25,6 @@ export function LoginForm() {
       handleSubmit,
       formState: { errors, isSubmitting },
     },
-    authError,
     handleLogin,
   } = useLogin()
 
@@ -73,11 +73,9 @@ export function LoginForm() {
                   placeholder="nome@exemplo.com"
                   {...register('email')}
                   disabled={isSubmitting}
-                  aria-invalid={!!errors.email || !!authError}
+                  aria-invalid={!!errors.email || !!errors.root}
                 />
-                <span className="text-xs text-red-500 min-h-4">
-                  {errors.email?.message || authError || ''}
-                </span>
+                <ErrorSpan error={errors.email?.message || errors.root?.message} />
               </Field>
 
               {/* Senha */}
@@ -90,11 +88,9 @@ export function LoginForm() {
                   placeholder="Sua senha"
                   {...register('password')}
                   disabled={isSubmitting}
-                  aria-invalid={!!errors.password || !!authError}
+                  aria-invalid={!!errors.password || !!errors.root}
                 />
-                <span className="text-xs text-red-500 min-h-4">
-                  {errors.password?.message || authError || ''}
-                </span>
+                <ErrorSpan error={errors.password?.message || errors.root?.message} />
               </Field>
             </div>
 
@@ -120,8 +116,8 @@ export function LoginForm() {
                 type="submit"
                 disabled={isSubmitting}
                 className={`h-13 w-full mt-6 transition-all shadow-md border-0 text-lg ${isSubmitting
-                    ? 'cursor-not-allowed bg-zinc-400 opacity-70'
-                    : 'cursor-pointer bg-blue-900 hover:opacity-70'
+                  ? 'cursor-not-allowed bg-zinc-400 opacity-70'
+                  : 'cursor-pointer bg-blue-900 hover:opacity-70'
                   }`}
               >
                 {isSubmitting

@@ -1,5 +1,9 @@
-export function PasswordStrengthIndicator({ strength }) {
-  if (!strength || strength.score === 0) return null
+import { evaluatePasswordStrength } from '@/lib/calculateStrength'
+
+const PasswordStrengthIndicator = ({ password }) => {
+  if (!password) return null
+
+  let strength = evaluatePasswordStrength(password)
 
   console.log(strength);
   const BARS = 5
@@ -9,10 +13,12 @@ export function PasswordStrengthIndicator({ strength }) {
       {Array.from({ length: BARS }).map((_, i) => (
         <div
           key={i}
-          className={`w-3 h-1 rounded-2xl transition-all duration-300 ${ i < strength.score ? strength.color : 'bg-zinc-200'
+          className={`w-3 h-1 rounded-2xl transition-all duration-300 ${i < strength.score ? strength.color : 'bg-zinc-200'
             }`}
         />
       ))}
     </div>
   )
 }
+
+export { PasswordStrengthIndicator }

@@ -1,11 +1,12 @@
 import { Loader } from 'lucide-react'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/passwordInput'
+import { PasswordInput } from '@/components/PasswordInput'
 import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 import { useRegister } from '@/hooks/useRegister'
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator'
+import { ErrorSpan } from '@/components/ErrorSpan'
 
 export function RegisterForm() {
   const navigate = useNavigate()
@@ -14,11 +15,11 @@ export function RegisterForm() {
     form: {
       register,
       handleSubmit,
+      watch,
       formState: { errors, isSubmitting },
     },
     authError,
     success,
-    strength,
     handleRegister,
   } = useRegister()
 
@@ -65,9 +66,7 @@ export function RegisterForm() {
                 disabled={isSubmitting || success}
                 aria-invalid={!!errors.name}
               />
-              <span className="text-xs text-red-500 min-h-4">
-                {errors.name?.message || ''}
-              </span>
+              <ErrorSpan error={errors.name?.message} />
             </Field>
 
             {/* E-mail */}
@@ -82,9 +81,7 @@ export function RegisterForm() {
                 disabled={isSubmitting || success}
                 aria-invalid={!!errors.email || !!authError}
               />
-              <span className="text-xs text-red-500 min-h-4">
-                {errors.email?.message || authError || ''}
-              </span>
+              <ErrorSpan error={errors.email?.message} />
             </Field>
 
             {/* Senha */}
@@ -94,7 +91,7 @@ export function RegisterForm() {
                 <FieldLabel className="text-lg font-medium text-zinc-500">
                   Senha
                 </FieldLabel>
-                <PasswordStrengthIndicator strength={strength} />
+                <PasswordStrengthIndicator password={watch('password', '')} />
               </div>
 
               <PasswordInput
@@ -103,10 +100,7 @@ export function RegisterForm() {
                 disabled={isSubmitting || success}
                 aria-invalid={!!errors.password}
               />
-
-              <span className="text-xs text-red-500 min-h-4">
-                {errors.password?.message || ''}
-              </span>
+              <ErrorSpan error={errors.password?.message} />
             </Field>
 
             {/* Confirmar senha */}
@@ -120,9 +114,7 @@ export function RegisterForm() {
                 disabled={isSubmitting || success}
                 aria-invalid={!!errors.confirmPassword}
               />
-              <span className="text-xs text-red-500 min-h-4">
-                {errors.confirmPassword?.message || ''}
-              </span>
+              <ErrorSpan error={errors.confirmPassword?.message}/>
             </Field>
           </div>
 
@@ -131,8 +123,8 @@ export function RegisterForm() {
               type="submit"
               disabled={isSubmitting || success}
               className={`h-13 w-full mt-4 text-lg font-medium transition-all shadow-md border-0 ${isSubmitting || success
-                  ? 'cursor-not-allowed bg-zinc-400 opacity-70'
-                  : 'bg-blue-900 text-white hover:opacity-70'
+                ? 'cursor-not-allowed bg-zinc-400 opacity-70'
+                : 'bg-blue-900 text-white hover:opacity-70'
                 }`}
             >
               {isSubmitting
