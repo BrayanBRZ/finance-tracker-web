@@ -1,14 +1,13 @@
 import { useState } from 'react'
-import { Loader } from 'lucide-react'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/PasswordInput'
-import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useLogin } from '@/hooks/useLogin'
 import { Toast } from '@/components/Toast'
 import { ErrorSpan } from '@/components/ErrorSpan'
+import { FormSubmit } from '@/components/FormSubmit'
 
 export function LoginForm() {
   const navigate = useNavigate()
@@ -97,12 +96,15 @@ export function LoginForm() {
             {/* Options */}
             <div className="flex justify-between">
               <Field orientation="horizontal" className="flex items-center gap-2 max-w-40">
-                <Checkbox id="remember-me" className="cursor-pointer border-zinc-400" />
+                <Checkbox
+                  id="rememberMe"
+                  {...register('rememberMe')}
+                  className="cursor-pointer border-zinc-400" />
                 <FieldLabel
                   htmlFor="remember-me"
-                  className="text-sm text-zinc-950 hover:underline cursor-pointer"
+                  className="text-sm text-zinc-950"
                 >
-                  Lembre-se
+                  Lembre-se de mim
                 </FieldLabel>
               </Field>
               <a href="#" className="text-zinc-950 hover:underline text-sm max-w-40">
@@ -111,20 +113,7 @@ export function LoginForm() {
             </div>
 
             {/* Submit */}
-            <Field>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className={`h-13 w-full mt-6 transition-all shadow-md border-0 text-lg ${isSubmitting
-                  ? 'cursor-not-allowed bg-zinc-400 opacity-70'
-                  : 'cursor-pointer bg-blue-900 hover:opacity-70'
-                  }`}
-              >
-                {isSubmitting
-                  ? <Loader className="animate-spin text-zinc-950" size={24} />
-                  : 'Entrar'}
-              </Button>
-            </Field>
+            <FormSubmit buttonText={"Entrar"} isSubmitting={isSubmitting}/>
 
           </FieldGroup>
         </form>

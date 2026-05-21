@@ -1,12 +1,11 @@
-import { Loader } from 'lucide-react'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/PasswordInput'
-import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
 import { useRegister } from '@/hooks/useRegister'
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator'
 import { ErrorSpan } from '@/components/ErrorSpan'
+import { FormSubmit } from '@/components/FormSubmit'
 
 export function RegisterForm() {
   const navigate = useNavigate()
@@ -18,7 +17,6 @@ export function RegisterForm() {
       watch,
       formState: { errors, isSubmitting },
     },
-    authError,
     success,
     handleRegister,
   } = useRegister()
@@ -48,7 +46,7 @@ export function RegisterForm() {
                 onClick={() => navigate('/login')}
                 className="font-medium text-zinc-950 hover:underline cursor-pointer"
               >
-                Entrar
+                Efetuar Login
               </span>
             </p>
           </header>
@@ -66,7 +64,7 @@ export function RegisterForm() {
                 disabled={isSubmitting || success}
                 aria-invalid={!!errors.name}
               />
-              <ErrorSpan error={errors.name?.message} />
+              <ErrorSpan error={errors.name?.message || errors.root?.message} />
             </Field>
 
             {/* E-mail */}
@@ -79,9 +77,9 @@ export function RegisterForm() {
                 placeholder="nome@exemplo.com"
                 {...register('email')}
                 disabled={isSubmitting || success}
-                aria-invalid={!!errors.email || !!authError}
+                aria-invalid={!!errors.email || !!errors.root}
               />
-              <ErrorSpan error={errors.email?.message} />
+              <ErrorSpan error={errors.email?.message || errors.root?.message} />
             </Field>
 
             {/* Senha */}
@@ -100,7 +98,7 @@ export function RegisterForm() {
                 disabled={isSubmitting || success}
                 aria-invalid={!!errors.password}
               />
-              <ErrorSpan error={errors.password?.message} />
+              <ErrorSpan error={errors.password?.message || errors.root?.message} />
             </Field>
 
             {/* Confirmar senha */}
@@ -114,26 +112,12 @@ export function RegisterForm() {
                 disabled={isSubmitting || success}
                 aria-invalid={!!errors.confirmPassword}
               />
-              <ErrorSpan error={errors.confirmPassword?.message}/>
+              <ErrorSpan error={errors.confirmPassword?.message || errors.root?.message} />
             </Field>
           </div>
 
-          <Field>
-            <Button
-              type="submit"
-              disabled={isSubmitting || success}
-              className={`h-13 w-full mt-4 text-lg font-medium transition-all shadow-md border-0 ${isSubmitting || success
-                ? 'cursor-not-allowed bg-zinc-400 opacity-70'
-                : 'bg-blue-900 text-white hover:opacity-70'
-                }`}
-            >
-              {isSubmitting
-                ? <Loader className="animate-spin" size={24} />
-                : success
-                  ? 'Redirecionando…'
-                  : 'Criar conta'}
-            </Button>
-          </Field>
+          {/* Submit */}
+          <FormSubmit buttonText={"Cadastrar-se"} isSubmitting={isSubmitting} />
 
         </FieldGroup>
       </form>

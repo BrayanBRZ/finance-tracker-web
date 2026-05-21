@@ -1,12 +1,12 @@
 import { Navigate, useLocation } from 'react-router-dom'
+import { getAuthUser, getAuthToken } from '@/utils/auth';
 
 export function ProtectedRoute({ children }) {
   const location = useLocation()
-  const token = localStorage.getItem('@project:token')
-  const user = localStorage.getItem('@project:user')
+  const token = getAuthToken()
+  const user = getAuthUser()
 
   if (!token || !user) {
-    // Preserve the attempted URL so we can redirect back after login
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 

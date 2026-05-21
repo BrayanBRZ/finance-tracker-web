@@ -1,11 +1,9 @@
-import { evaluatePasswordStrength } from '@/lib/calculateStrength'
+import { evaluatePasswordStrength } from '@/utils/calculateStrength'
 
 const PasswordStrengthIndicator = ({ password }) => {
   if (!password) return null
 
   let strength = evaluatePasswordStrength(password)
-
-  console.log(strength);
   const BARS = 5
 
   return (
