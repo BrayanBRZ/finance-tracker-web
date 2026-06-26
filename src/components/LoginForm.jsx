@@ -1,31 +1,30 @@
 import { useState } from 'react'
+import { Controller } from 'react-hook-form'
+import { Link, useLocation } from 'react-router-dom'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/PasswordInput'
+import { PasswordInput } from '@/components/passwordInput'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { useLogin } from '@/hooks/useLogin'
-import { Toast } from '@/components/Toast'
+import { useLoginForm } from '@/hooks/useLoginForm'
 import { ErrorSpan } from '@/components/ErrorSpan'
 import { FormSubmit } from '@/components/FormSubmit'
+import { Toast } from '@/components/feedback/Toast'
 
 export function LoginForm() {
-  const navigate = useNavigate()
   const location = useLocation()
-
-  // Toast message passed via router state after successful registration
   const [toastMessage, setToastMessage] = useState(
     () => location.state?.toast ?? null
   )
 
   const {
     form: {
+      control,
       register,
       handleSubmit,
       formState: { errors, isSubmitting },
     },
-    handleLogin,
-  } = useLogin()
+    onSubmit,
+  } = useLoginForm()
 
   return (
     <>
@@ -33,35 +32,29 @@ export function LoginForm() {
         <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
       )}
 
-      <section className="grid p-0 md:grid-cols-2 h-full">
-
-        {/* Left – Form */}
+      <section className="grid h-full p-0 md:grid-cols-2">
         <form
-          onSubmit={handleSubmit(handleLogin)}
-          className="p-5 flex flex-col justify-center items-center relative bg-white h-full w-full"
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="relative flex h-full w-full flex-col items-center justify-center bg-white p-5"
         >
-          <FieldGroup className="flex flex-col max-w-md gap-2 p-4">
-
-            {/* Header */}
-            <header className="flex flex-col items-start gap-2 mt-2 mb-2">
+          <FieldGroup className="flex max-w-md flex-col gap-2 p-4">
+            <header className="mt-2 mb-2 flex flex-col items-start gap-2">
               <h1 className="text-4xl tracking-tight text-zinc-950">
                 Efetuar login
               </h1>
               <p className="mt-2 text-base text-zinc-500">
                 Não possui uma conta?{' '}
-                <span
-                  onClick={() => navigate('/cadastro')}
-                  className="text-zinc-950 hover:underline cursor-pointer text-base"
+                <Link
+                  to="/cadastro"
+                  className="cursor-pointer text-base text-zinc-950 hover:underline"
                 >
                   Cadastre-se
-                </span>
+                </Link>
               </p>
             </header>
 
-            {/* Fields */}
             <div className="flex flex-col gap-2">
-
-              {/* E-mail */}
               <Field className="flex flex-col">
                 <FieldLabel htmlFor="email" className="text-lg text-zinc-500">
                   E-mail
@@ -69,60 +62,89 @@ export function LoginForm() {
                 <Input
                   id="email"
                   type="email"
+                  autoComplete="email"
                   placeholder="nome@exemplo.com"
                   {...register('email')}
                   disabled={isSubmitting}
-                  aria-invalid={!!errors.email || !!errors.root}
+                  aria-invalid={errors.email ? true : undefined}
+                  aria-describedby={errors.email ? 'email-error' : undefined}
                 />
-                <ErrorSpan error={errors.email?.message || errors.root?.message} />
+                <ErrorSpan id="email-error" error={errors.email?.message} />
               </Field>
 
-              {/* Senha */}
               <Field className="flex flex-col">
-                <FieldLabel htmlFor="password" className="text-lg text-zinc-500">
+                <FieldLabel
+                  htmlFor="password"
+                  className="text-lg text-zinc-500"
+                >
                   Senha
                 </FieldLabel>
                 <PasswordInput
                   id="password"
+                  autoComplete="current-password"
                   placeholder="Sua senha"
                   {...register('password')}
                   disabled={isSubmitting}
-                  aria-invalid={!!errors.password || !!errors.root}
+                  aria-invalid={errors.password ? true : undefined}
+                  aria-describedby={errors.password ? 'password-error' : undefined}
                 />
-                <ErrorSpan error={errors.password?.message || errors.root?.message} />
+                <ErrorSpan
+                  id="password-error"
+                  error={errors.password?.message}
+                />
               </Field>
             </div>
 
-            {/* Options */}
             <div className="flex justify-between">
-              <Field orientation="horizontal" className="flex items-center gap-2 max-w-40">
-                <Checkbox
-                  id="rememberMe"
-                  {...register('rememberMe')}
-                  className="cursor-pointer border-zinc-400" />
+              <Field
+                orientation="horizontal"
+                className="flex max-w-40 items-center gap-2"
+              >
+                <Controller
+                  name="rememberMe"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="rememberMe"
+                      name={field.name}
+                      ref={field.ref}
+                      checked={field.value}
+                      onBlur={field.onBlur}
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked === true)
+                      }
+                      disabled={isSubmitting}
+                      className="cursor-pointer border-zinc-400"
+                    />
+                  )}
+                />
                 <FieldLabel
-                  htmlFor="remember-me"
-                  className="text-sm text-zinc-950"
+                  htmlFor="rememberMe"
+                  className="cursor-pointer text-sm text-zinc-950 hover:underline"
                 >
                   Lembre-se de mim
                 </FieldLabel>
               </Field>
-              <a href="#" className="text-zinc-950 hover:underline text-sm max-w-40">
+              <Link
+                to="/recuperar-senha"
+                className="max-w-40 text-sm text-zinc-950 hover:underline"
+              >
                 Esqueceu a senha?
-              </a>
+              </Link>
             </div>
 
-            {/* Submit */}
-            <FormSubmit buttonText={"Entrar"} isSubmitting={isSubmitting}/>
-
+            <FormSubmit buttonText="Entrar" isSubmitting={isSubmitting} />
+            <ErrorSpan
+              id="login-error"
+              error={errors.root?.server?.message}
+              className="min-h-5 text-center text-sm"
+            />
           </FieldGroup>
         </form>
 
-        {/* Right – Placeholder */}
-        <div className="hidden md:flex flex-col justify-center items-center relative overflow-hidden bg-[#08205d]">
-          <div className="absolute w-125 h-125 bg-white/10 rounded-full blur-[120px] z-0" />
+        <div className="relative hidden flex-col items-center justify-center overflow-hidden bg-[#08205d] md:flex">
+          <div className="absolute z-0 h-125 w-125 rounded-full bg-white/10 blur-[120px]" />
         </div>
-
       </section>
     </>
   )

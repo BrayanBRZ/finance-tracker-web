@@ -1,54 +1,45 @@
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
 import { registerSchema } from '@/schemas/registerSchema'
-import { registerUser } from '@/services/registerService'
-import { AppError } from '@/utils/appError'
+import { registerUser } from '@/services/authService'
 
 export function useRegister() {
-  const [success, setSuccess] = useState(false)
   const navigate = useNavigate()
 
   const form = useForm({
     resolver: zodResolver(registerSchema),
     mode: 'onTouched',
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
   })
 
   const handleRegister = async (data) => {
     try {
+      form.clearErrors('root')
       await registerUser(data)
-      setSuccess(true)
-      setTimeout(() => {
-        navigate('/login', {
-          state: { toast: 'Conta criada com sucesso! Faça login para continuar.' },
-        })
-      }, 400)
+      navigate('/login', {
+        state: {
+          toast: 'Conta criada com sucesso! Faça login para continuar.',
+        },
+      })
     } catch (error) {
-      if (error instanceof AppError) {
-        if (error.field) { // Para campos específicos
-          form.setError(error.field, {
-            type: 'server',
-            message: error.message,
-          });
-        } else { // Sem campos específicos
-          form.setError('root', {
-            type: 'server',
-            message: error.message,
-          });
-        }
-      } else { // Exceções sem tratamento
-        form.setError('root', {
-          type: 'server',
-          message: 'Ocorreu um erro inesperado no sistema. Tente novamente mais tarde.',
-        });
-      }
+      form.setError('root.server', {
+        type: 'server',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Ocorreu um erro inesperado.',
+      })
     }
   }
 
   return {
     form,
-    success,
     handleRegister,
   }
 }

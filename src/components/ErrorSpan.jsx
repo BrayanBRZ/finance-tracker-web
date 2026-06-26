@@ -1,10 +1,15 @@
-const ErrorSpan = ({ error }) => {
+import { cn } from '@/lib/utils'
 
-    return (
-        <span className="text-xs text-red-500 min-h-4">
-            {error}
-        </span>
-    )
+const ErrorSpan = ({ error, className, ...props }) => {
+  return (
+    <span
+      role={error ? 'alert' : undefined}
+      className={cn('min-h-4 text-xs text-red-500', className)}
+      {...props}
+    >
+      {error}
+    </span>
+  )
 }
 
 export { ErrorSpan }

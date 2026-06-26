@@ -2,27 +2,22 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { LoginPage } from './pages/Login'
 import { RegisterPage } from './pages/Register'
 import { DashboardPage } from './pages/Dashboard'
-import { ProtectedRoute } from './components/ProtectedRoute'
+import AuthGuard from '@/components/guards/AuthGuard'
+import GuestGuard from '@/components/guards/GuestGuard'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/cadastro" element={<RegisterPage />} />
+        <Route element={<GuestGuard />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/cadastro" element={<RegisterPage />} />
+        </Route>
 
-        {/* Protected routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route element={<AuthGuard />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+        </Route>
 
-        {/* Fallback — redirect root to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

@@ -41,6 +41,7 @@ export function Toast({ message, onClose }) {
       <CheckCircle2 size={20} className="text-green-600 shrink-0" />
       <p className="text-sm font-medium text-zinc-800 flex-1">{message}</p>
       <button
+        type="button"
         onClick={dismiss}
         aria-label="Fechar notificação"
         className="text-zinc-400 hover:text-zinc-600 transition-colors ml-1 shrink-0"

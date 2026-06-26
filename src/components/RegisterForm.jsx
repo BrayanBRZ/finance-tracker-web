@@ -1,15 +1,13 @@
+import { Link } from 'react-router-dom'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/PasswordInput'
-import { useNavigate } from 'react-router-dom'
+import { PasswordInput } from '@/components/passwordInput'
 import { useRegister } from '@/hooks/useRegister'
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator'
 import { ErrorSpan } from '@/components/ErrorSpan'
 import { FormSubmit } from '@/components/FormSubmit'
 
 export function RegisterForm() {
-  const navigate = useNavigate()
-
   const {
     form: {
       register,
@@ -17,111 +15,139 @@ export function RegisterForm() {
       watch,
       formState: { errors, isSubmitting },
     },
-    success,
     handleRegister,
   } = useRegister()
 
   return (
-    <section className="grid p-0 md:grid-cols-2 h-full">
-
-      {/* Left – Placeholder */}
-      <div className="hidden md:flex flex-col justify-center items-center relative overflow-hidden bg-[#08205d]">
-        <div className="absolute w-125 h-125 bg-white/10 rounded-full blur-[120px] z-0" />
+    <section className="grid h-full p-0 md:grid-cols-2">
+      <div className="relative hidden flex-col items-center justify-center overflow-hidden bg-[#08205d] md:flex">
+        <div className="absolute z-0 h-125 w-125 rounded-full bg-white/10 blur-[120px]" />
       </div>
 
-      {/* Right – Form */}
       <form
+        noValidate
         onSubmit={handleSubmit(handleRegister)}
-        className="p-5 flex flex-col justify-center items-center relative bg-white h-full w-full"
+        className="relative flex h-full w-full flex-col items-center justify-center bg-white p-5"
       >
-        <FieldGroup className="flex flex-col gap-2 p-4 w-full max-w-md">
-
-          <header className="flex flex-col items-start gap-2 mt-2 mb-2">
+        <FieldGroup className="flex w-full max-w-md flex-col gap-2 p-4">
+          <header className="mt-2 mb-2 flex flex-col items-start gap-2">
             <h1 className="text-4xl tracking-tight text-zinc-950">
               Criar conta
             </h1>
             <p className="mt-2 text-base text-zinc-500">
               Já tem uma conta?{' '}
-              <span
-                onClick={() => navigate('/login')}
-                className="font-medium text-zinc-950 hover:underline cursor-pointer"
+              <Link
+                to="/login"
+                className="font-medium text-zinc-950 hover:underline"
               >
-                Efetuar Login
-              </span>
+                Efetuar login
+              </Link>
             </p>
           </header>
 
           <div className="flex flex-col gap-2">
-
-            {/* Nome */}
             <Field className="flex flex-col">
-              <FieldLabel className="text-lg font-medium text-zinc-500">
+              <FieldLabel
+                htmlFor="name"
+                className="text-lg font-medium text-zinc-500"
+              >
                 Nome completo
               </FieldLabel>
               <Input
+                id="name"
+                autoComplete="name"
                 placeholder="Seu nome"
                 {...register('name')}
-                disabled={isSubmitting || success}
-                aria-invalid={!!errors.name}
+                disabled={isSubmitting}
+                aria-invalid={errors.name ? true : undefined}
+                aria-describedby={errors.name ? 'name-error' : undefined}
               />
-              <ErrorSpan error={errors.name?.message || errors.root?.message} />
+              <ErrorSpan id="name-error" error={errors.name?.message} />
             </Field>
 
-            {/* E-mail */}
             <Field className="flex flex-col">
-              <FieldLabel className="text-lg font-medium text-zinc-500">
+              <FieldLabel
+                htmlFor="register-email"
+                className="text-lg font-medium text-zinc-500"
+              >
                 E-mail
               </FieldLabel>
               <Input
+                id="register-email"
                 type="email"
+                autoComplete="email"
                 placeholder="nome@exemplo.com"
                 {...register('email')}
-                disabled={isSubmitting || success}
-                aria-invalid={!!errors.email || !!errors.root}
+                disabled={isSubmitting}
+                aria-invalid={errors.email ? true : undefined}
+                aria-describedby={errors.email ? 'register-email-error' : undefined}
               />
-              <ErrorSpan error={errors.email?.message || errors.root?.message} />
+              <ErrorSpan
+                id="register-email-error"
+                error={errors.email?.message}
+              />
             </Field>
 
-            {/* Senha */}
             <Field className="flex flex-col">
-
-              <div className='flex justify-between'>
-                <FieldLabel className="text-lg font-medium text-zinc-500">
+              <div className="flex justify-between">
+                <FieldLabel
+                  htmlFor="register-password"
+                  className="text-lg font-medium text-zinc-500"
+                >
                   Senha
                 </FieldLabel>
                 <PasswordStrengthIndicator password={watch('password', '')} />
               </div>
-
               <PasswordInput
+                id="register-password"
+                autoComplete="new-password"
                 placeholder="Mínimo 6 caracteres"
                 {...register('password')}
-                disabled={isSubmitting || success}
-                aria-invalid={!!errors.password}
+                disabled={isSubmitting}
+                aria-invalid={errors.password ? true : undefined}
+                aria-describedby={
+                  errors.password ? 'register-password-error' : undefined
+                }
               />
-              <ErrorSpan error={errors.password?.message || errors.root?.message} />
+              <ErrorSpan
+                id="register-password-error"
+                error={errors.password?.message}
+              />
             </Field>
 
-            {/* Confirmar senha */}
             <Field className="flex flex-col">
-              <FieldLabel className="text-lg font-medium text-zinc-500">
+              <FieldLabel
+                htmlFor="confirm-password"
+                className="text-lg font-medium text-zinc-500"
+              >
                 Confirmar senha
               </FieldLabel>
               <PasswordInput
+                id="confirm-password"
+                autoComplete="new-password"
                 placeholder="Repita a senha"
                 {...register('confirmPassword')}
-                disabled={isSubmitting || success}
-                aria-invalid={!!errors.confirmPassword}
+                disabled={isSubmitting}
+                aria-invalid={errors.confirmPassword ? true : undefined}
+                aria-describedby={
+                  errors.confirmPassword ? 'confirm-password-error' : undefined
+                }
               />
-              <ErrorSpan error={errors.confirmPassword?.message || errors.root?.message} />
+              <ErrorSpan
+                id="confirm-password-error"
+                error={errors.confirmPassword?.message}
+              />
             </Field>
           </div>
 
-          {/* Submit */}
-          <FormSubmit buttonText={"Cadastrar-se"} isSubmitting={isSubmitting} />
-
+          <ErrorSpan
+            id="register-error"
+            error={errors.root?.server?.message}
+            className="min-h-5 text-center text-sm"
+          />
+          <FormSubmit buttonText="Cadastrar-se" isSubmitting={isSubmitting} />
         </FieldGroup>
       </form>
-
     </section>
   )
 }
