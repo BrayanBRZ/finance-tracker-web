@@ -1,34 +1,25 @@
-const USERS_STORAGE_KEY = '@project:users'
+const USERS_STORAGE_KEY = "@project:users_data";
 
-const defaultUsers = [
+const mockUsers = [
   {
-    id: 'user-admin',
-    name: 'Admin',
-    email: 'admin@example.com',
-    password: '123456',
+    id: "1",
+    name: "Admin",
+    email: "admin@example.com",
+    password: "123456",
   },
-]
-
-const cloneDefaultUsers = () => defaultUsers.map((user) => ({ ...user }))
+];
 
 export function readUsers() {
-  try {
-    const storedUsers = localStorage.getItem(USERS_STORAGE_KEY)
+  const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
 
-    if (!storedUsers) {
-      const users = cloneDefaultUsers()
-      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users))
-      return users
-    }
-
-    const users = JSON.parse(storedUsers)
-
-    return Array.isArray(users) ? users : cloneDefaultUsers()
-  } catch {
-    return cloneDefaultUsers()
+  if (!storedUsers) {
+    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(mockUsers));
+    return mockUsers;
   }
+
+  return JSON.parse(storedUsers);
 }
 
 export function writeUsers(users) {
-  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users))
+  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
 }
