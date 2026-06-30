@@ -30,21 +30,23 @@ export function Toast({ message, onClose }) {
       className={`
         fixed bottom-6 right-6 z-50
         flex items-center gap-3
-        rounded-xl bg-white border border-green-200
-        shadow-lg shadow-black/10
+        rounded-xl border border-border bg-card
+        shadow-lg
         px-4 py-3
         max-w-sm
         transition-all duration-350 ease-in-out
         ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}
       `}
     >
-      <CheckCircle2 size={20} className="text-green-600 shrink-0" />
-      <p className="text-sm font-medium text-zinc-800 flex-1">{message}</p>
+      <CheckCircle2 size={20} className="text-primary shrink-0" />
+      <p className="flex-1 text-sm font-medium text-card-foreground">
+        {message}
+      </p>
       <button
         type="button"
         onClick={dismiss}
         aria-label="Fechar notificação"
-        className="text-zinc-400 hover:text-zinc-600 transition-colors ml-1 shrink-0"
+        className="ml-1 shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
       >
         <X size={15} />
       </button>

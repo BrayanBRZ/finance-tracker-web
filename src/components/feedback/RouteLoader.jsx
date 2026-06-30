@@ -8,7 +8,7 @@ export function RouteLoader({ className }) {
       aria-live="polite"
       className={cn('flex min-h-screen w-full items-center justify-center', className)}
     >
-      <Loader2 className="animate-spin text-[#08205d]" size={40} />
+      <Loader2 className="animate-spin text-primary" size={40} />
       <span className="sr-only">Carregando sessão...</span>
     </div>
   )

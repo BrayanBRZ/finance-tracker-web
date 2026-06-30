@@ -18,14 +18,14 @@ export function DashboardLayout() {
   }
 
   return (
-    <div className="min-h-svh bg-zinc-50 text-zinc-950">
-      <header className="border-b border-zinc-200 bg-white">
+    <div className="min-h-svh bg-background text-foreground">
+      <header className="border-b border-border bg-card">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-900">
+            <p className="text-sm font-medium text-primary">
               Finance Tracker
             </p>
-            <p className="text-sm text-zinc-600">
+            <p className="text-sm text-muted-foreground">
               Olá, {session?.user.name}
             </p>
           </div>
@@ -43,8 +43,8 @@ export function DashboardLayout() {
                         [
                           'rounded-lg px-3 py-2 text-sm font-medium transition',
                           isActive
-                            ? 'bg-blue-900 text-white'
-                            : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950',
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                         ].join(' ')
                       }
                     >

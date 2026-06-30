@@ -1,3 +1,11 @@
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useWallet } from '@/context/walletContext'
 
 export function WalletSelector() {
@@ -10,45 +18,44 @@ export function WalletSelector() {
     selectWallet,
   } = useWallet()
 
-  const handleChange = (event) => {
-    void selectWallet(event.target.value)
-  }
-
   return (
     <div className="min-w-52">
-      <label
+      <Label
         htmlFor="wallet-selector"
-        className="text-xs font-medium text-zinc-500"
+        className="text-xs text-muted-foreground"
       >
         Carteira atual
-      </label>
+      </Label>
 
-      <select
-        id="wallet-selector"
-        value={currentWallet?.id ?? ''}
-        onChange={handleChange}
+      <Select
+        value={currentWallet?.id ?? undefined}
+        onValueChange={(walletId) => void selectWallet(walletId)}
         disabled={isLoading || !hasWallets}
-        aria-describedby={errorMessage ? 'wallet-selector-error' : undefined}
-        aria-invalid={errorMessage ? true : undefined}
-        className="mt-1 h-9 w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-950 outline-none transition focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500"
       >
-        {isLoading ? (
-          <option value="">Carregando...</option>
-        ) : null}
+        <SelectTrigger
+          id="wallet-selector"
+          className="mt-1 w-full"
+          aria-describedby={errorMessage ? 'wallet-selector-error' : undefined}
+          aria-invalid={errorMessage ? true : undefined}
+        >
+          <SelectValue
+            placeholder={
+              isLoading ? 'Carregando...' : 'Nenhuma carteira'
+            }
+          />
+        </SelectTrigger>
 
-        {!isLoading && !hasWallets ? (
-          <option value="">Nenhuma carteira</option>
-        ) : null}
-
-        {wallets.map((wallet) => (
-          <option key={wallet.id} value={wallet.id}>
-            {wallet.name}
-          </option>
-        ))}
-      </select>
+        <SelectContent>
+          {wallets.map((wallet) => (
+            <SelectItem key={wallet.id} value={wallet.id}>
+              {wallet.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       {errorMessage ? (
-        <p id="wallet-selector-error" className="mt-1 text-xs text-red-600">
+        <p id="wallet-selector-error" className="mt-1 text-xs text-destructive">
           {errorMessage}
         </p>
       ) : null}
