@@ -1,22 +1,26 @@
-import { readUsers, writeUsers } from "@/mocks/data/userData";
 import { latency } from "@/mocks/utils/fakeLatency";
-import * as SessionData from "@/mocks/data/sessionData";
 import {
   createSessionRecord,
   isSessionRecordActive,
   touchSessionRecord,
 } from "@/mocks/models/sessionModel";
+import { createUser, toPublicUser } from "@/mocks/models/userModel";
 import {
-  createUser,
-  isSameEmail,
-  toPublicUser,
-} from "@/mocks/models/userModel";
+  clearSessionRecord,
+  readSessionRecord,
+  SESSION_STORAGE_KEY,
+  writeSessionRecord,
+} from "@/mocks/repositories/sessionRepository.mock";
+import {
+  appendUser,
+  findUserByEmail,
+  findUserById,
+} from "@/mocks/repositories/userRepository.mock";
 
 export async function registerUser({ name, email, password }) {
   await latency();
 
-  const users = readUsers();
-  const emailTaken = users.some((user) => isSameEmail(user.email, email));
+  const emailTaken = Boolean(findUserByEmail(email));
 
   if (emailTaken) {
     throw new Error("Este e-mail já está cadastrado");
@@ -24,7 +28,7 @@ export async function registerUser({ name, email, password }) {
 
   const user = createUser({ name, email, password });
 
-  writeUsers([...users, user]);
+  appendUser(user);
 
   return { user: toPublicUser(user) };
 }
@@ -32,52 +36,47 @@ export async function registerUser({ name, email, password }) {
 export async function login({ email, password, rememberMe = false }) {
   await latency();
 
-  const user = readUsers().find(
-    (candidate) =>
-      isSameEmail(candidate.email, email) && candidate.password === password,
-  );
+  const user = findUserByEmail(email);
 
-  if (!user) {
+  if (!user || user.password !== password) {
     throw new Error("E-mail ou senha incorretos");
   }
 
   const sessionRecord = createSessionRecord(user.id, { rememberMe });
 
-  SessionData.writeSessionRecord(sessionRecord);
+  writeSessionRecord(sessionRecord);
 
   return { user: toPublicUser(user) };
 }
 
 export async function restoreSession() {
-  const sessionRecord = SessionData.readSessionRecord();
+  const sessionRecord = readSessionRecord();
 
   if (!isSessionRecordActive(sessionRecord)) {
-    SessionData.clearSessionRecord();
+    clearSessionRecord();
     return null;
   }
 
-  const user = readUsers().find(
-    (candidate) => String(candidate.id) === String(sessionRecord.userId),
-  );
+  const user = findUserById(sessionRecord.userId);
 
   if (!user) {
-    SessionData.clearSessionRecord();
+    clearSessionRecord();
     return null;
   }
 
-  SessionData.writeSessionRecord(touchSessionRecord(sessionRecord));
+  writeSessionRecord(touchSessionRecord(sessionRecord));
 
   return { user: toPublicUser(user) };
 }
 
 export async function logout() {
   await latency();
-  SessionData.clearSessionRecord();
+  clearSessionRecord();
 }
 
 export function subscribeToAuthStateChanges(listener) {
   const handleStorage = (event) => {
-    if (event.key === SessionData.SESSION_STORAGE_KEY) {
+    if (event.key === SESSION_STORAGE_KEY) {
       listener();
     }
   };

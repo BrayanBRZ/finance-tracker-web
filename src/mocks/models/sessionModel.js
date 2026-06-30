@@ -1,9 +1,8 @@
 import { createMockId } from '@/mocks/utils/createMockId'
+import { createIsoTimestamp, toIsoString } from '@/mocks/utils/date'
 
 const SESSION_DURATION_IN_MS = 1000 * 60 * 60 * 2
 const REMEMBER_ME_SESSION_DURATION_IN_MS = 1000 * 60 * 60 * 24 * 30
-
-const toIsoString = (date) => date.toISOString()
 
 export function createSessionRecord(userId, { rememberMe = false } = {}) {
   const now = new Date()
@@ -37,6 +36,6 @@ export function isSessionRecordActive(sessionRecord) {
 export function touchSessionRecord(sessionRecord) {
   return {
     ...sessionRecord,
-    lastAccessAt: toIsoString(new Date()),
+    lastAccessAt: createIsoTimestamp(),
   }
 }

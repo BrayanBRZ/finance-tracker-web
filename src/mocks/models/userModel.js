@@ -1,11 +1,13 @@
 import { createMockId } from '@/mocks/utils/createMockId'
-
-const normalizeEmail = (email) => email.trim().toLowerCase()
+import {
+  normalizeEmail,
+  normalizeRequiredText,
+} from '@/mocks/utils/text'
 
 export function createUser({ name, email, password }) {
   return {
     id: createMockId(),
-    name: name.trim(),
+    name: normalizeRequiredText(name),
     email: normalizeEmail(email),
     password,
   }

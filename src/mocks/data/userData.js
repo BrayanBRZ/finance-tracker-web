@@ -1,3 +1,5 @@
+import { createLocalStorageCollection } from '@/mocks/data/createLocalStorageCollection'
+
 const USERS_STORAGE_KEY = "@project:users_data";
 
 const mockUsers = [
@@ -9,17 +11,8 @@ const mockUsers = [
   },
 ];
 
-export function readUsers() {
-  const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
-
-  if (!storedUsers) {
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(mockUsers));
-    return mockUsers;
-  }
-
-  return JSON.parse(storedUsers);
-}
-
-export function writeUsers(users) {
-  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-}
+export const { read: readUsers, write: writeUsers } =
+  createLocalStorageCollection({
+    storageKey: USERS_STORAGE_KEY,
+    initialData: mockUsers,
+  })

@@ -1,3 +1,5 @@
+import { createLocalStorageCollection } from '@/mocks/data/createLocalStorageCollection'
+
 const WALLET_MEMBERS_STORAGE_KEY = '@project:wallet_members_data'
 
 const mockWalletMembers = [
@@ -10,23 +12,8 @@ const mockWalletMembers = [
   },
 ]
 
-export function readWalletMembers() {
-  const storedWalletMembers = localStorage.getItem(WALLET_MEMBERS_STORAGE_KEY)
-
-  if (!storedWalletMembers) {
-    localStorage.setItem(
-      WALLET_MEMBERS_STORAGE_KEY,
-      JSON.stringify(mockWalletMembers),
-    )
-    return mockWalletMembers
-  }
-
-  return JSON.parse(storedWalletMembers)
-}
-
-export function writeWalletMembers(walletMembers) {
-  localStorage.setItem(
-    WALLET_MEMBERS_STORAGE_KEY,
-    JSON.stringify(walletMembers),
-  )
-}
+export const { read: readWalletMembers, write: writeWalletMembers } =
+  createLocalStorageCollection({
+    storageKey: WALLET_MEMBERS_STORAGE_KEY,
+    initialData: mockWalletMembers,
+  })

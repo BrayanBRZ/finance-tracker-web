@@ -1,54 +1,28 @@
-import { readUsers } from '@/mocks/data/userData'
-import { readWallets, writeWallets } from '@/mocks/data/walletData'
-import {
-  readWalletMembers,
-  writeWalletMembers,
-} from '@/mocks/data/walletMemberData'
-import { latency } from '@/mocks/utils/fakeLatency'
 import {
   createOwnerMembership,
   createWallet as createWalletRecord,
-  isActiveMembership,
   toPublicMembership,
   toPublicWallet,
 } from '@/mocks/models/walletModel'
-
-const isSameId = (leftId, rightId) => String(leftId) === String(rightId)
-
-const findRegisteredUser = (userId) =>
-  readUsers().find((user) => isSameId(user.id, userId))
-
-const validateAuthenticatedUser = (userId) => {
-  if (!userId || !findRegisteredUser(userId)) {
-    throw new Error('Usuário autenticado não encontrado')
-  }
-}
-
-const validateWalletName = (name) => {
-  if (!name?.trim()) {
-    throw new Error('O nome da carteira é obrigatório')
-  }
-}
-
-const findWallet = (walletId) =>
-  readWallets().find((wallet) => isSameId(wallet.id, walletId))
-
-const findActiveMembership = ({ walletId, userId }) =>
-  readWalletMembers().find(
-    (membership) =>
-      isSameId(membership.walletId, walletId) &&
-      isSameId(membership.userId, userId) &&
-      isActiveMembership(membership),
-  )
+import { ensureAuthenticatedUser } from '@/mocks/policies/authPolicy.mock'
+import {
+  appendWalletMember,
+  findActiveMembership,
+  listActiveMembershipsForUser,
+} from '@/mocks/repositories/walletMemberRepository.mock'
+import {
+  appendWallet,
+  findWalletById,
+  listWallets,
+} from '@/mocks/repositories/walletRepository.mock'
+import { latency } from '@/mocks/utils/fakeLatency'
+import { isSameId } from '@/mocks/utils/id'
+import { validateWalletName } from '@/mocks/validators/walletValidator'
 
 const listAccessibleWalletsForUser = (userId) => {
-  const wallets = readWallets()
-  const activeMemberships = readWalletMembers().filter(
-    (membership) =>
-      isSameId(membership.userId, userId) && isActiveMembership(membership),
-  )
+  const wallets = listWallets()
 
-  return activeMemberships
+  return listActiveMembershipsForUser(userId)
     .map((membership) => {
       const wallet = wallets.find((candidate) =>
         isSameId(candidate.id, membership.walletId),
@@ -62,7 +36,7 @@ const listAccessibleWalletsForUser = (userId) => {
 export async function listWalletsForUser(userId) {
   await latency()
 
-  validateAuthenticatedUser(userId)
+  ensureAuthenticatedUser(userId)
 
   return listAccessibleWalletsForUser(userId)
 }
@@ -70,7 +44,7 @@ export async function listWalletsForUser(userId) {
 export async function createWallet({ userId, name, description = '' }) {
   await latency()
 
-  validateAuthenticatedUser(userId)
+  ensureAuthenticatedUser(userId)
   validateWalletName(name)
 
   const wallet = createWalletRecord({ userId, name, description })
@@ -79,8 +53,8 @@ export async function createWallet({ userId, name, description = '' }) {
     userId,
   })
 
-  writeWallets([...readWallets(), wallet])
-  writeWalletMembers([...readWalletMembers(), membership])
+  appendWallet(wallet)
+  appendWalletMember(membership)
 
   return {
     wallet: toPublicWallet(wallet, membership),
@@ -90,9 +64,9 @@ export async function createWallet({ userId, name, description = '' }) {
 export async function getWalletMembership({ walletId, userId }) {
   await latency()
 
-  validateAuthenticatedUser(userId)
+  ensureAuthenticatedUser(userId)
 
-  if (!findWallet(walletId)) {
+  if (!findWalletById(walletId)) {
     return null
   }
 
