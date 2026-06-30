@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from '@/context/sessionContext'
 import { WalletContext } from '@/context/walletContext'
-import { listWalletsForUser } from '@/services/walletService'
+import {
+  createWallet as createWalletOperation,
+  listWalletsForUser,
+} from '@/services/walletService'
 import {
   clearSelectedWalletId,
   readSelectedWalletId,
@@ -121,6 +124,43 @@ export function WalletProvider({ children }) {
     }
   }, [resetWalletState, userId, wallets])
 
+  const handleCreateWallet = useCallback(async (walletData) => {
+    if (!userId) {
+      const error = new Error('Sessão expirada. Faça login novamente.')
+
+      resetWalletState()
+      setErrorMessage(error.message)
+
+      throw error
+    }
+
+    setErrorMessage(null)
+
+    try {
+      const { wallet } = await createWalletOperation({
+        userId,
+        ...walletData,
+      })
+
+      setWallets((currentWallets) => {
+        if (currentWallets.some((current) => isSameId(current.id, wallet.id))) {
+          return currentWallets.map((current) =>
+            isSameId(current.id, wallet.id) ? wallet : current,
+          )
+        }
+
+        return [...currentWallets, wallet]
+      })
+      setCurrentWallet(wallet)
+      writeSelectedWalletId({ userId, walletId: wallet.id })
+
+      return wallet
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error))
+      throw error
+    }
+  }, [resetWalletState, userId])
+
   useEffect(() => {
     let isActive = true
 
@@ -165,6 +205,7 @@ export function WalletProvider({ children }) {
         errorMessage,
         refreshWallets,
         selectWallet: handleSelectWallet,
+        createWallet: handleCreateWallet,
       }}
     >
       {children}
