@@ -5,6 +5,7 @@ import { DashboardPage } from './pages/Dashboard'
 import AuthGuard from '@/components/guards/AuthGuard'
 import GuestGuard from '@/components/guards/GuestGuard'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { WalletProvider } from '@/context/WalletProvider'
 
 function App() {
   return (
@@ -16,7 +17,13 @@ function App() {
         </Route>
 
         <Route element={<AuthGuard />}>
-          <Route element={<DashboardLayout />}>
+          <Route
+            element={
+              <WalletProvider>
+                <DashboardLayout />
+              </WalletProvider>
+            }
+          >
             <Route path="/dashboard" element={<DashboardPage />} />
           </Route>
         </Route>

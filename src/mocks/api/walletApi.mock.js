@@ -41,11 +41,7 @@ const findActiveMembership = ({ walletId, userId }) =>
       isActiveMembership(membership),
   )
 
-export async function listWalletsForUser(userId) {
-  await latency()
-
-  validateAuthenticatedUser(userId)
-
+const listAccessibleWalletsForUser = (userId) => {
   const wallets = readWallets()
   const activeMemberships = readWalletMembers().filter(
     (membership) =>
@@ -61,6 +57,14 @@ export async function listWalletsForUser(userId) {
       return wallet ? toPublicWallet(wallet, membership) : null
     })
     .filter(Boolean)
+}
+
+export async function listWalletsForUser(userId) {
+  await latency()
+
+  validateAuthenticatedUser(userId)
+
+  return listAccessibleWalletsForUser(userId)
 }
 
 export async function createWallet({ userId, name, description = '' }) {

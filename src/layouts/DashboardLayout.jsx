@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useSession } from '@/context/sessionContext'
 import { Button } from '@/components/ui/button'
+import { WalletSelector } from '@/components/wallets/WalletSelector'
 
 const navigationItems = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -30,6 +31,8 @@ export function DashboardLayout() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <WalletSelector />
+
             <nav aria-label="Navegação principal">
               <ul className="flex gap-2">
                 {navigationItems.map((item) => (
