@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/passwordInput'
+import { PasswordInput } from '@/components/PasswordInput'
 import { useRegister } from '@/hooks/useRegister'
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator'
 import { ErrorSpan } from '@/components/ErrorSpan'

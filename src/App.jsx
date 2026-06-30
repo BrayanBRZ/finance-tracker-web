@@ -4,6 +4,7 @@ import { RegisterPage } from './pages/Register'
 import { DashboardPage } from './pages/Dashboard'
 import AuthGuard from '@/components/guards/AuthGuard'
 import GuestGuard from '@/components/guards/GuestGuard'
+import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 function App() {
   return (
@@ -15,7 +16,9 @@ function App() {
         </Route>
 
         <Route element={<AuthGuard />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />
