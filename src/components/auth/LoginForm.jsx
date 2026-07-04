@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Controller } from "react-hook-form";
 import { Link, useLocation } from "react-router-dom";
 import {
+  AuthFormLayout,
   AuthFormHeader,
   AuthScreenLayout,
-} from "@/components/auth/AuthScreenLayout";
+} from "@/components/auth/AuthLayout";
 
 import { ErrorSpan } from "@/components/forms/ErrorSpan";
 
-import { FieldGroup } from "@/components/ui/field"
 import { SubmitButton } from "@/components/forms/SubmitButton";
 import { FormPasswordField } from "@/components/forms/FormPasswordField";
 
@@ -43,13 +43,7 @@ export function LoginForm() {
       ) : null}
 
       <AuthScreenLayout visualSide="right">
-
-        <form
-          noValidate
-          className="w-full max-w-77"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <FieldGroup className="gap-3 p-3">
+        <AuthFormLayout onSubmit={handleSubmit(onSubmit)}>
             <AuthFormHeader
               title="Efetuar login"
               description="Não possui uma conta?"
@@ -132,8 +126,7 @@ export function LoginForm() {
               error={errors.root?.server?.message}
               className="text-center"
             />
-          </FieldGroup>
-        </form>
+        </AuthFormLayout>
       </AuthScreenLayout>
     </>
   );

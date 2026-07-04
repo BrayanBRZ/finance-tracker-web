@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 import {
-  AuthFormHeader,
   AuthScreenLayout,
-} from "@/components/auth/AuthScreenLayout";
+  AuthFormLayout,
+  AuthFormHeader,
+} from "@/components/auth/AuthLayout";
 import { SubmitButton } from "@/components/forms/SubmitButton";
 import { FormPasswordField } from "@/components/forms/FormPasswordField";
 import { PasswordStrength } from "@/components/forms/PasswordStrength";
 import { useRegisterForm } from "@/hooks/useRegisterForm";
 import { ErrorSpan } from "../forms/ErrorSpan";
-import { FieldGroup } from "@/components/ui/field";
 import { FormInputField } from "../forms/FormInputField";
 
 export function RegisterForm() {
@@ -24,12 +24,7 @@ export function RegisterForm() {
 
   return (
     <AuthScreenLayout visualSide="left">
-      <form
-        noValidate
-        className="w-full max-w-77"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <FieldGroup className="gap-3 p-3">
+      <AuthFormLayout onSubmit={handleSubmit(onSubmit)}>
           <AuthFormHeader
             title="Criar conta"
             description="Já tem uma conta?"
@@ -72,9 +67,7 @@ export function RegisterForm() {
             {...register("password")}
             disabled={isSubmitting}
             error={errors.password?.message}
-            labelAddon={
-              <PasswordStrength password={watch("password", "")} />
-            }
+            labelAddon={<PasswordStrength password={watch("password", "")} />}
           />
 
           <FormPasswordField
@@ -87,18 +80,17 @@ export function RegisterForm() {
             error={errors.confirmPassword?.message}
           />
 
-          <ErrorSpan
-            error={errors.root?.server?.message}
-            className="text-center"
-          />
-
           <SubmitButton
             buttonText="Cadastrar-se"
             isSubmitting={isSubmitting}
             className="mt-3 h-10 w-full"
           />
-        </FieldGroup>
-      </form>
+
+          <ErrorSpan
+            error={errors.root?.server?.message}
+            className="text-center"
+          />
+      </AuthFormLayout>
     </AuthScreenLayout>
   );
 }

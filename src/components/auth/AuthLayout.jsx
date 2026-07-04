@@ -1,3 +1,4 @@
+import { FieldGroup } from '@/components/ui/field'
 import { cn } from '@/lib/utils'
 
 function AuthVisualPanel() {
@@ -22,6 +23,21 @@ export function AuthScreenLayout({ children, visualSide = 'right' }) {
       {content}
       {visualSide === 'right' ? panel : null}
     </section>
+  )
+}
+
+export function AuthFormLayout({
+  children,
+  className,
+  fieldGroupClassName,
+  ...props
+}) {
+  return (
+    <form noValidate className={cn('w-full max-w-77', className)} {...props}>
+      <FieldGroup className={cn('gap-3 p-3', fieldGroupClassName)}>
+        {children}
+      </FieldGroup>
+    </form>
   )
 }
 
