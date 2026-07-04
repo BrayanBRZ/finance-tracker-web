@@ -9,7 +9,7 @@ const strengthClasses = {
   5: 'bg-primary',
 }
 
-export function AuthPasswordStrengthIndicator({ password, className }) {
+export function PasswordStrength({ password, className }) {
   if (!password) {
     return null
   }

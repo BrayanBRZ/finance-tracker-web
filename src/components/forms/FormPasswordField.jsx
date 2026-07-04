@@ -1,18 +1,17 @@
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { ErrorSpan } from '@/components/forms/ErrorSpan'
+import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
-const authInputClassName = 'h-10 px-2.5 py-1.5 text-sm'
-
-export function AuthPasswordField({
+export function FormPasswordField({
   id,
   label,
   error,
   labelAddon,
-  inputClassName,
+  className,
   ...props
 }) {
   const [showPassword, setShowPassword] = useState(false)
@@ -29,23 +28,27 @@ export function AuthPasswordField({
         <Input
           id={id}
           type={showPassword ? 'text' : 'password'}
-          className={cn(authInputClassName, 'pr-10', inputClassName)}
+          className={cn('h-10 pr-10', className)}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
           {...props}
         />
-        <button
-          type="button"
-          onClick={() => setShowPassword((current) => !current)}
-          aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-          className="absolute top-1/2 right-2.5 -translate-y-1/2 cursor-pointer rounded-sm p-0.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
-        >
-          {showPassword ? (
-            <EyeOff className="size-4" strokeWidth={1.5} />
-          ) : (
-            <Eye className="size-4" strokeWidth={1.5} />
-          )}
-        </button>
+        <div className="absolute top-0 right-1 flex h-full items-center">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowPassword((current) => !current)}
+            aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            className="cursor-pointer rounded-sm text-muted-foreground focus:outline-none hover:bg-transparent"
+          >
+            {showPassword ? (
+              <EyeOff className="size-4" strokeWidth={1.5} />
+            ) : (
+              <Eye className="size-4" strokeWidth={1.5} />
+            )}
+          </Button>
+        </div>
       </div>
 
       <ErrorSpan id={errorId} error={error} />

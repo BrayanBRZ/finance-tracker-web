@@ -7,9 +7,8 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { ErrorSpan } from '@/components/forms/ErrorSpan'
+import { FormInputField } from '@/components/forms/FormInputField'
 import { FieldGroup } from '@/components/ui/field'
-import { TextareaField } from '@/components/forms/TextareaField'
-import { TextField } from '@/components/forms/TextField'
 import { useCreateWalletForm } from '@/hooks/useCreateWalletForm'
 
 export function CreateWalletForm({ title = 'Criar carteira' }) {
@@ -34,7 +33,7 @@ export function CreateWalletForm({ title = 'Criar carteira' }) {
       <CardContent>
         <form noValidate onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup className="gap-4">
-            <TextField
+            <FormInputField
               id="wallet-name"
               label="Nome"
               placeholder="Ex.: Casa, Pessoal, Família"
@@ -44,7 +43,8 @@ export function CreateWalletForm({ title = 'Criar carteira' }) {
               error={errors.name?.message}
             />
 
-            <TextareaField
+            <FormInputField
+              as="textarea"
               id="wallet-description"
               label="Descrição"
               rows={3}

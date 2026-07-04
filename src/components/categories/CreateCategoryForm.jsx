@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { TextField } from '@/components/forms/TextField'
+import { FormInputField } from '@/components/forms/FormInputField'
 import { FINANCIAL_TYPE_OPTIONS } from '@/domain/financialTypes'
 import { useCreateCategoryForm } from '@/hooks/useCreateCategoryForm'
 
@@ -45,7 +45,7 @@ export function CreateCategoryForm({ createCategory, disabled = false }) {
       <CardContent>
         <form noValidate onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup className="gap-4">
-            <TextField
+            <FormInputField
               id="category-name"
               label="Nome"
               placeholder="Ex.: Mercado, Salário, Transporte"
@@ -98,7 +98,7 @@ export function CreateCategoryForm({ createCategory, disabled = false }) {
             />
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <TextField
+              <FormInputField
                 id="category-icon"
                 label="Ícone"
                 placeholder="Opcional"
@@ -108,7 +108,7 @@ export function CreateCategoryForm({ createCategory, disabled = false }) {
                 error={errors.icon?.message}
               />
 
-              <TextField
+              <FormInputField
                 id="category-color"
                 label="Cor"
                 placeholder="Opcional"

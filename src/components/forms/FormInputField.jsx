@@ -1,13 +1,14 @@
-import { ErrorSpan } from '@/components/forms/ErrorSpan'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { ErrorSpan } from '@/components/forms/ErrorSpan'
+import { cn } from '@/lib/utils'
 
-export function TextField({
+export function FormInputField({
   id,
   label,
+  type,
   error,
-  type = 'text',
-  inputClassName,
+  className,
   ...props
 }) {
   const errorId = `${id}-error`
@@ -17,8 +18,8 @@ export function TextField({
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
       <Input
         id={id}
-        type={type}
-        className={inputClassName}
+        type={type ? type : "text"}
+        className={cn('h-10 pr-10', className)}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         {...props}

@@ -1,15 +1,15 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 import {
   AuthFormHeader,
   AuthScreenLayout,
-} from '@/components/auth/AuthScreenLayout'
-import { AuthForm } from '@/components/auth/form/AuthForm'
-import { AuthFormError } from '@/components/auth/form/AuthFormError'
-import { AuthFormSubmit } from '@/components/auth/form/AuthFormSubmit'
-import { AuthPasswordField } from '@/components/auth/form/AuthPasswordField'
-import { AuthPasswordStrengthIndicator } from '@/components/auth/form/AuthPasswordStrengthIndicator'
-import { AuthTextField } from '@/components/auth/form/AuthTextField'
-import { useRegister } from '@/hooks/useRegister'
+} from "@/components/auth/AuthScreenLayout";
+import { SubmitButton } from "@/components/forms/SubmitButton";
+import { FormPasswordField } from "@/components/forms/FormPasswordField";
+import { PasswordStrength } from "@/components/forms/PasswordStrength";
+import { useRegisterForm } from "@/hooks/useRegisterForm";
+import { ErrorSpan } from "../forms/ErrorSpan";
+import { FieldGroup } from "@/components/ui/field";
+import { FormInputField } from "../forms/FormInputField";
 
 export function RegisterForm() {
   const {
@@ -19,78 +19,86 @@ export function RegisterForm() {
       watch,
       formState: { errors, isSubmitting },
     },
-    handleRegister,
-  } = useRegister()
+    onSubmit,
+  } = useRegisterForm();
 
   return (
     <AuthScreenLayout visualSide="left">
-      <AuthForm onSubmit={handleSubmit(handleRegister)}>
-        <AuthFormHeader
-          title="Criar conta"
-          description="Já tem uma conta?"
-          action={
-            <Link
-              to="/login"
-              className="font-medium text-foreground underline-offset-4 hover:underline"
-            >
-              Efetuar login
-            </Link>
-          }
-        />
+      <form
+        noValidate
+        className="w-full max-w-77"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <FieldGroup className="gap-3 p-3">
+          <AuthFormHeader
+            title="Criar conta"
+            description="Já tem uma conta?"
+            action={
+              <Link
+                to="/login"
+                className="font-medium text-foreground underline-offset-4 hover:underline"
+              >
+                Efetuar login
+              </Link>
+            }
+          />
 
-        <AuthTextField
-          id="name"
-          label="Nome completo"
-          autoComplete="name"
-          placeholder="Seu nome"
-          {...register('name')}
-          disabled={isSubmitting}
-          error={errors.name?.message}
-        />
+          <FormInputField
+            id="name"
+            label="Nome completo"
+            autoComplete="name"
+            placeholder="Seu nome"
+            {...register("name")}
+            disabled={isSubmitting}
+            error={errors.name?.message}
+          />
 
-        <AuthTextField
-          id="register-email"
-          label="E-mail"
-          type="email"
-          autoComplete="email"
-          placeholder="nome@exemplo.com"
-          {...register('email')}
-          disabled={isSubmitting}
-          error={errors.email?.message}
-        />
+          <FormInputField
+            id="register-email"
+            label="E-mail"
+            type="email"
+            autoComplete="email"
+            placeholder="nome@exemplo.com"
+            {...register("email")}
+            disabled={isSubmitting}
+            error={errors.email?.message}
+          />
 
-        <AuthPasswordField
-          id="register-password"
-          label="Senha"
-          autoComplete="new-password"
-          placeholder="Mínimo 6 caracteres"
-          {...register('password')}
-          disabled={isSubmitting}
-          error={errors.password?.message}
-          labelAddon={
-            <AuthPasswordStrengthIndicator password={watch('password', '')} />
-          }
-        />
+          <FormPasswordField
+            id="register-password"
+            label="Senha"
+            autoComplete="new-password"
+            placeholder="Mínimo 6 caracteres"
+            {...register("password")}
+            disabled={isSubmitting}
+            error={errors.password?.message}
+            labelAddon={
+              <PasswordStrength password={watch("password", "")} />
+            }
+          />
 
-        <AuthPasswordField
-          id="confirm-password"
-          label="Confirmar senha"
-          autoComplete="new-password"
-          placeholder="Repita a senha"
-          {...register('confirmPassword')}
-          disabled={isSubmitting}
-          error={errors.confirmPassword?.message}
-        />
+          <FormPasswordField
+            id="confirm-password"
+            label="Confirmar senha"
+            autoComplete="new-password"
+            placeholder="Repita a senha"
+            {...register("confirmPassword")}
+            disabled={isSubmitting}
+            error={errors.confirmPassword?.message}
+          />
 
-        <AuthFormError
-          id="register-error"
-          error={errors.root?.server?.message}
-        />
-        <AuthFormSubmit
-          buttonText="Cadastrar-se"
-          isSubmitting={isSubmitting}
-        />
-      </AuthForm>
+          <ErrorSpan
+            error={errors.root?.server?.message}
+            className="text-center"
+          />
+
+          <SubmitButton
+            buttonText="Cadastrar-se"
+            isSubmitting={isSubmitting}
+            className="mt-3 h-10 w-full"
+          />
+        </FieldGroup>
+      </form>
     </AuthScreenLayout>
-  )
+  );
 }

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { registerSchema } from '@/schemas/registerSchema'
 import { registerUser } from '@/services/authService'
 
-export function useRegister() {
+export function useRegisterForm() {
   const navigate = useNavigate()
 
   const form = useForm({
@@ -18,7 +18,7 @@ export function useRegister() {
     },
   })
 
-  const handleRegister = async (data) => {
+  const onSubmit = async (data) => {
     try {
       form.clearErrors('root')
       await registerUser(data)
@@ -40,6 +40,6 @@ export function useRegister() {
 
   return {
     form,
-    handleRegister,
+    onSubmit,
   }
 }
