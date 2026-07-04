@@ -1,18 +1,14 @@
 import { createMockId } from '@/mocks/utils/createMockId'
+import {
+  FINANCIAL_TYPES,
+  isKnownFinancialType,
+} from '@/domain/financialTypes'
 import { createIsoTimestamp } from '@/mocks/utils/date'
 import {
   normalizeOptionalText,
   normalizeRequiredText,
 } from '@/mocks/utils/text'
-
-export const FINANCIAL_TYPES = Object.freeze({
-  INCOME: 'INCOME',
-  EXPENSE: 'EXPENSE',
-})
-
-export function isKnownFinancialType(type) {
-  return Object.values(FINANCIAL_TYPES).includes(type)
-}
+export { FINANCIAL_TYPES, isKnownFinancialType }
 
 export function createCategory({
   walletId,

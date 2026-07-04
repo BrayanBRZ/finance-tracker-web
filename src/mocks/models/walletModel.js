@@ -1,21 +1,15 @@
 import { createMockId } from '@/mocks/utils/createMockId'
+import {
+  WALLET_MEMBER_ROLES,
+  WALLET_MEMBER_STATUS,
+} from '@/domain/walletRoles'
 import { createIsoTimestamp } from '@/mocks/utils/date'
 import {
   normalizeOptionalText,
   normalizeRequiredText,
 } from '@/mocks/utils/text'
 
-export const WALLET_MEMBER_ROLES = Object.freeze({
-  OWNER: 'OWNER',
-  COLLABORATOR: 'COLLABORATOR',
-  VIEWER: 'VIEWER',
-})
-
-export const WALLET_MEMBER_STATUS = Object.freeze({
-  PENDING: 'PENDING',
-  ACTIVE: 'ACTIVE',
-  REMOVED: 'REMOVED',
-})
+export { WALLET_MEMBER_ROLES, WALLET_MEMBER_STATUS }
 
 export function createWallet({ userId, name, description = '' }) {
   const now = createIsoTimestamp()

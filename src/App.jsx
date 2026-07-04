@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { LoginPage } from './pages/Login'
 import { RegisterPage } from './pages/Register'
 import { DashboardPage } from './pages/Dashboard'
+import { CategoriesPage } from './pages/Categories'
 import AuthGuard from '@/components/guards/AuthGuard'
 import GuestGuard from '@/components/guards/GuestGuard'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -25,6 +26,7 @@ function App() {
             }
           >
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/categorias" element={<CategoriesPage />} />
           </Route>
         </Route>
 
