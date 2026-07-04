@@ -4,12 +4,12 @@ import {
   AuthFormLayout,
   AuthFormHeader,
 } from "@/components/auth/AuthLayout";
-import { SubmitButton } from "@/components/forms/SubmitButton";
-import { FormPasswordField } from "@/components/forms/FormPasswordField";
-import { PasswordStrength } from "@/components/forms/PasswordStrength";
+import { SubmitButton } from "@/components/form-fields/SubmitButton";
+import { FormPasswordField } from "@/components/form-fields/FormPasswordField";
+import { PasswordStrength } from "@/components/form-fields/PasswordStrength";
 import { useRegisterForm } from "@/hooks/useRegisterForm";
-import { ErrorSpan } from "../forms/ErrorSpan";
-import { FormInputField } from "../forms/FormInputField";
+import { ErrorSpan } from "../form-fields/ErrorSpan";
+import { FormInputField } from "../form-fields/FormInputField";
 
 export function RegisterForm() {
   const {

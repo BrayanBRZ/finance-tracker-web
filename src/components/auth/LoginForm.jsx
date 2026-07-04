@@ -7,10 +7,10 @@ import {
   AuthScreenLayout,
 } from "@/components/auth/AuthLayout";
 
-import { ErrorSpan } from "@/components/forms/ErrorSpan";
+import { ErrorSpan } from "@/components/form-fields/ErrorSpan";
 
-import { SubmitButton } from "@/components/forms/SubmitButton";
-import { FormPasswordField } from "@/components/forms/FormPasswordField";
+import { SubmitButton } from "@/components/form-fields/SubmitButton";
+import { FormPasswordField } from "@/components/form-fields/FormPasswordField";
 
 import { Toast } from "@/components/feedback/Toast";
 
@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldLabel } from "@/components/ui/field";
 
 import { useLoginForm } from "@/hooks/useLoginForm";
-import { FormInputField } from "../forms/FormInputField";
+import { FormInputField } from "../form-fields/FormInputField";
 
 export function LoginForm() {
   const location = useLocation();

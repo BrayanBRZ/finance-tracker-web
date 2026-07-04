@@ -1,6 +1,6 @@
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { ErrorSpan } from '@/components/forms/ErrorSpan'
+import { ErrorSpan } from '@/components/form-fields/ErrorSpan'
 import { cn } from '@/lib/utils'
 
 export function FormInputField({

@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { ErrorSpan } from '@/components/forms/ErrorSpan'
+import { ErrorSpan } from '@/components/form-fields/ErrorSpan'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import {
   Select,
@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { FormInputField } from '@/components/forms/FormInputField'
+import { FormInputField } from '@/components/form-fields/FormInputField'
 import { FINANCIAL_TYPE_OPTIONS } from '@/domain/financialTypes'
 import { useCreateCategoryForm } from '@/hooks/useCreateCategoryForm'
 

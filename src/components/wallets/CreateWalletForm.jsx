@@ -6,8 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { ErrorSpan } from '@/components/forms/ErrorSpan'
-import { FormInputField } from '@/components/forms/FormInputField'
+import { ErrorSpan } from '@/components/form-fields/ErrorSpan'
+import { FormInputField } from '@/components/form-fields/FormInputField'
 import { FieldGroup } from '@/components/ui/field'
 import { useCreateWalletForm } from '@/hooks/useCreateWalletForm'
 
