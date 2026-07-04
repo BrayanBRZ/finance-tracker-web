@@ -14,7 +14,7 @@ export function DashboardPage() {
       <ContentWithAside>
         <Card className="p-4">
           <CardHeader>
-            <p className="text-sm font-medium text-primary">
+            <p className="text-primary text-sm font-medium">
               Dashboard da carteira
             </p>
             <CardTitle className="text-3xl">
@@ -22,7 +22,7 @@ export function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="max-w-2xl text-muted-foreground">
+            <p className="text-muted-foreground max-w-2xl">
               A carteira atual é {currentWallet?.name}. A estrutura financeira
               do dashboard será carregada somente dentro deste contexto.
             </p>

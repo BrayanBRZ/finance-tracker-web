@@ -1,8 +1,5 @@
 import { createMockId } from '@/mocks/utils/createMockId'
-import {
-  WALLET_MEMBER_ROLES,
-  WALLET_MEMBER_STATUS,
-} from '@/domain/walletRoles'
+import { WALLET_MEMBER_ROLES, WALLET_MEMBER_STATUS } from '@/domain/walletRoles'
 import { createIsoTimestamp } from '@/mocks/utils/date'
 import {
   normalizeOptionalText,

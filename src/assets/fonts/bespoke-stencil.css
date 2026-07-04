@@ -23,90 +23,102 @@
 */
 @font-face {
   font-family: 'BespokeStencil-Light';
-  src: url('./bespoke-stencil/BespokeStencil-Light.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-Light.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-Light.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-Light.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-Light.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-Light.ttf') format('truetype');
   font-weight: 300;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
   font-family: 'BespokeStencil-LightItalic';
-  src: url('./bespoke-stencil/BespokeStencil-LightItalic.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-LightItalic.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-LightItalic.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-LightItalic.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-LightItalic.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-LightItalic.ttf') format('truetype');
   font-weight: 300;
   font-display: swap;
   font-style: italic;
 }
 @font-face {
   font-family: 'BespokeStencil-Regular';
-  src: url('./bespoke-stencil/BespokeStencil-Regular.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-Regular.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-Regular.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-Regular.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-Regular.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-Regular.ttf') format('truetype');
   font-weight: 400;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
   font-family: 'BespokeStencil-Italic';
-  src: url('./bespoke-stencil/BespokeStencil-Italic.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-Italic.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-Italic.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-Italic.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-Italic.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-Italic.ttf') format('truetype');
   font-weight: 400;
   font-display: swap;
   font-style: italic;
 }
 @font-face {
   font-family: 'BespokeStencil-Medium';
-  src: url('./bespoke-stencil/BespokeStencil-Medium.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-Medium.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-Medium.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-Medium.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-Medium.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-Medium.ttf') format('truetype');
   font-weight: 500;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
   font-family: 'BespokeStencil-MediumItalic';
-  src: url('./bespoke-stencil/BespokeStencil-MediumItalic.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-MediumItalic.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-MediumItalic.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-MediumItalic.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-MediumItalic.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-MediumItalic.ttf') format('truetype');
   font-weight: 500;
   font-display: swap;
   font-style: italic;
 }
 @font-face {
   font-family: 'BespokeStencil-Bold';
-  src: url('./bespoke-stencil/BespokeStencil-Bold.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-Bold.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-Bold.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-Bold.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-Bold.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-Bold.ttf') format('truetype');
   font-weight: 700;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
   font-family: 'BespokeStencil-BoldItalic';
-  src: url('./bespoke-stencil/BespokeStencil-BoldItalic.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-BoldItalic.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-BoldItalic.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-BoldItalic.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-BoldItalic.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-BoldItalic.ttf') format('truetype');
   font-weight: 700;
   font-display: swap;
   font-style: italic;
 }
 @font-face {
   font-family: 'BespokeStencil-Extrabold';
-  src: url('./bespoke-stencil/BespokeStencil-Extrabold.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-Extrabold.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-Extrabold.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-Extrabold.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-Extrabold.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-Extrabold.ttf') format('truetype');
   font-weight: 800;
   font-display: swap;
   font-style: normal;
 }
 @font-face {
   font-family: 'BespokeStencil-ExtraboldItalic';
-  src: url('./bespoke-stencil/BespokeStencil-ExtraboldItalic.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-ExtraboldItalic.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-ExtraboldItalic.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-ExtraboldItalic.woff2')
+      format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-ExtraboldItalic.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-ExtraboldItalic.ttf')
+      format('truetype');
   font-weight: 800;
   font-display: swap;
   font-style: italic;
@@ -121,9 +133,10 @@
 */
 @font-face {
   font-family: 'BespokeStencil-Variable';
-  src: url('./bespoke-stencil/BespokeStencil-Variable.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-Variable.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-Variable.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-Variable.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-Variable.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-Variable.ttf') format('truetype');
   font-weight: 300 800;
   font-display: swap;
   font-style: normal;
@@ -138,11 +151,12 @@
 */
 @font-face {
   font-family: 'BespokeStencil-VariableItalic';
-  src: url('./bespoke-stencil/BespokeStencil-VariableItalic.woff2') format('woff2'),
-       url('./bespoke-stencil/BespokeStencil-VariableItalic.woff') format('woff'),
-       url('./bespoke-stencil/BespokeStencil-VariableItalic.ttf') format('truetype');
+  src:
+    url('./bespoke-stencil/BespokeStencil-VariableItalic.woff2') format('woff2'),
+    url('./bespoke-stencil/BespokeStencil-VariableItalic.woff') format('woff'),
+    url('./bespoke-stencil/BespokeStencil-VariableItalic.ttf')
+      format('truetype');
   font-weight: 300 800;
   font-display: swap;
   font-style: italic;
 }
-

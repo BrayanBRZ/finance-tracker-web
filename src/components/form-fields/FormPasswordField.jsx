@@ -40,7 +40,7 @@ export function FormPasswordField({
             size="icon"
             onClick={() => setShowPassword((current) => !current)}
             aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-            className="cursor-pointer rounded-sm text-muted-foreground focus:outline-none hover:bg-transparent"
+            className="text-muted-foreground cursor-pointer rounded-sm hover:bg-transparent focus:outline-none"
           >
             {showPassword ? (
               <EyeOff className="size-4" strokeWidth={1.5} />

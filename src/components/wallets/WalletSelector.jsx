@@ -22,7 +22,7 @@ export function WalletSelector() {
     <div className="min-w-52">
       <Label
         htmlFor="wallet-selector"
-        className="text-xs text-muted-foreground"
+        className="text-muted-foreground text-xs"
       >
         Carteira atual
       </Label>
@@ -39,9 +39,7 @@ export function WalletSelector() {
           aria-invalid={errorMessage ? true : undefined}
         >
           <SelectValue
-            placeholder={
-              isLoading ? 'Carregando...' : 'Nenhuma carteira'
-            }
+            placeholder={isLoading ? 'Carregando...' : 'Nenhuma carteira'}
           />
         </SelectTrigger>
 
@@ -55,7 +53,7 @@ export function WalletSelector() {
       </Select>
 
       {errorMessage ? (
-        <p id="wallet-selector-error" className="mt-1 text-xs text-destructive">
+        <p id="wallet-selector-error" className="text-destructive mt-1 text-xs">
           {errorMessage}
         </p>
       ) : null}

@@ -29,8 +29,7 @@ function CategoriesContent() {
     isLoading,
     refreshCategories,
   } = useCategories()
-  const canManageCategories =
-    currentWallet?.role === WALLET_MEMBER_ROLES.OWNER
+  const canManageCategories = currentWallet?.role === WALLET_MEMBER_ROLES.OWNER
 
   if (isLoading) {
     return (

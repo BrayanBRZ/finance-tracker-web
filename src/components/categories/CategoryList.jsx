@@ -7,10 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import {
-  FINANCIAL_TYPE_LABELS,
-  FINANCIAL_TYPES,
-} from '@/domain/financialTypes'
+import { FINANCIAL_TYPE_LABELS, FINANCIAL_TYPES } from '@/domain/financialTypes'
 import { cn } from '@/lib/utils'
 
 const categorySections = [
@@ -30,18 +27,18 @@ const categorySections = [
 
 function CategoryItem({ category }) {
   return (
-    <li className="rounded-xl border border-border bg-card p-4">
+    <li className="border-border bg-card rounded-xl border p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <span className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-lg">
               <Tags className="size-4" aria-hidden="true" />
             </span>
             <div className="min-w-0">
-              <p className="truncate font-medium text-card-foreground">
+              <p className="text-card-foreground truncate font-medium">
                 {category.name}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {FINANCIAL_TYPE_LABELS[category.type]}
               </p>
             </div>
@@ -52,17 +49,17 @@ function CategoryItem({ category }) {
       </div>
 
       {category.icon || category.color ? (
-        <dl className="mt-4 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+        <dl className="text-muted-foreground mt-4 grid gap-2 text-xs sm:grid-cols-2">
           {category.icon ? (
             <div>
-              <dt className="font-medium text-foreground">Ícone</dt>
+              <dt className="text-foreground font-medium">Ícone</dt>
               <dd>{category.icon}</dd>
             </div>
           ) : null}
 
           {category.color ? (
             <div>
-              <dt className="font-medium text-foreground">Cor</dt>
+              <dt className="text-foreground font-medium">Cor</dt>
               <dd>{category.color}</dd>
             </div>
           ) : null}
@@ -76,12 +73,10 @@ function CategorySection({ section, categories }) {
   return (
     <section className="space-y-3">
       <div>
-        <h3 className="font-heading text-lg font-medium text-foreground">
+        <h3 className="font-heading text-foreground text-lg font-medium">
           {section.title}
         </h3>
-        <p className="text-sm text-muted-foreground">
-          {section.description}
-        </p>
+        <p className="text-muted-foreground text-sm">{section.description}</p>
       </div>
 
       {categories.length > 0 ? (
@@ -91,7 +86,7 @@ function CategorySection({ section, categories }) {
           ))}
         </ul>
       ) : (
-        <div className="rounded-xl border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+        <div className="border-border bg-muted/40 text-muted-foreground rounded-xl border border-dashed p-4 text-sm">
           {section.emptyMessage}
         </div>
       )}
@@ -99,15 +94,11 @@ function CategorySection({ section, categories }) {
   )
 }
 
-export function CategoryList({
-  groupedCategories,
-  hasCategories,
-  className,
-}) {
+export function CategoryList({ groupedCategories, hasCategories, className }) {
   return (
     <Card className={cn('p-4', className)}>
       <CardHeader>
-        <p className="text-sm font-medium text-primary">
+        <p className="text-primary text-sm font-medium">
           Categorias cadastradas
         </p>
         <CardTitle className="text-2xl">Organização financeira</CardTitle>
@@ -118,7 +109,7 @@ export function CategoryList({
 
       <CardContent className="space-y-6">
         {!hasCategories ? (
-          <div className="rounded-xl border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
+          <div className="border-border bg-muted/40 text-muted-foreground rounded-xl border border-dashed p-5 text-sm">
             Nenhuma categoria cadastrada para esta carteira.
           </div>
         ) : null}

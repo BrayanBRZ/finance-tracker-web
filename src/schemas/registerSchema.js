@@ -17,9 +17,7 @@ export const registerSchema = z
       .string()
       .min(1, 'Senha é obrigatória')
       .min(6, 'Mínimo 6 caracteres'),
-    confirmPassword: z
-      .string()
-      .min(1, 'Confirmação de senha é obrigatória'),
+    confirmPassword: z.string().min(1, 'Confirmação de senha é obrigatória'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'As senhas não coincidem',

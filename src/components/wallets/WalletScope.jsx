@@ -4,12 +4,7 @@ import { CreateWalletForm } from '@/components/wallets/CreateWalletForm'
 import { useWallet } from '@/context/walletContext'
 
 export function WalletScope({ children }) {
-  const {
-    currentWallet,
-    errorMessage,
-    isLoading,
-    refreshWallets,
-  } = useWallet()
+  const { currentWallet, errorMessage, isLoading, refreshWallets } = useWallet()
 
   if (isLoading) {
     return (

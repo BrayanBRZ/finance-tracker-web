@@ -60,31 +60,36 @@ export function useCategories() {
     }
   }, [userId, walletId])
 
-  const createCategory = useCallback(async (categoryData) => {
-    if (!userId || !walletId) {
-      const error = new Error('Selecione uma carteira antes de criar categorias.')
+  const createCategory = useCallback(
+    async (categoryData) => {
+      if (!userId || !walletId) {
+        const error = new Error(
+          'Selecione uma carteira antes de criar categorias.',
+        )
 
-      setErrorMessage(error.message)
-      throw error
-    }
+        setErrorMessage(error.message)
+        throw error
+      }
 
-    setErrorMessage(null)
+      setErrorMessage(null)
 
-    try {
-      const { category } = await createCategoryOperation({
-        userId,
-        walletId,
-        ...categoryData,
-      })
+      try {
+        const { category } = await createCategoryOperation({
+          userId,
+          walletId,
+          ...categoryData,
+        })
 
-      setCategories((currentCategories) => [...currentCategories, category])
+        setCategories((currentCategories) => [...currentCategories, category])
 
-      return category
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error))
-      throw error
-    }
-  }, [userId, walletId])
+        return category
+      } catch (error) {
+        setErrorMessage(getErrorMessage(error))
+        throw error
+      }
+    },
+    [userId, walletId],
+  )
 
   useEffect(() => {
     let isActive = true

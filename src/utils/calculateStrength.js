@@ -1,5 +1,6 @@
 export function evaluatePasswordStrength(password) {
-  if (!password) return { score: 0, label: '', color: '', textColor: '', criteria: [] }
+  if (!password)
+    return { score: 0, label: '', color: '', textColor: '', criteria: [] }
 
   const criteria = [
     { test: password.length >= 6 },

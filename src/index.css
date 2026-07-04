@@ -1,11 +1,11 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
-@import "@fontsource/google-sans";
-@import "@fontsource/yeseva-one";
-@import "@fontsource/marmelad";
-@import "./assets/fonts/bespoke-stencil.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/geist';
+@import '@fontsource/google-sans';
+@import '@fontsource/yeseva-one';
+@import '@fontsource/marmelad';
+@import './assets/fonts/bespoke-stencil.css';
 
 @custom-variant dark (&:is(.dark *));
 

@@ -19,14 +19,12 @@ export function DashboardLayout() {
   }
 
   return (
-    <div className="min-h-svh bg-background text-foreground">
-      <header className="border-b border-border bg-card">
+    <div className="bg-background text-foreground min-h-svh">
+      <header className="border-border bg-card border-b">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-medium text-primary">
-              Finance Tracker
-            </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-primary text-sm font-medium">Finance Tracker</p>
+            <p className="text-muted-foreground text-sm">
               Olá, {session?.user.name}
             </p>
           </div>

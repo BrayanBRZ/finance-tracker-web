@@ -1,8 +1,5 @@
 import { createMockId } from '@/mocks/utils/createMockId'
-import {
-  normalizeEmail,
-  normalizeRequiredText,
-} from '@/mocks/utils/text'
+import { normalizeEmail, normalizeRequiredText } from '@/mocks/utils/text'
 
 export function createUser({ name, email, password }) {
   return {

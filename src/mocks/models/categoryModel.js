@@ -1,8 +1,5 @@
 import { createMockId } from '@/mocks/utils/createMockId'
-import {
-  FINANCIAL_TYPES,
-  isKnownFinancialType,
-} from '@/domain/financialTypes'
+import { FINANCIAL_TYPES, isKnownFinancialType } from '@/domain/financialTypes'
 import { createIsoTimestamp } from '@/mocks/utils/date'
 import {
   normalizeOptionalText,

@@ -52,36 +52,39 @@ export function WalletProvider({ children }) {
     setErrorMessage(null)
   }, [])
 
-  const loadWalletState = useCallback(async (userId) => {
-    setIsLoading(true)
-    setErrorMessage(null)
+  const loadWalletState = useCallback(
+    async (userId) => {
+      setIsLoading(true)
+      setErrorMessage(null)
 
-    try {
-      const nextWallets = await listWalletsForUser(userId)
-      const nextCurrentWallet = resolveCurrentWallet({
-        userId,
-        wallets: nextWallets,
-      })
+      try {
+        const nextWallets = await listWalletsForUser(userId)
+        const nextCurrentWallet = resolveCurrentWallet({
+          userId,
+          wallets: nextWallets,
+        })
 
-      setWallets(nextWallets)
-      setCurrentWallet(nextCurrentWallet)
+        setWallets(nextWallets)
+        setCurrentWallet(nextCurrentWallet)
 
-      return {
-        wallets: nextWallets,
-        currentWallet: nextCurrentWallet,
+        return {
+          wallets: nextWallets,
+          currentWallet: nextCurrentWallet,
+        }
+      } catch (error) {
+        resetWalletState()
+        setErrorMessage(getErrorMessage(error))
+
+        return {
+          wallets: [],
+          currentWallet: null,
+        }
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      resetWalletState()
-      setErrorMessage(getErrorMessage(error))
-
-      return {
-        wallets: [],
-        currentWallet: null,
-      }
-    } finally {
-      setIsLoading(false)
-    }
-  }, [resetWalletState])
+    },
+    [resetWalletState],
+  )
 
   const refreshWallets = useCallback(async () => {
     if (!userId) {
@@ -96,70 +99,78 @@ export function WalletProvider({ children }) {
     return loadWalletState(userId)
   }, [loadWalletState, resetWalletState, userId])
 
-  const handleSelectWallet = useCallback(async (walletId) => {
-    if (!userId) {
-      resetWalletState()
+  const handleSelectWallet = useCallback(
+    async (walletId) => {
+      if (!userId) {
+        resetWalletState()
 
-      return null
-    }
-
-    setErrorMessage(null)
-
-    try {
-      const wallet = wallets.find((candidate) =>
-        isSameId(candidate.id, walletId),
-      )
-
-      if (!wallet) {
-        throw new Error('Carteira não encontrada ou sem acesso')
+        return null
       }
 
-      setCurrentWallet(wallet)
-      writeSelectedWalletId({ userId, walletId: wallet.id })
+      setErrorMessage(null)
 
-      return wallet
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error))
-      return null
-    }
-  }, [resetWalletState, userId, wallets])
+      try {
+        const wallet = wallets.find((candidate) =>
+          isSameId(candidate.id, walletId),
+        )
 
-  const handleCreateWallet = useCallback(async (walletData) => {
-    if (!userId) {
-      const error = new Error('Sessão expirada. Faça login novamente.')
-
-      resetWalletState()
-      setErrorMessage(error.message)
-
-      throw error
-    }
-
-    setErrorMessage(null)
-
-    try {
-      const { wallet } = await createWalletOperation({
-        userId,
-        ...walletData,
-      })
-
-      setWallets((currentWallets) => {
-        if (currentWallets.some((current) => isSameId(current.id, wallet.id))) {
-          return currentWallets.map((current) =>
-            isSameId(current.id, wallet.id) ? wallet : current,
-          )
+        if (!wallet) {
+          throw new Error('Carteira não encontrada ou sem acesso')
         }
 
-        return [...currentWallets, wallet]
-      })
-      setCurrentWallet(wallet)
-      writeSelectedWalletId({ userId, walletId: wallet.id })
+        setCurrentWallet(wallet)
+        writeSelectedWalletId({ userId, walletId: wallet.id })
 
-      return wallet
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error))
-      throw error
-    }
-  }, [resetWalletState, userId])
+        return wallet
+      } catch (error) {
+        setErrorMessage(getErrorMessage(error))
+        return null
+      }
+    },
+    [resetWalletState, userId, wallets],
+  )
+
+  const handleCreateWallet = useCallback(
+    async (walletData) => {
+      if (!userId) {
+        const error = new Error('Sessão expirada. Faça login novamente.')
+
+        resetWalletState()
+        setErrorMessage(error.message)
+
+        throw error
+      }
+
+      setErrorMessage(null)
+
+      try {
+        const { wallet } = await createWalletOperation({
+          userId,
+          ...walletData,
+        })
+
+        setWallets((currentWallets) => {
+          if (
+            currentWallets.some((current) => isSameId(current.id, wallet.id))
+          ) {
+            return currentWallets.map((current) =>
+              isSameId(current.id, wallet.id) ? wallet : current,
+            )
+          }
+
+          return [...currentWallets, wallet]
+        })
+        setCurrentWallet(wallet)
+        writeSelectedWalletId({ userId, walletId: wallet.id })
+
+        return wallet
+      } catch (error) {
+        setErrorMessage(getErrorMessage(error))
+        throw error
+      }
+    },
+    [resetWalletState, userId],
+  )
 
   useEffect(() => {
     let isActive = true
@@ -188,12 +199,7 @@ export function WalletProvider({ children }) {
     return () => {
       isActive = false
     }
-  }, [
-    isSessionLoading,
-    loadWalletState,
-    resetWalletState,
-    userId,
-  ])
+  }, [isSessionLoading, loadWalletState, resetWalletState, userId])
 
   return (
     <WalletContext.Provider

@@ -18,7 +18,7 @@ export function FormInputField({
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
       <Input
         id={id}
-        type={type ? type : "text"}
+        type={type ? type : 'text'}
         className={cn('h-10 pr-10', className)}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}

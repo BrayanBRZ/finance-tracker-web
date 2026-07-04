@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 export function StateCard({
@@ -18,14 +13,14 @@ export function StateCard({
     <Card role={role} aria-live={ariaLive} className="p-4">
       <CardHeader>
         {eyebrow ? (
-          <p className="text-sm font-medium text-primary">{eyebrow}</p>
+          <p className="text-primary text-sm font-medium">{eyebrow}</p>
         ) : null}
         <CardTitle className="text-3xl">{title}</CardTitle>
       </CardHeader>
 
       <CardContent>
         {description ? (
-          <p className="max-w-2xl text-muted-foreground">{description}</p>
+          <p className="text-muted-foreground max-w-2xl">{description}</p>
         ) : null}
 
         {action ? (
