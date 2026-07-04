@@ -9,7 +9,7 @@ const strengthClasses = {
   5: 'bg-primary',
 }
 
-export function PasswordStrengthIndicator({ password }) {
+export function AuthPasswordStrengthIndicator({ password, className }) {
   if (!password) {
     return null
   }
@@ -18,7 +18,7 @@ export function PasswordStrengthIndicator({ password }) {
   const bars = 5
 
   return (
-    <div className="flex items-center gap-1.5 pt-4 pr-1">
+    <div className={cn('flex items-center gap-1 pt-3 pr-1', className)}>
       {Array.from({ length: bars }).map((_, index) => (
         <div
           key={index}

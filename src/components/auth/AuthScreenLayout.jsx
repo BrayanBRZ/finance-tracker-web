@@ -33,10 +33,10 @@ export function AuthFormHeader({
 }) {
   return (
     <header
-      className={cn('mt-2 mb-2 flex flex-col items-start gap-2', className)}
+      className={cn('mb-1 flex flex-col items-start gap-1.5', className)}
     >
-      <h1 className="text-4xl tracking-tight text-foreground">{title}</h1>
-      <p className="mt-2 text-base text-muted-foreground">
+      <h1 className="text-3xl tracking-tight text-foreground">{title}</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
         {description} {action}
       </p>
     </header>
