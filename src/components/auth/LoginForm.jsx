@@ -77,7 +77,7 @@ export function LoginForm() {
             error={errors.password?.message}
           />
 
-          <div className="flex justify-between gap-3">
+          <div className="flex gap-3">
             <Field
               orientation="horizontal"
               className="flex max-w-40 items-center gap-1.5"
@@ -108,12 +108,6 @@ export function LoginForm() {
               </FieldLabel>
             </Field>
 
-            <Link
-              to="/recuperar-senha"
-              className="max-w-36 text-xs text-foreground underline-offset-4 hover:underline"
-            >
-              Esqueceu a senha?
-            </Link>
           </div>
 
           <AuthFormSubmit buttonText="Entrar" isSubmitting={isSubmitting} />
