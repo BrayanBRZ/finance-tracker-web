@@ -2,8 +2,13 @@ import { useCallback, useEffect, useState } from 'react'
 import { useSession } from '@/context/sessionContext'
 import { WalletContext } from '@/context/walletContext'
 import {
+  addWalletMember as addWalletMemberOperation,
   createWallet as createWalletOperation,
+  listWalletMembersForUser,
   listWalletsForUser,
+  removeWalletMember as removeWalletMemberOperation,
+  updateWallet as updateWalletOperation,
+  updateWalletMemberRole as updateWalletMemberRoleOperation,
 } from '@/services/walletService'
 import {
   clearSelectedWalletId,
@@ -161,6 +166,61 @@ export function WalletProvider({ children }) {
     }
   }, [resetWalletState, userId])
 
+  const updateCurrentWallet = useCallback(async (walletData) => {
+    if (!userId || !currentWallet) {
+      throw new Error('Selecione uma carteira antes de continuar.')
+    }
+
+    const { wallet } = await updateWalletOperation({
+      userId,
+      walletId: currentWallet.id,
+      ...walletData,
+    })
+
+    setWallets((currentWallets) =>
+      currentWallets.map((candidate) =>
+        isSameId(candidate.id, wallet.id) ? wallet : candidate,
+      ),
+    )
+    setCurrentWallet(wallet)
+
+    return wallet
+  }, [currentWallet, userId])
+
+  const requireCurrentWallet = useCallback(() => {
+    if (!userId || !currentWallet) {
+      throw new Error('Selecione uma carteira antes de continuar.')
+    }
+
+    return { userId, walletId: currentWallet.id }
+  }, [currentWallet, userId])
+
+  const listCurrentWalletMembers = useCallback(() => {
+    return listWalletMembersForUser(requireCurrentWallet())
+  }, [requireCurrentWallet])
+
+  const addCurrentWalletMember = useCallback((memberData) => {
+    return addWalletMemberOperation({
+      ...requireCurrentWallet(),
+      ...memberData,
+    })
+  }, [requireCurrentWallet])
+
+  const updateCurrentWalletMemberRole = useCallback((memberUserId, role) => {
+    return updateWalletMemberRoleOperation({
+      ...requireCurrentWallet(),
+      memberUserId,
+      role,
+    })
+  }, [requireCurrentWallet])
+
+  const removeCurrentWalletMember = useCallback((memberUserId) => {
+    return removeWalletMemberOperation({
+      ...requireCurrentWallet(),
+      memberUserId,
+    })
+  }, [requireCurrentWallet])
+
   useEffect(() => {
     let isActive = true
 
@@ -206,6 +266,11 @@ export function WalletProvider({ children }) {
         refreshWallets,
         selectWallet: handleSelectWallet,
         createWallet: handleCreateWallet,
+        updateWallet: updateCurrentWallet,
+        listWalletMembers: listCurrentWalletMembers,
+        addWalletMember: addCurrentWalletMember,
+        updateWalletMemberRole: updateCurrentWalletMemberRole,
+        removeWalletMember: removeCurrentWalletMember,
       }}
     >
       {children}

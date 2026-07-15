@@ -12,3 +12,11 @@ export function findWalletById(walletId) {
 export function appendWallet(wallet) {
   writeWallets([...listWallets(), wallet])
 }
+
+export function replaceWallet(nextWallet) {
+  writeWallets(
+    listWallets().map((wallet) =>
+      isSameId(wallet.id, nextWallet.id) ? nextWallet : wallet,
+    ),
+  )
+}
