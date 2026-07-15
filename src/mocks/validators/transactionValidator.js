@@ -17,7 +17,10 @@ export function validateTransactionInput({ description, amount, transactionDate 
 
   const parsedDate = new Date(`${transactionDate}T00:00:00`)
 
-  if (Number.isNaN(parsedDate.getTime())) {
+  if (
+    Number.isNaN(parsedDate.getTime()) ||
+    parsedDate.toISOString().slice(0, 10) !== transactionDate
+  ) {
     throw new Error('Informe uma data válida')
   }
 }

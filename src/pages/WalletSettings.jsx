@@ -1,6 +1,7 @@
 import { ContentWithAside } from '@/components/layout/ContentWithAside'
 import { StateCard } from '@/components/feedback/StateCard'
 import { EditWalletForm } from '@/components/wallets/EditWalletForm'
+import { CreateWalletForm } from '@/components/wallets/CreateWalletForm'
 import { WalletMembersCard } from '@/components/wallets/WalletMembersCard'
 import { WalletScope } from '@/components/wallets/WalletScope'
 import { useWallet } from '@/context/walletContext'
@@ -13,17 +14,20 @@ function WalletSettingsContent() {
   return (
     <ContentWithAside>
       <WalletMembersCard />
-      {isOwner ? (
-        <EditWalletForm />
-      ) : (
-        <StateCard
-          eyebrow="Acesso de leitura"
-          title="Apenas o proprietário pode editar a carteira"
-          description="Você pode consultar os membros, mas não alterar informações ou acessos."
-          role="status"
-          ariaLive="polite"
-        />
-      )}
+      <div className="space-y-6">
+        {isOwner ? (
+          <EditWalletForm />
+        ) : (
+          <StateCard
+            eyebrow="Acesso de leitura"
+            title="Apenas o proprietário pode editar a carteira"
+            description="Você pode consultar os membros, mas não alterar informações ou acessos."
+            role="status"
+            ariaLive="polite"
+          />
+        )}
+        <CreateWalletForm title="Criar outra carteira" />
+      </div>
     </ContentWithAside>
   )
 }
