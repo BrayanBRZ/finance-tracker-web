@@ -25,3 +25,17 @@ export function findCategoryById(categoryId) {
 export function appendCategory(category) {
   writeCategories([...listCategories(), category])
 }
+
+export function replaceCategory(nextCategory) {
+  writeCategories(
+    listCategories().map((category) =>
+      isSameId(category.id, nextCategory.id) ? nextCategory : category,
+    ),
+  )
+}
+
+export function removeCategory(categoryId) {
+  writeCategories(
+    listCategories().filter((category) => !isSameId(category.id, categoryId)),
+  )
+}

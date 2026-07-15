@@ -28,6 +28,16 @@ export function createCategory({
   }
 }
 
+export function updateCategory({ category, name, type, color = '', icon = '' }) {
+  return {
+    ...category,
+    name: normalizeRequiredText(name),
+    type,
+    color: normalizeOptionalText(color),
+    icon: normalizeOptionalText(icon),
+  }
+}
+
 export function toPublicCategory(category) {
   return {
     id: category.id,

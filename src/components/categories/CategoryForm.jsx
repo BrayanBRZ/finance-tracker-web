@@ -1,4 +1,5 @@
-import { Controller } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -18,32 +19,56 @@ import {
 } from '@/components/ui/select'
 import { TextField } from '@/components/forms/TextField'
 import { FINANCIAL_TYPE_OPTIONS } from '@/domain/financialTypes'
-import { useCreateCategoryForm } from '@/hooks/useCreateCategoryForm'
+import { categorySchema } from '@/schemas/categorySchema'
 
-export function CreateCategoryForm({ createCategory, disabled = false }) {
-  const {
-    form: {
-      control,
-      register,
-      handleSubmit,
-      formState: { errors, isSubmitting },
+export function CategoryForm({ category, onSubmit, onCancel }) {
+  const isEditing = Boolean(category)
+  const form = useForm({
+    resolver: zodResolver(categorySchema),
+    mode: 'onTouched',
+    values: {
+      name: category?.name ?? '',
+      type: category?.type ?? '',
+      icon: category?.icon ?? '',
+      color: category?.color ?? '',
     },
-    onSubmit,
-  } = useCreateCategoryForm({ createCategory })
+  })
+  const {
+    control,
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = form
 
-  const isDisabled = disabled || isSubmitting
+  const submit = async (categoryData) => {
+    try {
+      form.clearErrors('root')
+      await onSubmit(categoryData)
+      if (!isEditing) reset()
+    } catch (error) {
+      form.setError('root.server', {
+        type: 'server',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível salvar a categoria.',
+      })
+    }
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Criar categoria</CardTitle>
+        <CardTitle className="text-xl">
+          {isEditing ? 'Editar categoria' : 'Criar categoria'}
+        </CardTitle>
         <CardDescription>
-          Categorias pertencem à carteira atual e serão usadas nos lançamentos.
+          Categorias pertencem à carteira atual e classificam os lançamentos.
         </CardDescription>
       </CardHeader>
-
       <CardContent>
-        <form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <form noValidate onSubmit={handleSubmit(submit)}>
           <FieldGroup className="gap-4">
             <TextField
               id="category-name"
@@ -51,10 +76,9 @@ export function CreateCategoryForm({ createCategory, disabled = false }) {
               placeholder="Ex.: Mercado, Salário, Transporte"
               autoComplete="off"
               {...register('name')}
-              disabled={isDisabled}
+              disabled={isSubmitting}
               error={errors.name?.message}
             />
-
             <Controller
               control={control}
               name="type"
@@ -65,19 +89,13 @@ export function CreateCategoryForm({ createCategory, disabled = false }) {
                     value={field.value}
                     onValueChange={field.onChange}
                     onOpenChange={(isOpen) => {
-                      if (!isOpen) {
-                        field.onBlur()
-                      }
+                      if (!isOpen) field.onBlur()
                     }}
-                    disabled={isDisabled}
+                    disabled={isSubmitting}
                   >
                     <SelectTrigger
                       id="category-type"
-                      className="h-11 w-full"
                       aria-invalid={errors.type ? true : undefined}
-                      aria-describedby={
-                        errors.type ? 'category-type-error' : undefined
-                      }
                     >
                       <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
@@ -89,14 +107,10 @@ export function CreateCategoryForm({ createCategory, disabled = false }) {
                       ))}
                     </SelectContent>
                   </Select>
-                  <ErrorSpan
-                    id="category-type-error"
-                    error={errors.type?.message}
-                  />
+                  <ErrorSpan id="category-type-error" error={errors.type?.message} />
                 </Field>
               )}
             />
-
             <div className="grid gap-4 sm:grid-cols-2">
               <TextField
                 id="category-icon"
@@ -104,25 +118,33 @@ export function CreateCategoryForm({ createCategory, disabled = false }) {
                 placeholder="Opcional"
                 autoComplete="off"
                 {...register('icon')}
-                disabled={isDisabled}
+                disabled={isSubmitting}
                 error={errors.icon?.message}
               />
-
               <TextField
                 id="category-color"
                 label="Cor"
                 placeholder="Opcional"
                 autoComplete="off"
                 {...register('color')}
-                disabled={isDisabled}
+                disabled={isSubmitting}
                 error={errors.color?.message}
               />
             </div>
-
-            <Button type="submit" disabled={isDisabled} className="h-11">
-              {isSubmitting ? 'Criando...' : 'Criar categoria'}
-            </Button>
-
+            <div className="flex flex-wrap gap-2">
+              <Button type="submit" disabled={isSubmitting} className="h-11">
+                {isSubmitting
+                  ? 'Salvando...'
+                  : isEditing
+                    ? 'Salvar alterações'
+                    : 'Criar categoria'}
+              </Button>
+              {isEditing ? (
+                <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting} className="h-11">
+                  Cancelar
+                </Button>
+              ) : null}
+            </div>
             <ErrorSpan
               id="category-form-error"
               error={errors.root?.server?.message}

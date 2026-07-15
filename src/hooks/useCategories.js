@@ -5,6 +5,8 @@ import { useWallet } from '@/context/walletContext'
 import {
   createCategory as createCategoryOperation,
   listCategoriesForWallet,
+  removeCategory as removeCategoryOperation,
+  updateCategory as updateCategoryOperation,
 } from '@/services/categoryService'
 
 const getErrorMessage = (error) =>
@@ -70,20 +72,47 @@ export function useCategories() {
 
     setErrorMessage(null)
 
-    try {
-      const { category } = await createCategoryOperation({
-        userId,
-        walletId,
-        ...categoryData,
-      })
+    const { category } = await createCategoryOperation({
+      userId,
+      walletId,
+      ...categoryData,
+    })
 
-      setCategories((currentCategories) => [...currentCategories, category])
+    setCategories((currentCategories) => [...currentCategories, category])
 
-      return category
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error))
-      throw error
+    return category
+  }, [userId, walletId])
+
+  const updateCategory = useCallback(async (categoryId, categoryData) => {
+    if (!userId || !walletId) {
+      throw new Error('Selecione uma carteira antes de editar categorias.')
     }
+
+    const { category } = await updateCategoryOperation({
+      userId,
+      walletId,
+      categoryId,
+      ...categoryData,
+    })
+
+    setCategories((currentCategories) =>
+      currentCategories.map((currentCategory) =>
+        currentCategory.id === category.id ? category : currentCategory,
+      ),
+    )
+
+    return category
+  }, [userId, walletId])
+
+  const removeCategory = useCallback(async (categoryId) => {
+    if (!userId || !walletId) {
+      throw new Error('Selecione uma carteira antes de excluir categorias.')
+    }
+
+    await removeCategoryOperation({ userId, walletId, categoryId })
+    setCategories((currentCategories) =>
+      currentCategories.filter((category) => category.id !== categoryId),
+    )
   }, [userId, walletId])
 
   useEffect(() => {
@@ -117,5 +146,7 @@ export function useCategories() {
     errorMessage,
     refreshCategories: loadCategories,
     createCategory,
+    updateCategory,
+    removeCategory,
   }
 }
