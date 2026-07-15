@@ -4,6 +4,7 @@ import { RegisterPage } from './pages/Register'
 import { DashboardPage } from './pages/Dashboard'
 import { CategoriesPage } from './pages/Categories'
 import { WalletSettingsPage } from './pages/WalletSettings'
+import { TransactionsPage } from './pages/Transactions'
 import AuthGuard from '@/components/guards/AuthGuard'
 import GuestGuard from '@/components/guards/GuestGuard'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -28,6 +29,7 @@ function App() {
           >
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/categorias" element={<CategoriesPage />} />
+            <Route path="/transacoes" element={<TransactionsPage />} />
             <Route path="/carteiras" element={<WalletSettingsPage />} />
           </Route>
         </Route>

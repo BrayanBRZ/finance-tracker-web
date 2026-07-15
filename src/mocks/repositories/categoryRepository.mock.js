@@ -18,6 +18,10 @@ export function findCategoryByNameInWallet({ walletId, name }) {
   )
 }
 
+export function findCategoryById(categoryId) {
+  return listCategories().find((category) => isSameId(category.id, categoryId))
+}
+
 export function appendCategory(category) {
   writeCategories([...listCategories(), category])
 }

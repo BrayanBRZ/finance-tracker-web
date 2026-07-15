@@ -7,6 +7,7 @@ import { WalletSelector } from '@/components/wallets/WalletSelector'
 const navigationItems = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/categorias', label: 'Categorias' },
+  { to: '/transacoes', label: 'Transações' },
   { to: '/carteiras', label: 'Carteira' },
 ]
 
