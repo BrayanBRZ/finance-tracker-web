@@ -107,7 +107,12 @@ export function LoginForm() {
                 Lembre-se de mim
               </FieldLabel>
             </Field>
-
+            <Link
+              to="/recuperar-senha"
+              className="ml-auto text-xs font-medium text-foreground underline-offset-4 hover:underline"
+            >
+              Esqueci minha senha
+            </Link>
           </div>
 
           <AuthFormSubmit buttonText="Entrar" isSubmitting={isSubmitting} />

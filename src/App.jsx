@@ -5,6 +5,9 @@ import { DashboardPage } from './pages/Dashboard'
 import { CategoriesPage } from './pages/Categories'
 import { WalletSettingsPage } from './pages/WalletSettings'
 import { TransactionsPage } from './pages/Transactions'
+import { ForgotPasswordPage } from './pages/ForgotPassword'
+import { ResetPasswordPage } from './pages/ResetPassword'
+import { ChangePasswordPage } from './pages/ChangePassword'
 import AuthGuard from '@/components/guards/AuthGuard'
 import GuestGuard from '@/components/guards/GuestGuard'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -17,6 +20,8 @@ function App() {
         <Route element={<GuestGuard />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/cadastro" element={<RegisterPage />} />
+          <Route path="/recuperar-senha" element={<ForgotPasswordPage />} />
+          <Route path="/redefinir-senha/:token" element={<ResetPasswordPage />} />
         </Route>
 
         <Route element={<AuthGuard />}>
@@ -31,6 +36,7 @@ function App() {
             <Route path="/categorias" element={<CategoriesPage />} />
             <Route path="/transacoes" element={<TransactionsPage />} />
             <Route path="/carteiras" element={<WalletSettingsPage />} />
+            <Route path="/app/perfil/senha" element={<ChangePasswordPage />} />
           </Route>
         </Route>
 

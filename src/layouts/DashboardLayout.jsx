@@ -9,6 +9,7 @@ const navigationItems = [
   { to: '/categorias', label: 'Categorias' },
   { to: '/transacoes', label: 'Transações' },
   { to: '/carteiras', label: 'Carteira' },
+  { to: '/app/perfil/senha', label: 'Senha' },
 ]
 
 export function DashboardLayout() {
