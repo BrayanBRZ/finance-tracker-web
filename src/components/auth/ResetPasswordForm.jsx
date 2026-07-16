@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   AuthFormHeader,
@@ -24,9 +24,10 @@ export function ResetPasswordForm() {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = form
+  const newPassword = useWatch({ control, name: 'newPassword' })
 
   const submit = async ({ newPassword }) => {
     if (!token) {
@@ -61,7 +62,7 @@ export function ResetPasswordForm() {
           {...register('newPassword')}
           disabled={isSubmitting}
           error={errors.newPassword?.message}
-          labelAddon={<AuthPasswordStrengthIndicator password={watch('newPassword', '')} />}
+          labelAddon={<AuthPasswordStrengthIndicator password={newPassword ?? ''} />}
         />
         <AuthPasswordField
           id="reset-password-confirmation"

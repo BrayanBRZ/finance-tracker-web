@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AuthForm } from '@/components/auth/form/AuthForm'
 import { AuthFormError } from '@/components/auth/form/AuthFormError'
@@ -26,9 +26,10 @@ export function ChangePasswordForm() {
     register,
     handleSubmit,
     reset,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = form
+  const newPassword = useWatch({ control, name: 'newPassword' })
 
   const submit = async ({ currentPassword, newPassword }) => {
     try {
@@ -66,7 +67,7 @@ export function ChangePasswordForm() {
         {...register('newPassword')}
         disabled={isSubmitting}
         error={errors.newPassword?.message}
-        labelAddon={<AuthPasswordStrengthIndicator password={watch('newPassword', '')} />}
+        labelAddon={<AuthPasswordStrengthIndicator password={newPassword ?? ''} />}
       />
       <AuthPasswordField
         id="new-password-confirmation"
