@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FINANCIAL_TYPES } from '@/domain/financialTypes'
 import { useSession } from '@/context/sessionContext'
-import { useWallet } from '@/context/walletContext'
 import {
   createCategory as createCategoryOperation,
-  listCategoriesForWallet,
+  listCategoriesForUser,
   removeCategory as removeCategoryOperation,
   updateCategory as updateCategoryOperation,
 } from '@/services/categoryService'
@@ -25,18 +24,15 @@ const groupCategoriesByType = (categories) => ({
 
 export function useCategories() {
   const { session } = useSession()
-  const { currentWallet } = useWallet()
   const userId = session?.user.id
-  const walletId = currentWallet?.id
   const [categories, setCategories] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
 
   const loadCategories = useCallback(async () => {
-    if (!userId || !walletId) {
+    if (!userId) {
       setCategories([])
       setErrorMessage(null)
-
       return []
     }
 
@@ -44,53 +40,36 @@ export function useCategories() {
     setErrorMessage(null)
 
     try {
-      const nextCategories = await listCategoriesForWallet({
-        userId,
-        walletId,
-      })
-
+      const nextCategories = await listCategoriesForUser({ userId })
       setCategories(nextCategories)
-
       return nextCategories
     } catch (error) {
       setCategories([])
       setErrorMessage(getErrorMessage(error))
-
       return []
     } finally {
       setIsLoading(false)
     }
-  }, [userId, walletId])
+  }, [userId])
 
   const createCategory = useCallback(async (categoryData) => {
-    if (!userId || !walletId) {
-      const error = new Error('Selecione uma carteira antes de criar categorias.')
-
+    if (!userId) {
+      const error = new Error('Faça login para criar categorias.')
       setErrorMessage(error.message)
       throw error
     }
 
     setErrorMessage(null)
-
-    const { category } = await createCategoryOperation({
-      userId,
-      walletId,
-      ...categoryData,
-    })
-
+    const { category } = await createCategoryOperation({ userId, ...categoryData })
     setCategories((currentCategories) => [...currentCategories, category])
-
     return category
-  }, [userId, walletId])
+  }, [userId])
 
   const updateCategory = useCallback(async (categoryId, categoryData) => {
-    if (!userId || !walletId) {
-      throw new Error('Selecione uma carteira antes de editar categorias.')
-    }
+    if (!userId) throw new Error('Faça login para editar categorias.')
 
     const { category } = await updateCategoryOperation({
       userId,
-      walletId,
       categoryId,
       ...categoryData,
     })
@@ -102,35 +81,24 @@ export function useCategories() {
     )
 
     return category
-  }, [userId, walletId])
+  }, [userId])
 
   const removeCategory = useCallback(async (categoryId) => {
-    if (!userId || !walletId) {
-      throw new Error('Selecione uma carteira antes de excluir categorias.')
-    }
+    if (!userId) throw new Error('Faça login para excluir categorias.')
 
-    await removeCategoryOperation({ userId, walletId, categoryId })
+    await removeCategoryOperation({ userId, categoryId })
     setCategories((currentCategories) =>
       currentCategories.filter((category) => category.id !== categoryId),
     )
-  }, [userId, walletId])
+  }, [userId])
 
   useEffect(() => {
-    let isActive = true
-
-    const syncCategories = async () => {
+    const synchronizeCategories = async () => {
       await Promise.resolve()
-
-      if (isActive) {
-        await loadCategories()
-      }
+      await loadCategories()
     }
 
-    void syncCategories()
-
-    return () => {
-      isActive = false
-    }
+    void synchronizeCategories()
   }, [loadCategories])
 
   const groupedCategories = useMemo(

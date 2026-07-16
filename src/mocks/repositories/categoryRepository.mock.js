@@ -6,14 +6,14 @@ export function listCategories() {
   return readCategories()
 }
 
-export function listCategoriesByWalletId(walletId) {
+export function listCategoriesByUserId(userId) {
   return listCategories().filter((category) =>
-    isSameId(category.walletId, walletId),
+    isSameId(category.userId, userId),
   )
 }
 
-export function findCategoryByNameInWallet({ walletId, name }) {
-  return listCategoriesByWalletId(walletId).find((category) =>
+export function findCategoryByNameForUser({ userId, name }) {
+  return listCategoriesByUserId(userId).find((category) =>
     isSameNormalizedText(category.name, name),
   )
 }

@@ -3,25 +3,9 @@ import { CategoryForm } from '@/components/categories/CategoryForm'
 import { CategoryList } from '@/components/categories/CategoryList'
 import { StateCard } from '@/components/feedback/StateCard'
 import { ContentWithAside } from '@/components/layout/ContentWithAside'
-import { WalletScope } from '@/components/wallets/WalletScope'
-import { useWallet } from '@/context/walletContext'
-import { WALLET_MEMBER_ROLES } from '@/domain/walletRoles'
 import { useCategories } from '@/hooks/useCategories'
 
-function CategoryAccessCard() {
-  return (
-    <StateCard
-      eyebrow="Permissão da carteira"
-      title="Somente o proprietário pode gerenciar categorias"
-      description="Você ainda pode visualizar as categorias desta carteira, mas não pode criar, editar ou excluir registros."
-      role="status"
-      ariaLive="polite"
-    />
-  )
-}
-
 function CategoriesContent() {
-  const { currentWallet } = useWallet()
   const [editingCategory, setEditingCategory] = useState(null)
   const [operationError, setOperationError] = useState(null)
   const {
@@ -34,7 +18,6 @@ function CategoriesContent() {
     updateCategory,
     removeCategory,
   } = useCategories()
-  const canManageCategories = currentWallet?.role === WALLET_MEMBER_ROLES.OWNER
 
   const saveCategory = async (categoryData) => {
     setOperationError(null)
@@ -52,9 +35,7 @@ function CategoriesContent() {
     try {
       setOperationError(null)
       await removeCategory(categoryId)
-      if (editingCategory?.id === categoryId) {
-        setEditingCategory(null)
-      }
+      if (editingCategory?.id === categoryId) setEditingCategory(null)
     } catch (error) {
       setOperationError(
         error instanceof Error
@@ -68,8 +49,8 @@ function CategoriesContent() {
     return (
       <StateCard
         eyebrow="Carregando categorias"
-        title="Buscando categorias da carteira..."
-        description="Estamos preparando receitas e despesas da carteira atual."
+        title="Buscando suas categorias"
+        description="Estamos preparando suas categorias de receitas e despesas."
         role="status"
         ariaLive="polite"
       />
@@ -99,28 +80,20 @@ function CategoriesContent() {
         <CategoryList
           groupedCategories={groupedCategories}
           hasCategories={hasCategories}
-          canManage={canManageCategories}
+          canManage
           onEdit={setEditingCategory}
           onRemove={deleteCategory}
         />
       </div>
-      {canManageCategories ? (
-        <CategoryForm
-          category={editingCategory}
-          onSubmit={saveCategory}
-          onCancel={() => setEditingCategory(null)}
-        />
-      ) : (
-        <CategoryAccessCard />
-      )}
+      <CategoryForm
+        category={editingCategory}
+        onSubmit={saveCategory}
+        onCancel={() => setEditingCategory(null)}
+      />
     </ContentWithAside>
   )
 }
 
 export function CategoriesPage() {
-  return (
-    <WalletScope>
-      <CategoriesContent />
-    </WalletScope>
-  )
+  return <CategoriesContent />
 }

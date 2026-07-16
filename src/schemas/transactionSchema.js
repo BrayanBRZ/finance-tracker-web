@@ -1,7 +1,9 @@
 import { z } from 'zod'
+import { isKnownFinancialType } from '@/domain/financialTypes'
 
 export const transactionSchema = z.object({
-  categoryId: z.string().min(1, 'Selecione uma categoria'),
+  categoryId: z.string(),
+  type: z.string().refine(isKnownFinancialType, 'Selecione um tipo válido'),
   description: z
     .string()
     .trim()

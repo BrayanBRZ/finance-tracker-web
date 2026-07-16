@@ -1,11 +1,13 @@
 import { createLocalStorageCollection } from '@/mocks/data/createLocalStorageCollection'
+import { readWallets } from '@/mocks/data/walletData'
+import { isSameId } from '@/mocks/utils/id'
 
 const CATEGORIES_STORAGE_KEY = '@project:categories_data'
 
 const mockCategories = [
   {
     id: 'category-salary',
-    walletId: 'wallet-personal',
+    userId: '1',
     name: 'Salário',
     type: 'INCOME',
     color: '#16a34a',
@@ -14,7 +16,7 @@ const mockCategories = [
   },
   {
     id: 'category-food',
-    walletId: 'wallet-personal',
+    userId: '1',
     name: 'Alimentação',
     type: 'EXPENSE',
     color: '#f97316',
@@ -23,7 +25,7 @@ const mockCategories = [
   },
   {
     id: 'category-transport',
-    walletId: 'wallet-personal',
+    userId: '1',
     name: 'Transporte',
     type: 'EXPENSE',
     color: '#2563eb',
@@ -32,8 +34,42 @@ const mockCategories = [
   },
 ]
 
-export const { read: readCategories, write: writeCategories } =
-  createLocalStorageCollection({
-    storageKey: CATEGORIES_STORAGE_KEY,
-    initialData: mockCategories,
+const categoryCollection = createLocalStorageCollection({
+  storageKey: CATEGORIES_STORAGE_KEY,
+  initialData: mockCategories,
+})
+
+const migrateLegacyCategories = (categories) => {
+  const wallets = readWallets()
+  let hasChanges = false
+
+  const migratedCategories = categories.map((category) => {
+    if (category.userId || !category.walletId) return category
+
+    const wallet = wallets.find((candidate) =>
+      isSameId(candidate.id, category.walletId),
+    )
+
+    if (!wallet?.createdById) return category
+
+    hasChanges = true
+    const categoryData = { ...category }
+    delete categoryData.walletId
+
+    return { ...categoryData, userId: wallet.createdById }
   })
+
+  return { categories: migratedCategories, hasChanges }
+}
+
+export function readCategories() {
+  const { categories, hasChanges } = migrateLegacyCategories(
+    categoryCollection.read(),
+  )
+
+  if (hasChanges) categoryCollection.write(categories)
+
+  return categories
+}
+
+export const writeCategories = categoryCollection.write

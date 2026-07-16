@@ -5,32 +5,37 @@ import {
 } from '@/mocks/models/categoryModel'
 import { ensureAuthenticatedUser } from '@/mocks/policies/authPolicy.mock'
 import {
-  ensureWalletAccess,
-  ensureWalletOwner,
-} from '@/mocks/policies/walletAccessPolicy.mock'
-import {
   appendCategory,
   findCategoryById,
-  findCategoryByNameInWallet,
-  listCategoriesByWalletId,
+  findCategoryByNameForUser,
+  listCategoriesByUserId,
   removeCategory as removeCategoryRecord,
   replaceCategory,
 } from '@/mocks/repositories/categoryRepository.mock'
 import { hasTransactionsForCategory } from '@/mocks/repositories/transactionRepository.mock'
 import { latency } from '@/mocks/utils/fakeLatency'
+import { isSameId } from '@/mocks/utils/id'
 import { validateCategoryInput } from '@/mocks/validators/categoryValidator'
 
-export async function listCategoriesForWallet({ walletId, userId }) {
+const findOwnedCategory = ({ categoryId, userId }) => {
+  const category = findCategoryById(categoryId)
+
+  if (!category || !isSameId(category.userId, userId)) {
+    throw new Error('Categoria não encontrada')
+  }
+
+  return category
+}
+
+export async function listCategoriesForUser({ userId }) {
   await latency()
 
   ensureAuthenticatedUser(userId)
-  ensureWalletAccess({ walletId, userId })
 
-  return listCategoriesByWalletId(walletId).map(toPublicCategory)
+  return listCategoriesByUserId(userId).map(toPublicCategory)
 }
 
 export async function createCategory({
-  walletId,
   userId,
   name,
   type,
@@ -40,30 +45,19 @@ export async function createCategory({
   await latency()
 
   ensureAuthenticatedUser(userId)
-  ensureWalletOwner({ walletId, userId })
   validateCategoryInput({ name, type })
 
-  if (findCategoryByNameInWallet({ walletId, name })) {
-    throw new Error('Já existe uma categoria com este nome nesta carteira')
+  if (findCategoryByNameForUser({ userId, name })) {
+    throw new Error('Já existe uma categoria com este nome')
   }
 
-  const category = createCategoryRecord({
-    walletId,
-    name,
-    type,
-    color,
-    icon,
-  })
-
+  const category = createCategoryRecord({ userId, name, type, color, icon })
   appendCategory(category)
 
-  return {
-    category: toPublicCategory(category),
-  }
+  return { category: toPublicCategory(category) }
 }
 
 export async function updateCategory({
-  walletId,
   userId,
   categoryId,
   name,
@@ -74,19 +68,13 @@ export async function updateCategory({
   await latency()
 
   ensureAuthenticatedUser(userId)
-  ensureWalletOwner({ walletId, userId })
   validateCategoryInput({ name, type })
 
-  const category = findCategoryById(categoryId)
-
-  if (!category || category.walletId !== walletId) {
-    throw new Error('Categoria não encontrada')
-  }
-
-  const categoryWithSameName = findCategoryByNameInWallet({ walletId, name })
+  const category = findOwnedCategory({ categoryId, userId })
+  const categoryWithSameName = findCategoryByNameForUser({ userId, name })
 
   if (categoryWithSameName && categoryWithSameName.id !== category.id) {
-    throw new Error('Já existe uma categoria com este nome nesta carteira')
+    throw new Error('Já existe uma categoria com este nome')
   }
 
   if (category.type !== type && hasTransactionsForCategory(category.id)) {
@@ -99,23 +87,15 @@ export async function updateCategory({
   return { category: toPublicCategory(nextCategory) }
 }
 
-export async function removeCategory({ walletId, userId, categoryId }) {
+export async function removeCategory({ userId, categoryId }) {
   await latency()
 
   ensureAuthenticatedUser(userId)
-  ensureWalletOwner({ walletId, userId })
-
-  const category = findCategoryById(categoryId)
-
-  if (!category || category.walletId !== walletId) {
-    throw new Error('Categoria não encontrada')
-  }
+  const category = findOwnedCategory({ categoryId, userId })
 
   if (hasTransactionsForCategory(category.id)) {
     throw new Error('Não é possível excluir uma categoria usada por transações')
   }
 
   removeCategoryRecord(category.id)
-
-  return null
 }

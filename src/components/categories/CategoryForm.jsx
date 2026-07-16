@@ -64,7 +64,7 @@ export function CategoryForm({ category, onSubmit, onCancel }) {
           {isEditing ? 'Editar categoria' : 'Criar categoria'}
         </CardTitle>
         <CardDescription>
-          Categorias pertencem à carteira atual e classificam os lançamentos.
+          Categorias são pessoais e podem classificar lançamentos das suas carteiras.
         </CardDescription>
       </CardHeader>
       <CardContent>

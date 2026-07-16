@@ -33,11 +33,17 @@ const ensureTransactionInWallet = ({ transaction, walletId }) => {
   }
 }
 
-const findCategoryForTransaction = ({ walletId, categoryId }) => {
+const findCategoryForTransaction = ({ userId, categoryId, type }) => {
+  if (!categoryId) return null
+
   const category = findCategoryById(categoryId)
 
-  if (!category || !isSameId(category.walletId, walletId)) {
-    throw new Error('A categoria precisa pertencer à carteira atual')
+  if (!category || !isSameId(category.userId, userId)) {
+    throw new Error('A categoria precisa pertencer ao usuário atual')
+  }
+
+  if (category.type !== type) {
+    throw new Error('O tipo da categoria deve corresponder ao tipo da transação')
   }
 
   return category
@@ -71,6 +77,7 @@ export async function createTransaction({
   categoryId,
   description,
   amount,
+  type,
   transactionDate,
 }) {
   await latency()
@@ -78,15 +85,15 @@ export async function createTransaction({
   ensureAuthenticatedUser(userId)
   const membership = ensureWalletAccess({ walletId, userId })
   ensureCanCreateTransaction(membership)
-  validateTransactionInput({ description, amount, transactionDate })
-  const category = findCategoryForTransaction({ walletId, categoryId })
+  validateTransactionInput({ description, amount, type, transactionDate })
+  const category = findCategoryForTransaction({ userId, categoryId, type })
   const transaction = createTransactionRecord({
     walletId,
-    categoryId,
+    categoryId: category?.id ?? null,
     recordedById: userId,
     description,
     amount,
-    type: category.type,
+    type,
     transactionDate,
   })
 
@@ -102,6 +109,7 @@ export async function updateTransaction({
   categoryId,
   description,
   amount,
+  type,
   transactionDate,
 }) {
   await latency()
@@ -119,14 +127,14 @@ export async function updateTransaction({
     throw new Error('Você não possui permissão para editar esta transação')
   }
 
-  validateTransactionInput({ description, amount, transactionDate })
-  const category = findCategoryForTransaction({ walletId, categoryId })
+  validateTransactionInput({ description, amount, type, transactionDate })
+  const category = findCategoryForTransaction({ userId, categoryId, type })
   const nextTransaction = updateTransactionRecord({
     transaction,
-    categoryId,
+    categoryId: category?.id ?? null,
     description,
     amount,
-    type: category.type,
+    type,
     transactionDate,
   })
 
@@ -148,6 +156,4 @@ export async function removeTransaction({ walletId, userId, transactionId }) {
   const transaction = findTransactionById(transactionId)
   ensureTransactionInWallet({ transaction, walletId })
   removeTransactionRecord(transactionId)
-
-  return null
 }

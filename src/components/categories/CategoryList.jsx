@@ -18,13 +18,13 @@ const categorySections = [
   {
     type: FINANCIAL_TYPES.EXPENSE,
     title: 'Despesas',
-    description: 'Categorias usadas para classificar saídas da carteira.',
+    description: 'Categorias pessoais para classificar suas despesas.',
     emptyMessage: 'Nenhuma categoria de despesa cadastrada.',
   },
   {
     type: FINANCIAL_TYPES.INCOME,
     title: 'Receitas',
-    description: 'Categorias usadas para classificar entradas da carteira.',
+    description: 'Categorias pessoais para classificar suas receitas.',
     emptyMessage: 'Nenhuma categoria de receita cadastrada.',
   },
 ]
@@ -105,7 +105,7 @@ export function CategoryList({ groupedCategories, hasCategories, canManage, onEd
       <CardContent className="space-y-6">
         {!hasCategories ? (
           <div className="rounded-xl border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
-            Nenhuma categoria cadastrada para esta carteira.
+            Nenhuma categoria pessoal cadastrada.
           </div>
         ) : null}
         {categorySections.map((section) => (

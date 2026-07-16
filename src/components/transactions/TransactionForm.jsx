@@ -18,10 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { FINANCIAL_TYPE_LABELS } from '@/domain/financialTypes'
+import {
+  FINANCIAL_TYPE_LABELS,
+  FINANCIAL_TYPE_OPTIONS,
+  FINANCIAL_TYPES,
+} from '@/domain/financialTypes'
 import { transactionSchema } from '@/schemas/transactionSchema'
 
 const currentDate = () => new Date().toISOString().slice(0, 10)
+const NO_CATEGORY_VALUE = '__no_category__'
 
 export function TransactionForm({
   categories,
@@ -34,7 +39,8 @@ export function TransactionForm({
     resolver: zodResolver(transactionSchema),
     mode: 'onTouched',
     values: {
-      categoryId: transaction?.categoryId ?? '',
+      categoryId: transaction?.categoryId ?? NO_CATEGORY_VALUE,
+      type: transaction?.type ?? FINANCIAL_TYPES.EXPENSE,
       description: transaction?.description ?? '',
       amount: transaction?.amount ?? '',
       transactionDate: transaction?.transactionDate ?? currentDate(),
@@ -51,7 +57,13 @@ export function TransactionForm({
   const submit = async (transactionData) => {
     try {
       form.clearErrors('root')
-      await onSubmit(transactionData)
+      await onSubmit({
+        ...transactionData,
+        categoryId:
+          transactionData.categoryId === NO_CATEGORY_VALUE
+            ? null
+            : transactionData.categoryId,
+      })
       if (!isEditing) reset()
     } catch (error) {
       form.setError('root.server', {
@@ -71,12 +83,44 @@ export function TransactionForm({
           {isEditing ? 'Editar transação' : 'Nova transação'}
         </CardTitle>
         <CardDescription>
-          O tipo financeiro é definido pela categoria selecionada.
+          Escolha o tipo da transação. A categoria pessoal é opcional.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form noValidate onSubmit={handleSubmit(submit)}>
           <FieldGroup className="gap-4">
+            <Controller
+              control={control}
+              name="type"
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor="transaction-type">Tipo</FieldLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    onOpenChange={(isOpen) => {
+                      if (!isOpen) field.onBlur()
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    <SelectTrigger
+                      id="transaction-type"
+                      aria-invalid={errors.type ? true : undefined}
+                    >
+                      <SelectValue placeholder="Selecione o tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FINANCIAL_TYPE_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <ErrorSpan id="transaction-type-error" error={errors.type?.message} />
+                </Field>
+              )}
+            />
             <Controller
               control={control}
               name="categoryId"
@@ -89,15 +133,18 @@ export function TransactionForm({
                     onOpenChange={(isOpen) => {
                       if (!isOpen) field.onBlur()
                     }}
-                    disabled={isSubmitting || categories.length === 0}
+                    disabled={isSubmitting}
                   >
                     <SelectTrigger
                       id="transaction-category"
                       aria-invalid={errors.categoryId ? true : undefined}
                     >
-                      <SelectValue placeholder="Selecione uma categoria" />
+                      <SelectValue placeholder="Sem categoria" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value={NO_CATEGORY_VALUE}>
+                        Sem categoria
+                      </SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name} · {FINANCIAL_TYPE_LABELS[category.type]}
@@ -142,7 +189,7 @@ export function TransactionForm({
               />
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={isSubmitting || categories.length === 0} className="h-11">
+              <Button type="submit" disabled={isSubmitting} className="h-11">
                 {isSubmitting
                   ? 'Salvando...'
                   : isEditing
@@ -155,11 +202,6 @@ export function TransactionForm({
                 </Button>
               ) : null}
             </div>
-            {categories.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Crie uma categoria antes de registrar transações.
-              </p>
-            ) : null}
             <ErrorSpan
               id="transaction-form-error"
               error={errors.root?.server?.message}
