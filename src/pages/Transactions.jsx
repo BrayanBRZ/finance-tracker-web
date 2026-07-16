@@ -6,12 +6,10 @@ import { TransactionList } from '@/components/transactions/TransactionList'
 import { WalletScope } from '@/components/wallets/WalletScope'
 import { useCategories } from '@/hooks/useCategories'
 import { useTransactions } from '@/hooks/useTransactions'
-import { useSession } from '@/context/sessionContext'
 import { useWallet } from '@/context/walletContext'
 import { WALLET_MEMBER_ROLES } from '@/domain/walletRoles'
 
 function TransactionsContent() {
-  const { session } = useSession()
   const { currentWallet } = useWallet()
   const [editingTransaction, setEditingTransaction] = useState(null)
   const { categories, isLoading: isLoadingCategories } = useCategories()
@@ -24,12 +22,9 @@ function TransactionsContent() {
     updateTransaction,
     removeTransaction,
   } = useTransactions()
-  const isOwner = currentWallet?.role === WALLET_MEMBER_ROLES.OWNER
-  const canCreate = isOwner || currentWallet?.role === WALLET_MEMBER_ROLES.COLLABORATOR
-  const canEditTransaction = (transaction) =>
-    isOwner ||
-    (currentWallet?.role === WALLET_MEMBER_ROLES.COLLABORATOR &&
-      transaction.recordedById === session?.user.id)
+  const canManageTransactions =
+    currentWallet?.role === WALLET_MEMBER_ROLES.OWNER ||
+    currentWallet?.role === WALLET_MEMBER_ROLES.EDITOR
 
   const saveTransaction = async (transactionData) => {
     if (editingTransaction) {
@@ -69,12 +64,12 @@ function TransactionsContent() {
     <ContentWithAside>
       <TransactionList
         transactions={transactions}
-        canEditTransaction={canEditTransaction}
-        canDelete={isOwner}
+        canEditTransaction={() => canManageTransactions}
+        canDelete={canManageTransactions}
         onEdit={setEditingTransaction}
         onDelete={removeTransaction}
       />
-      {canCreate ? (
+      {canManageTransactions ? (
         <TransactionForm
           categories={categories}
           transaction={editingTransaction}
@@ -85,7 +80,7 @@ function TransactionsContent() {
         <StateCard
           eyebrow="Acesso de leitura"
           title="Você não pode registrar transações"
-          description="Visualizadores podem consultar os lançamentos, mas não criar ou alterar dados."
+          description="Visualizadores podem apenas consultar os lançamentos."
           role="status"
           ariaLive="polite"
         />

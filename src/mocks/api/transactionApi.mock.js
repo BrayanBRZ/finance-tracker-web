@@ -21,7 +21,7 @@ import { WALLET_MEMBER_ROLES } from '@/domain/walletRoles'
 const ensureCanCreateTransaction = (membership) => {
   if (
     membership.role !== WALLET_MEMBER_ROLES.OWNER &&
-    membership.role !== WALLET_MEMBER_ROLES.COLLABORATOR
+    membership.role !== WALLET_MEMBER_ROLES.EDITOR
   ) {
     throw new Error('Você não possui permissão para criar transações')
   }
@@ -121,8 +121,7 @@ export async function updateTransaction({
 
   if (
     membership.role !== WALLET_MEMBER_ROLES.OWNER &&
-    (!isSameId(transaction.recordedById, userId) ||
-      membership.role !== WALLET_MEMBER_ROLES.COLLABORATOR)
+    membership.role !== WALLET_MEMBER_ROLES.EDITOR
   ) {
     throw new Error('Você não possui permissão para editar esta transação')
   }
@@ -149,8 +148,11 @@ export async function removeTransaction({ walletId, userId, transactionId }) {
   ensureAuthenticatedUser(userId)
   const membership = ensureWalletAccess({ walletId, userId })
 
-  if (membership.role !== WALLET_MEMBER_ROLES.OWNER) {
-    throw new Error('Apenas o proprietário pode excluir transações')
+  if (
+    membership.role !== WALLET_MEMBER_ROLES.OWNER &&
+    membership.role !== WALLET_MEMBER_ROLES.EDITOR
+  ) {
+    throw new Error('Você não possui permissão para excluir transações')
   }
 
   const transaction = findTransactionById(transactionId)
