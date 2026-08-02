@@ -1,4 +1,5 @@
 import { ContentWithAside } from '@/components/layout/ContentWithAside'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { StateCard } from '@/components/feedback/StateCard'
 import { EditWalletForm } from '@/components/wallets/EditWalletForm'
 import { CreateWalletForm } from '@/components/wallets/CreateWalletForm'
@@ -35,7 +36,13 @@ function WalletSettingsContent() {
 export function WalletSettingsPage() {
   return (
     <WalletScope>
-      <WalletSettingsContent />
+      <div className="space-y-6">
+        <PageHeader
+          title="Carteiras"
+          description="Gerencie informações, membros e acessos da carteira."
+        />
+        <WalletSettingsContent />
+      </div>
     </WalletScope>
   )
 }

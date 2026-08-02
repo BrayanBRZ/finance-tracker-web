@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ContentWithAside } from '@/components/layout/ContentWithAside'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { StateCard } from '@/components/feedback/StateCard'
 import { TransactionForm } from '@/components/transactions/TransactionForm'
 import { TransactionList } from '@/components/transactions/TransactionList'
@@ -92,7 +93,13 @@ function TransactionsContent() {
 export function TransactionsPage() {
   return (
     <WalletScope>
-      <TransactionsContent />
+      <div className="space-y-6">
+        <PageHeader
+          title="Transações"
+          description="Gerencie receitas e despesas da carteira selecionada."
+        />
+        <TransactionsContent />
+      </div>
     </WalletScope>
   )
 }

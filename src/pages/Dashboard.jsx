@@ -3,6 +3,7 @@ import { DashboardSummary } from '@/components/dashboard/DashboardSummary'
 import { FinancialChart } from '@/components/dashboard/FinancialChart'
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions'
 import { StateCard } from '@/components/feedback/StateCard'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { WalletScope } from '@/components/wallets/WalletScope'
 import { FINANCIAL_TYPES } from '@/domain/financialTypes'
 import { useTransactions } from '@/hooks/useTransactions'
@@ -58,13 +59,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-sm font-medium text-primary">Dashboard da carteira</p>
-        <h1 className="font-heading text-3xl text-foreground">
-          Visão financeira atual
-        </h1>
-      </div>
+    <>
       <DashboardSummary
         totalIncome={totalIncome}
         totalExpenses={totalExpenses}
@@ -75,14 +70,20 @@ function DashboardContent() {
         totalExpenses={totalExpenses}
       />
       <RecentTransactions transactions={transactions} />
-    </div>
+    </>
   )
 }
 
 export function DashboardPage() {
   return (
     <WalletScope>
-      <DashboardContent />
+      <div className="space-y-6">
+        <PageHeader
+          title="Dashboard"
+          description="Visão geral da carteira selecionada"
+        />
+        <DashboardContent />
+      </div>
     </WalletScope>
   )
 }

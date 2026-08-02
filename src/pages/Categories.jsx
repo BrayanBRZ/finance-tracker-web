@@ -3,6 +3,7 @@ import { CategoryForm } from '@/components/categories/CategoryForm'
 import { CategoryList } from '@/components/categories/CategoryList'
 import { StateCard } from '@/components/feedback/StateCard'
 import { ContentWithAside } from '@/components/layout/ContentWithAside'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { useCategories } from '@/hooks/useCategories'
 
 function CategoriesContent() {
@@ -95,5 +96,13 @@ function CategoriesContent() {
 }
 
 export function CategoriesPage() {
-  return <CategoriesContent />
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Categorias"
+        description="Organize categorias para classificar seus lançamentos."
+      />
+      <CategoriesContent />
+    </div>
+  )
 }
