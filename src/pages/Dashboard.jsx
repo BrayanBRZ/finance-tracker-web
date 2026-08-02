@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import { DashboardSummary } from '@/components/dashboard/DashboardSummary'
+import { CashFlowChart } from '@/components/dashboard/CashFlowChart'
+import { ExpenseBreakdownChart } from '@/components/dashboard/ExpenseBreakdownChart'
 import { FinancialChart } from '@/components/dashboard/FinancialChart'
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions'
 import { StateCard } from '@/components/feedback/StateCard'
@@ -72,6 +74,10 @@ function DashboardContent() {
           totalExpenses={totalExpenses}
         />
         <RecentTransactions transactions={transactions} />
+      </div>
+      <div className="grid gap-6 lg:grid-cols-4">
+        <CashFlowChart transactions={transactions} />
+        <ExpenseBreakdownChart transactions={transactions} />
       </div>
     </>
   )

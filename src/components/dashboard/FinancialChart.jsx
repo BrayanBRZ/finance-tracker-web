@@ -2,12 +2,16 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
 } from 'recharts'
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
 import {
   Card,
   CardContent,
@@ -22,12 +26,23 @@ const formatCurrency = (value) =>
     currency: 'BRL',
   })
 
+const chartConfig = {
+  income: {
+    label: 'Receitas',
+    color: 'var(--chart-1)',
+  },
+  expenses: {
+    label: 'Despesas',
+    color: 'var(--chart-2)',
+  },
+}
+
 export function FinancialChart({ totalIncome, totalExpenses }) {
   const data = [
     {
       period: 'Carteira atual',
-      Receitas: totalIncome,
-      Despesas: totalExpenses,
+      income: totalIncome,
+      expenses: totalExpenses,
     },
   ]
 
@@ -40,24 +55,42 @@ export function FinancialChart({ totalIncome, totalExpenses }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-72" aria-label="Gráfico de receitas e despesas">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 12, right: 12, left: 0, bottom: 4 }}>
-              <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="period" tickLine={false} axisLine={false} />
-              <YAxis
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => formatCurrency(value)}
-                width={88}
-              />
-              <Tooltip formatter={(value) => formatCurrency(value)} />
-              <Legend />
-              <Bar dataKey="Receitas" fill="var(--primary)" radius={[5, 5, 0, 0]} />
-              <Bar dataKey="Despesas" fill="var(--destructive)" radius={[5, 5, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <ChartContainer
+          config={chartConfig}
+          className="h-72 w-full"
+          aria-label="Gráfico de receitas e despesas"
+        >
+          <BarChart
+            accessibilityLayer
+            data={data}
+            margin={{ top: 12, right: 12, left: 0, bottom: 4 }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="period"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => formatCurrency(value)}
+              width={88}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  formatter={(value) => formatCurrency(value)}
+                />
+              }
+            />
+            <ChartLegend content={<ChartLegendContent />} />
+            <Bar dataKey="income" fill="var(--color-income)" radius={4} />
+            <Bar dataKey="expenses" fill="var(--color-expenses)" radius={4} />
+          </BarChart>
+        </ChartContainer>
       </CardContent>
     </Card>
   )
