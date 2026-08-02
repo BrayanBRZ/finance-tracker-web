@@ -64,12 +64,15 @@ function DashboardContent() {
         totalIncome={totalIncome}
         totalExpenses={totalExpenses}
         currentBalance={currentBalance}
+        transactionCount={transactions.length}
       />
-      <FinancialChart
-        totalIncome={totalIncome}
-        totalExpenses={totalExpenses}
-      />
-      <RecentTransactions transactions={transactions} />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <FinancialChart
+          totalIncome={totalIncome}
+          totalExpenses={totalExpenses}
+        />
+        <RecentTransactions transactions={transactions} />
+      </div>
     </>
   )
 }
