@@ -1,15 +1,15 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 import {
   AuthFormHeader,
   AuthScreenLayout,
-} from '@/components/auth/AuthScreenLayout'
-import { AuthForm } from '@/components/auth/form/AuthForm'
-import { AuthFormError } from '@/components/auth/form/AuthFormError'
-import { AuthFormSubmit } from '@/components/auth/form/AuthFormSubmit'
-import { AuthPasswordField } from '@/components/auth/form/AuthPasswordField'
-import { AuthPasswordStrengthIndicator } from '@/components/auth/form/AuthPasswordStrengthIndicator'
-import { AuthTextField } from '@/components/auth/form/AuthTextField'
-import { useRegister } from '@/hooks/useRegister'
+} from "@/components/auth/AuthScreenLayout";
+import { AuthForm } from "@/components/auth/form/AuthForm";
+import { AuthFormError } from "@/components/auth/form/AuthFormError";
+import { AuthFormSubmit } from "@/components/auth/form/AuthFormSubmit";
+import { AuthPasswordField } from "@/components/auth/form/AuthPasswordField";
+import { AuthPasswordStrengthIndicator } from "@/components/auth/form/AuthPasswordStrengthIndicator";
+import { AuthTextField } from "@/components/auth/form/AuthTextField";
+import { useRegister } from "@/hooks/useRegister";
 
 export function RegisterForm() {
   const {
@@ -20,7 +20,7 @@ export function RegisterForm() {
       formState: { errors, isSubmitting },
     },
     handleRegister,
-  } = useRegister()
+  } = useRegister();
 
   return (
     <AuthScreenLayout visualSide="left">
@@ -43,7 +43,7 @@ export function RegisterForm() {
           label="Nome completo"
           autoComplete="name"
           placeholder="Seu nome"
-          {...register('name')}
+          {...register("name")}
           disabled={isSubmitting}
           error={errors.name?.message}
         />
@@ -54,7 +54,7 @@ export function RegisterForm() {
           type="email"
           autoComplete="email"
           placeholder="nome@exemplo.com"
-          {...register('email')}
+          {...register("email")}
           disabled={isSubmitting}
           error={errors.email?.message}
         />
@@ -64,11 +64,11 @@ export function RegisterForm() {
           label="Senha"
           autoComplete="new-password"
           placeholder="Mínimo 6 caracteres"
-          {...register('password')}
+          {...register("password")}
           disabled={isSubmitting}
           error={errors.password?.message}
           labelAddon={
-            <AuthPasswordStrengthIndicator password={watch('password', '')} />
+            <AuthPasswordStrengthIndicator password={watch("password", "")} />
           }
         />
 
@@ -77,20 +77,17 @@ export function RegisterForm() {
           label="Confirmar senha"
           autoComplete="new-password"
           placeholder="Repita a senha"
-          {...register('confirmPassword')}
+          {...register("confirmPassword")}
           disabled={isSubmitting}
           error={errors.confirmPassword?.message}
         />
 
+        <AuthFormSubmit buttonText="Cadastrar-se" isSubmitting={isSubmitting} />
         <AuthFormError
           id="register-error"
           error={errors.root?.server?.message}
         />
-        <AuthFormSubmit
-          buttonText="Cadastrar-se"
-          isSubmitting={isSubmitting}
-        />
       </AuthForm>
     </AuthScreenLayout>
-  )
+  );
 }

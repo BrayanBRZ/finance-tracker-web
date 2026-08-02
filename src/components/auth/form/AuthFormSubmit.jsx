@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 export function AuthFormSubmit({ buttonText, isSubmitting }) {
   return (
     <Button
-      type="submit"
       disabled={isSubmitting}
       className="mt-3 h-10 w-full text-sm shadow-sm"
     >

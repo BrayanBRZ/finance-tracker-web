@@ -111,7 +111,7 @@ export function LoginForm() {
               to="/recuperar-senha"
               className="ml-auto text-xs font-medium text-foreground underline-offset-4 hover:underline"
             >
-              Esqueci minha senha
+              Recuperar senha
             </Link>
           </div>
 

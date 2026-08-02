@@ -38,7 +38,7 @@ export function AuthPasswordField({
           type="button"
           onClick={() => setShowPassword((current) => !current)}
           aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-          className="absolute top-1/2 right-2.5 -translate-y-1/2 cursor-pointer rounded-sm p-0.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+          className="absolute top-1/2 right-2.5 -translate-y-1/2 cursor-pointer rounded-(--radius) p-0.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
         >
           {showPassword ? (
             <EyeOff className="size-4" strokeWidth={1.5} />

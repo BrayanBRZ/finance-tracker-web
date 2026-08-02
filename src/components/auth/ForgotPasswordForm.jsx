@@ -46,7 +46,7 @@ export function ForgotPasswordForm() {
       <AuthForm onSubmit={handleSubmit(submit)}>
         <AuthFormHeader
           title="Recuperar senha"
-          description="Lembrou a senha?"
+          description="Recordou sua senha?"
           action={<Link to="/login" className="font-medium text-foreground underline-offset-4 hover:underline">Voltar ao login</Link>}
         />
         <AuthTextField
