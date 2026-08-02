@@ -10,7 +10,7 @@ import { ResetPasswordPage } from './pages/ResetPassword'
 import { ChangePasswordPage } from './pages/ChangePassword'
 import AuthGuard from '@/components/guards/AuthGuard'
 import GuestGuard from '@/components/guards/GuestGuard'
-import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { AppLayout } from '@/layouts/AppLayout'
 import { WalletProvider } from '@/context/WalletProvider'
 
 function App() {
@@ -28,7 +28,7 @@ function App() {
           <Route
             element={
               <WalletProvider>
-                <DashboardLayout />
+                <AppLayout />
               </WalletProvider>
             }
           >
