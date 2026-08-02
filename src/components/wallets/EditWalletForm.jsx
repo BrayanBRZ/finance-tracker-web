@@ -82,7 +82,7 @@ export function EditWalletForm() {
               disabled={isSubmitting}
               error={errors.description?.message}
             />
-            <Button type="submit" disabled={isSubmitting} className="h-11">
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? 'Salvando...' : 'Salvar alterações'}
             </Button>
             <ErrorSpan

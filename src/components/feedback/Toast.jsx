@@ -30,7 +30,7 @@ export function Toast({ message, onClose }) {
       className={`
         fixed bottom-6 right-6 z-50
         flex items-center gap-3
-        rounded-xl border border-border bg-card
+        rounded-(--radius) border border-border bg-card
         shadow-lg
         px-4 py-3
         max-w-sm
@@ -38,7 +38,7 @@ export function Toast({ message, onClose }) {
         ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}
       `}
     >
-      <CheckCircle2 size={20} className="text-primary shrink-0" />
+      <CheckCircle2 size={20} className="shrink-0 text-success" />
       <p className="flex-1 text-sm font-medium text-card-foreground">
         {message}
       </p>

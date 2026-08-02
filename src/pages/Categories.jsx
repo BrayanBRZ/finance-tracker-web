@@ -73,7 +73,7 @@ function CategoriesContent() {
     <ContentWithAside>
       <div className="space-y-4">
         {operationError ? (
-          <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+          <p role="alert" className="rounded-(--radius) border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
             {operationError}
           </p>
         ) : null}

@@ -27,11 +27,11 @@ export function TransactionList({
       </CardHeader>
       <CardContent>
         {transactions.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
+          <p className="rounded-(--radius) border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
             Ainda não há transações nesta carteira.
           </p>
         ) : (
-          <ul className="divide-y divide-border rounded-lg border border-border">
+          <ul className="divide-y divide-border rounded-(--radius) border border-border">
             {transactions.map((transaction) => (
               <li key={transaction.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">

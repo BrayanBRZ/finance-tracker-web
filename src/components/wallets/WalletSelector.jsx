@@ -1,12 +1,11 @@
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useWallet } from '@/context/walletContext'
+} from "@/components/ui/select";
+import { useWallet } from "@/context/walletContext";
 
 export function WalletSelector() {
   const {
@@ -16,17 +15,10 @@ export function WalletSelector() {
     isLoading,
     errorMessage,
     selectWallet,
-  } = useWallet()
+  } = useWallet();
 
   return (
-    <div className="min-w-52">
-      <Label
-        htmlFor="wallet-selector"
-        className="text-xs text-muted-foreground"
-      >
-        Carteira atual
-      </Label>
-
+    <div>
       <Select
         value={currentWallet?.id ?? undefined}
         onValueChange={(walletId) => void selectWallet(walletId)}
@@ -34,14 +26,11 @@ export function WalletSelector() {
       >
         <SelectTrigger
           id="wallet-selector"
-          className="mt-1 w-full"
-          aria-describedby={errorMessage ? 'wallet-selector-error' : undefined}
+          aria-describedby={errorMessage ? "wallet-selector-error" : undefined}
           aria-invalid={errorMessage ? true : undefined}
         >
           <SelectValue
-            placeholder={
-              isLoading ? 'Carregando...' : 'Nenhuma carteira'
-            }
+            placeholder={isLoading ? "Carregando..." : "Nenhuma carteira"}
           />
         </SelectTrigger>
 
@@ -60,5 +49,5 @@ export function WalletSelector() {
         </p>
       ) : null}
     </div>
-  )
+  );
 }

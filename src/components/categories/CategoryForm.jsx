@@ -132,7 +132,7 @@ export function CategoryForm({ category, onSubmit, onCancel }) {
               />
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={isSubmitting} className="h-11">
+              <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting
                   ? 'Salvando...'
                   : isEditing
@@ -140,7 +140,7 @@ export function CategoryForm({ category, onSubmit, onCancel }) {
                     : 'Criar categoria'}
               </Button>
               {isEditing ? (
-                <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting} className="h-11">
+                <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
                   Cancelar
                 </Button>
               ) : null}

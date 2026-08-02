@@ -94,7 +94,7 @@ export function AddWalletMemberForm({ onAdd }) {
             </Field>
           )}
         />
-        <Button type="submit" disabled={isSubmitting} className="h-11">
+        <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Adicionando...' : 'Adicionar membro'}
         </Button>
         <ErrorSpan

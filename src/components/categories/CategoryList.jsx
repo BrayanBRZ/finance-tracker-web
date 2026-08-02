@@ -31,11 +31,11 @@ const categorySections = [
 
 function CategoryItem({ category, canManage, onEdit, onRemove }) {
   return (
-    <li className="rounded-xl border border-border bg-card p-4">
+    <li className="rounded-(--radius) border border-border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-(--radius) bg-primary/10 text-primary">
               <Tags className="size-4" aria-hidden="true" />
             </span>
             <div className="min-w-0">
@@ -86,7 +86,7 @@ function CategorySection({ section, categories, canManage, onEdit, onRemove }) {
           ))}
         </ul>
       ) : (
-        <div className="rounded-xl border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+        <div className="rounded-(--radius) border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
           {section.emptyMessage}
         </div>
       )}
@@ -104,7 +104,7 @@ export function CategoryList({ groupedCategories, hasCategories, canManage, onEd
       </CardHeader>
       <CardContent className="space-y-6">
         {!hasCategories ? (
-          <div className="rounded-xl border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
+          <div className="rounded-(--radius) border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
             Nenhuma categoria pessoal cadastrada.
           </div>
         ) : null}

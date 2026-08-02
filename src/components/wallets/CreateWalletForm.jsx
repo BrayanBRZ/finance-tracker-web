@@ -54,7 +54,7 @@ export function CreateWalletForm({ title = 'Criar carteira' }) {
               error={errors.description?.message}
             />
 
-            <Button type="submit" disabled={isSubmitting} className="h-11">
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? 'Criando...' : 'Criar carteira'}
             </Button>
 

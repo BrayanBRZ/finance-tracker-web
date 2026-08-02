@@ -22,7 +22,7 @@ export function WalletMemberList({ members, canManage, onRoleChange, onRemove })
   }
 
   return (
-    <ul className="divide-y divide-border rounded-lg border border-border">
+    <ul className="divide-y divide-border rounded-(--radius) border border-border">
       {members.map((member) => {
         const isOwner = member.role === WALLET_MEMBER_ROLES.OWNER
 
@@ -46,7 +46,10 @@ export function WalletMemberList({ members, canManage, onRoleChange, onRemove })
                   value={member.role}
                   onValueChange={(role) => void onRoleChange(member.userId, role)}
                 >
-                  <SelectTrigger aria-label={`Papel de ${member.user?.name ?? 'membro'}`}>
+                  <SelectTrigger
+                    className="w-36"
+                    aria-label={`Papel de ${member.user?.name ?? 'membro'}`}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
