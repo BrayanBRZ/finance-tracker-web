@@ -10,6 +10,8 @@ import {
 import { useSession } from "@/context/sessionContext";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { ChangePasswordForm } from "@/components/auth/ChangePasswordForm";
+import { FormDialog } from "@/components/forms/FormDialog";
 import { WalletSelector } from "@/components/wallets/WalletSelector";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -25,6 +27,7 @@ export function AppLayout() {
   const { session, handleLogout } = useSession();
   const { pathname } = useLocation();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const logout = async () => {
@@ -108,6 +111,7 @@ export function AppLayout() {
               <UserMenu
                 name={session?.user?.name}
                 isLoggingOut={isLoggingOut}
+                onChangePassword={() => setIsChangePasswordOpen(true)}
                 onLogout={logout}
               />
             </div>
@@ -151,6 +155,17 @@ export function AppLayout() {
           </div>
         </main>
       </div>
+
+      <FormDialog
+        open={isChangePasswordOpen}
+        onOpenChange={setIsChangePasswordOpen}
+        title="Alterar senha"
+        description="Confirme sua senha atual antes de escolher uma nova."
+        size="sm"
+        className="gap-4"
+      >
+        <ChangePasswordForm />
+      </FormDialog>
     </div>
   );
 }

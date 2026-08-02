@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AuthForm } from '@/components/auth/form/AuthForm'
-import { AuthFormError } from '@/components/auth/form/AuthFormError'
-import { AuthFormSubmit } from '@/components/auth/form/AuthFormSubmit'
-import { AuthPasswordField } from '@/components/auth/form/AuthPasswordField'
 import { AuthPasswordStrengthIndicator } from '@/components/auth/form/AuthPasswordStrengthIndicator'
+import { ErrorSpan } from '@/components/forms/ErrorSpan'
+import { PasswordField } from '@/components/forms/PasswordField'
+import { Button } from '@/components/ui/button'
+import { FieldGroup } from '@/components/ui/field'
 import { changePasswordSchema } from '@/schemas/changePasswordSchema'
 import { changePassword } from '@/services/authService'
 import { useSession } from '@/context/sessionContext'
@@ -51,35 +51,47 @@ export function ChangePasswordForm() {
   }
 
   return (
-    <AuthForm onSubmit={handleSubmit(submit)}>
-      <AuthPasswordField
-        id="current-password"
-        label="Senha atual"
-        autoComplete="current-password"
-        {...register('currentPassword')}
-        disabled={isSubmitting}
-        error={errors.currentPassword?.message}
-      />
-      <AuthPasswordField
-        id="new-password"
-        label="Nova senha"
-        autoComplete="new-password"
-        {...register('newPassword')}
-        disabled={isSubmitting}
-        error={errors.newPassword?.message}
-        labelAddon={<AuthPasswordStrengthIndicator password={newPassword ?? ''} />}
-      />
-      <AuthPasswordField
-        id="new-password-confirmation"
-        label="Confirmar nova senha"
-        autoComplete="new-password"
-        {...register('confirmPassword')}
-        disabled={isSubmitting}
-        error={errors.confirmPassword?.message}
-      />
-      <AuthFormSubmit buttonText="Alterar senha" isSubmitting={isSubmitting} />
-      <AuthFormError id="change-password-error" error={errors.root?.server?.message} />
-      {successMessage ? <p role="status" className="text-sm text-primary">{successMessage}</p> : null}
-    </AuthForm>
+    <form noValidate onSubmit={handleSubmit(submit)}>
+      <FieldGroup className="gap-4">
+        <PasswordField
+          id="current-password"
+          label="Senha atual"
+          autoComplete="current-password"
+          {...register('currentPassword')}
+          disabled={isSubmitting}
+          error={errors.currentPassword?.message}
+        />
+        <PasswordField
+          id="new-password"
+          label="Nova senha"
+          autoComplete="new-password"
+          {...register('newPassword')}
+          disabled={isSubmitting}
+          error={errors.newPassword?.message}
+          labelAddon={<AuthPasswordStrengthIndicator password={newPassword ?? ''} />}
+        />
+        <PasswordField
+          id="new-password-confirmation"
+          label="Confirmar nova senha"
+          autoComplete="new-password"
+          {...register('confirmPassword')}
+          disabled={isSubmitting}
+          error={errors.confirmPassword?.message}
+        />
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Alterando...' : 'Alterar senha'}
+        </Button>
+        <ErrorSpan
+          id="change-password-error"
+          error={errors.root?.server?.message}
+          className="text-sm"
+        />
+        {successMessage ? (
+          <p role="status" className="text-sm text-primary">
+            {successMessage}
+          </p>
+        ) : null}
+      </FieldGroup>
+    </form>
   )
 }

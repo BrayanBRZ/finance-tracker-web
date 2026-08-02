@@ -16,7 +16,7 @@ export function DataTable({
   return (
     <div
       className={cn(
-        'scrollbar-minimal min-h-0 overflow-auto rounded-(--radius) ring-1 ring-border',
+        'scrollbar-minimal min-h-0 overflow-auto ring-1 ring-border',
         className,
       )}
     >

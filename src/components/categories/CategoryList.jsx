@@ -1,18 +1,10 @@
 import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CategoryIndicator } from '@/components/categories/CategoryIndicator'
-import { CategoryTypeBadge } from '@/components/categories/CategoryTypeBadge'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  FINANCIAL_TYPE_LABELS,
-  FINANCIAL_TYPES,
-} from '@/domain/financialTypes'
+import { CollectionCard } from '@/components/collections/CollectionCard'
+import { DataList } from '@/components/collections/DataList'
+import { FINANCIAL_TYPES } from '@/domain/financialTypes'
+import { cn } from '@/lib/utils'
 
 const categorySections = [
   {
@@ -31,83 +23,98 @@ const categorySections = [
 
 function CategoryItem({ category, canManage, onEdit, onRemove }) {
   return (
-    <li className="rounded-(--radius) border border-border bg-card p-3">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <CategoryIndicator
-            category={category}
-            className="font-medium text-card-foreground"
-          />
-          <p className="mt-1 pl-9 text-xs text-muted-foreground">
-            Categoria de {FINANCIAL_TYPE_LABELS[category.type].toLowerCase()}
-          </p>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2">
-          <CategoryTypeBadge type={category.type} />
-          {canManage ? (
-            <>
-              <Button type="button" variant="outline" size="sm" onClick={() => onEdit(category)}>
-                <Pencil aria-hidden="true" /> Editar
-              </Button>
-              <Button type="button" variant="destructive" size="sm" onClick={() => void onRemove(category.id)}>
-                <Trash2 aria-hidden="true" /> Excluir
-              </Button>
-            </>
-          ) : null}
-        </div>
+    <div className="flex min-w-0 items-center justify-between gap-3 px-1">
+      <CategoryIndicator
+        category={category}
+        className="min-w-0 font-medium text-card-foreground"
+      />
+      <div className="flex shrink-0 items-center gap-2">
+        {canManage ? (
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onEdit(category)}
+            >
+              <Pencil aria-hidden="true" />
+              Editar
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={() => void onRemove(category.id)}
+            >
+              <Trash2 aria-hidden="true" />
+              Excluir
+            </Button>
+          </>
+        ) : null}
       </div>
-    </li>
+    </div>
   )
 }
 
 function CategorySection({ section, categories, canManage, onEdit, onRemove }) {
   return (
-    <section className="space-y-3">
-      <div>
-        <h3 className="font-heading text-lg font-medium text-foreground">{section.title}</h3>
-        <p className="text-sm text-muted-foreground">{section.description}</p>
-      </div>
-      {categories.length > 0 ? (
-        <ul className="grid gap-3">
-          {categories.map((category) => (
-            <CategoryItem key={category.id} category={category} canManage={canManage} onEdit={onEdit} onRemove={onRemove} />
-          ))}
-        </ul>
-      ) : (
-        <div className="rounded-(--radius) border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-          {section.emptyMessage}
-        </div>
-      )}
-    </section>
-  )
-}
-
-export function CategoryList({ groupedCategories, hasCategories, canManage, onEdit, onRemove, className }) {
-  return (
-    <Card className={className}>
-      <CardHeader>
-        <p className="text-sm font-medium text-primary">Categorias cadastradas</p>
-        <CardTitle className="text-2xl">Organização financeira</CardTitle>
-        <CardDescription>Separe receitas e despesas para classificar os lançamentos.</CardDescription>
-      </CardHeader>
-      <CardContent className="scrollbar-minimal min-h-0 flex-1 space-y-5 overflow-y-auto">
-        {!hasCategories ? (
-          <div className="rounded-(--radius) border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
-            Nenhuma categoria pessoal cadastrada.
-          </div>
-        ) : null}
-        {categorySections.map((section) => (
-          <CategorySection
-            key={section.type}
-            section={section}
-            categories={section.type === FINANCIAL_TYPES.INCOME ? groupedCategories.income : groupedCategories.expense}
+    <CollectionCard
+      className="h-full"
+      contentClassName="flex min-h-0 flex-1 flex-col"
+      eyebrow={`${categories.length} ${
+        categories.length === 1 ? 'categoria' : 'categorias'
+      }`}
+      title={section.title}
+      description={section.description}
+    >
+      <DataList
+        items={categories}
+        getItemKey={(category) => category.id}
+        renderItem={(category) => (
+          <CategoryItem
+            category={category}
             canManage={canManage}
             onEdit={onEdit}
             onRemove={onRemove}
           />
-        ))}
-      </CardContent>
-    </Card>
+        )}
+        emptyMessage={section.emptyMessage}
+        compact
+        scrollable
+        className="h-full px-2 ring-1 ring-border"
+      />
+    </CollectionCard>
+  )
+}
+
+export function CategoryList({
+  groupedCategories,
+  canManage,
+  onEdit,
+  onRemove,
+  className,
+}) {
+  return (
+    <div
+      className={cn(
+        'grid min-h-0 grid-rows-2 gap-4 lg:grid-cols-2 lg:grid-rows-1',
+        className,
+      )}
+    >
+      {categorySections.map((section) => (
+        <CategorySection
+          key={section.type}
+          section={section}
+          categories={
+            section.type === FINANCIAL_TYPES.INCOME
+              ? groupedCategories.income
+              : groupedCategories.expense
+          }
+          canManage={canManage}
+          onEdit={onEdit}
+          onRemove={onRemove}
+        />
+      ))}
+    </div>
   )
 }

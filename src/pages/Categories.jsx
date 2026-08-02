@@ -18,7 +18,6 @@ function CategoriesContent() {
     appearanceOptions,
     errorMessage,
     groupedCategories,
-    hasCategories,
     isLoading,
     refreshCategories,
     updateCategory,
@@ -100,7 +99,6 @@ function CategoriesContent() {
       <CategoryList
         className="min-h-0 flex-1"
         groupedCategories={groupedCategories}
-        hasCategories={hasCategories}
         canManage
         onEdit={openEditForm}
         onRemove={deleteCategory}

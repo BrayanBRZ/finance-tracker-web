@@ -57,7 +57,7 @@ function DashboardContent() {
         transactionCount={transactions.length}
       />
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         <FinancialChart
           totalIncome={totalIncome}
           totalExpenses={totalExpenses}
@@ -65,7 +65,7 @@ function DashboardContent() {
         <RecentTransactions transactions={transactions} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-4">
+      <div className="grid gap-5 lg:grid-cols-4">
         <CashFlowChart transactions={transactions} />
         <ExpenseBreakdownChart transactions={transactions} />
       </div>

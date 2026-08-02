@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useSession } from '@/context/sessionContext'
-import { RouteLoader } from '@/components/feedback/RouteLoader'
+import { PageLoader } from '@/components/feedback/PageLoader'
 
 const getSafeRedirect = (search) => {
   const redirect = new URLSearchParams(search).get('redirect')?.trim()
@@ -15,7 +15,7 @@ export default function GuestGuard() {
   const location = useLocation()
 
   if (isLoading) {
-    return <RouteLoader />
+    return <PageLoader />
   }
 
   if (session) {
