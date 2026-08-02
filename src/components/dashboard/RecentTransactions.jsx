@@ -15,7 +15,7 @@ const formatCurrency = (value) =>
 
 export function RecentTransactions({ transactions }) {
   return (
-    <Card className="h-full py-0 shadow-sm">
+    <Card className="h-full shadow-sm">
       <CardHeader>
         <CardTitle className="text-base">Atividades recentes</CardTitle>
         <CardDescription>

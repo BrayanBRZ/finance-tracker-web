@@ -72,7 +72,7 @@ export function CashFlowChart({ transactions }) {
   }, [transactions])
 
   return (
-    <Card className="h-full py-0 shadow-sm lg:col-span-2">
+    <Card className="h-full shadow-sm lg:col-span-2">
       <CardHeader>
         <CardTitle className="text-base">Evolução financeira</CardTitle>
         <CardDescription>

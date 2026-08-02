@@ -12,7 +12,6 @@ import {
   FINANCIAL_TYPE_LABELS,
   FINANCIAL_TYPES,
 } from '@/domain/financialTypes'
-import { cn } from '@/lib/utils'
 
 const categorySections = [
   {
@@ -96,7 +95,7 @@ function CategorySection({ section, categories, canManage, onEdit, onRemove }) {
 
 export function CategoryList({ groupedCategories, hasCategories, canManage, onEdit, onRemove, className }) {
   return (
-    <Card className={cn('p-4', className)}>
+    <Card className={className}>
       <CardHeader>
         <p className="text-sm font-medium text-primary">Categorias cadastradas</p>
         <CardTitle className="text-2xl">Organização financeira</CardTitle>
