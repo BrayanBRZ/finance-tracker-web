@@ -13,7 +13,13 @@ export function createLocalStorageCollection({ storageKey, initialData }) {
       }
 
       try {
-        return JSON.parse(storedData)
+        const parsedData = JSON.parse(storedData)
+
+        if (!Array.isArray(parsedData)) {
+          return seedCollection(storageKey, initialData)
+        }
+
+        return parsedData
       } catch {
         return seedCollection(storageKey, initialData)
       }

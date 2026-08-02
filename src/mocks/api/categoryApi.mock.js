@@ -13,6 +13,7 @@ import {
   replaceCategory,
 } from '@/mocks/repositories/categoryRepository.mock'
 import { hasTransactionsForCategory } from '@/mocks/repositories/transactionRepository.mock'
+import { categoryAppearanceOptions } from '@/mocks/data/categoryAppearanceData'
 import { latency } from '@/mocks/utils/fakeLatency'
 import { isSameId } from '@/mocks/utils/id'
 import { validateCategoryInput } from '@/mocks/validators/categoryValidator'
@@ -35,6 +36,14 @@ export async function listCategoriesForUser({ userId }) {
   return listCategoriesByUserId(userId).map(toPublicCategory)
 }
 
+export async function listCategoryAppearanceOptions({ userId }) {
+  await latency()
+
+  ensureAuthenticatedUser(userId)
+
+  return categoryAppearanceOptions
+}
+
 export async function createCategory({
   userId,
   name,
@@ -45,7 +54,7 @@ export async function createCategory({
   await latency()
 
   ensureAuthenticatedUser(userId)
-  validateCategoryInput({ name, type })
+  validateCategoryInput({ name, type, color, icon })
 
   if (findCategoryByNameForUser({ userId, name })) {
     throw new Error('Já existe uma categoria com este nome')
@@ -68,9 +77,14 @@ export async function updateCategory({
   await latency()
 
   ensureAuthenticatedUser(userId)
-  validateCategoryInput({ name, type })
-
   const category = findOwnedCategory({ categoryId, userId })
+  validateCategoryInput({
+    name,
+    type,
+    color,
+    icon,
+    currentCategory: category,
+  })
   const categoryWithSameName = findCategoryByNameForUser({ userId, name })
 
   if (categoryWithSameName && categoryWithSameName.id !== category.id) {

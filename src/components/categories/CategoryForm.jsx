@@ -1,5 +1,6 @@
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CategoryIcon } from '@/components/categories/CategoryIndicator'
 import { Button } from '@/components/ui/button'
 import { ErrorSpan } from '@/components/forms/ErrorSpan'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
@@ -14,16 +15,37 @@ import { TextField } from '@/components/forms/TextField'
 import { FINANCIAL_TYPE_OPTIONS } from '@/domain/financialTypes'
 import { categorySchema } from '@/schemas/categorySchema'
 
-export function CategoryForm({ category, onSubmit, onCancel }) {
+const includeLegacyOption = (options, value, label) => {
+  if (!value || options.some((option) => option.value === value)) return options
+
+  return [{ value, label }, ...options]
+}
+
+export function CategoryForm({
+  appearanceOptions,
+  category,
+  onSubmit,
+  onCancel,
+}) {
   const isEditing = Boolean(category)
+  const colorOptions = includeLegacyOption(
+    appearanceOptions.colors,
+    category?.color,
+    `Cor atual (${category?.color})`,
+  )
+  const iconOptions = includeLegacyOption(
+    appearanceOptions.icons,
+    category?.icon,
+    `Ícone atual (${category?.icon})`,
+  )
   const form = useForm({
     resolver: zodResolver(categorySchema),
     mode: 'onTouched',
     values: {
       name: category?.name ?? '',
       type: category?.type ?? '',
-      icon: category?.icon ?? '',
-      color: category?.color ?? '',
+      icon: category?.icon ?? appearanceOptions.icons[0]?.value ?? '',
+      color: category?.color ?? appearanceOptions.colors[0]?.value ?? '',
     },
   })
   const {
@@ -33,6 +55,7 @@ export function CategoryForm({ category, onSubmit, onCancel }) {
     reset,
     formState: { errors, isSubmitting },
   } = form
+  const selectedColor = useWatch({ control, name: 'color' })
 
   const submit = async (categoryData) => {
     try {
@@ -94,26 +117,89 @@ export function CategoryForm({ category, onSubmit, onCancel }) {
                 </Field>
               )}
             />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <TextField
-                id="category-icon"
-                label="Ícone"
-                placeholder="Opcional"
-                autoComplete="off"
-                {...register('icon')}
-                disabled={isSubmitting}
-                error={errors.icon?.message}
-              />
-              <TextField
-                id="category-color"
-                label="Cor"
-                placeholder="Opcional"
-                autoComplete="off"
-                {...register('color')}
-                disabled={isSubmitting}
-                error={errors.color?.message}
-              />
-            </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Controller
+            control={control}
+            name="color"
+            render={({ field }) => (
+              <Field>
+                <FieldLabel htmlFor="category-color">Cor</FieldLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  onOpenChange={(isOpen) => {
+                    if (!isOpen) field.onBlur()
+                  }}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger
+                    id="category-color"
+                    aria-invalid={errors.color ? true : undefined}
+                  >
+                    <SelectValue placeholder="Selecione uma cor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {colorOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <span
+                          className="size-3 rounded-[2px]"
+                          style={{ backgroundColor: option.value }}
+                          aria-hidden="true"
+                        />
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <ErrorSpan
+                  id="category-color-error"
+                  error={errors.color?.message}
+                />
+              </Field>
+            )}
+          />
+          <Controller
+            control={control}
+            name="icon"
+            render={({ field }) => (
+              <Field>
+                <FieldLabel htmlFor="category-icon">Ícone</FieldLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  onOpenChange={(isOpen) => {
+                    if (!isOpen) field.onBlur()
+                  }}
+                  disabled={isSubmitting}
+                >
+                  <SelectTrigger
+                    id="category-icon"
+                    aria-invalid={errors.icon ? true : undefined}
+                  >
+                    <SelectValue placeholder="Selecione um ícone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {iconOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <CategoryIcon
+                          icon={option.value}
+                          color={selectedColor}
+                          className="size-6"
+                          iconClassName="size-3.5"
+                        />
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <ErrorSpan
+                  id="category-icon-error"
+                  error={errors.icon?.message}
+                />
+              </Field>
+            )}
+          />
+        </div>
             <div className="flex flex-wrap gap-2">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting

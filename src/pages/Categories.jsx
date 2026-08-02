@@ -15,6 +15,7 @@ function CategoriesContent() {
   const [operationError, setOperationError] = useState(null)
   const {
     createCategory,
+    appearanceOptions,
     errorMessage,
     groupedCategories,
     hasCategories,
@@ -112,6 +113,7 @@ function CategoriesContent() {
         description="Categorias são pessoais e podem classificar lançamentos das suas carteiras."
       >
         <CategoryForm
+          appearanceOptions={appearanceOptions}
           category={editingCategory}
           onSubmit={saveCategory}
           onCancel={() => handleFormOpenChange(false)}

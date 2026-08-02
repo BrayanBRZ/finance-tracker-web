@@ -10,6 +10,6 @@ export const categorySchema = z.object({
   type: z
     .string()
     .refine(isKnownFinancialType, 'Selecione um tipo de categoria válido'),
-  color: z.string().trim(),
-  icon: z.string().trim(),
+  color: z.string().trim().min(1, 'Selecione uma cor'),
+  icon: z.string().trim().min(1, 'Selecione um ícone'),
 })

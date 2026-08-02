@@ -63,6 +63,8 @@ export function toPublicTransaction(transaction, category) {
           id: category.id,
           name: category.name,
           type: category.type,
+          color: category.color,
+          icon: category.icon,
         }
       : null,
   }

@@ -3,10 +3,16 @@ import { FINANCIAL_TYPES } from '@/domain/financialTypes'
 import { useSession } from '@/context/sessionContext'
 import {
   createCategory as createCategoryOperation,
+  listCategoryAppearanceOptions,
   listCategoriesForUser,
   removeCategory as removeCategoryOperation,
   updateCategory as updateCategoryOperation,
 } from '@/services/categoryService'
+
+const emptyAppearanceOptions = {
+  colors: [],
+  icons: [],
+}
 
 const getErrorMessage = (error) =>
   error instanceof Error
@@ -26,12 +32,16 @@ export function useCategories() {
   const { session } = useSession()
   const userId = session?.user.id
   const [categories, setCategories] = useState([])
+  const [appearanceOptions, setAppearanceOptions] = useState(
+    emptyAppearanceOptions,
+  )
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
 
   const loadCategories = useCallback(async () => {
     if (!userId) {
       setCategories([])
+      setAppearanceOptions(emptyAppearanceOptions)
       setErrorMessage(null)
       return []
     }
@@ -40,11 +50,16 @@ export function useCategories() {
     setErrorMessage(null)
 
     try {
-      const nextCategories = await listCategoriesForUser({ userId })
+      const [nextCategories, nextAppearanceOptions] = await Promise.all([
+        listCategoriesForUser({ userId }),
+        listCategoryAppearanceOptions({ userId }),
+      ])
       setCategories(nextCategories)
+      setAppearanceOptions(nextAppearanceOptions)
       return nextCategories
     } catch (error) {
       setCategories([])
+      setAppearanceOptions(emptyAppearanceOptions)
       setErrorMessage(getErrorMessage(error))
       return []
     } finally {
@@ -108,6 +123,7 @@ export function useCategories() {
 
   return {
     categories,
+    appearanceOptions,
     groupedCategories,
     hasCategories: categories.length > 0,
     isLoading,
