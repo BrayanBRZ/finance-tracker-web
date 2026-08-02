@@ -2,9 +2,11 @@ import { useMemo } from 'react'
 import { Cell, Pie, PieChart } from 'recharts'
 import {
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltip,
-  ChartTooltipContent,
 } from '@/components/ui/chart'
+import { getCategoryColor } from '@/components/categories/categoryAppearance'
 import {
   Card,
   CardContent,
@@ -14,24 +16,32 @@ import {
 } from '@/components/ui/card'
 import { FINANCIAL_TYPES } from '@/domain/financialTypes'
 
-const chartColors = [
-  'var(--chart-2)',
-  'var(--chart-3)',
-  'var(--chart-4)',
-  'var(--chart-5)',
-  'var(--chart-1)',
-]
-
 const formatCurrency = (value) =>
   Number(value).toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
   })
 
-const chartConfig = {
-  amount: {
-    label: 'Despesas',
-  },
+function ExpenseTooltip({ active, payload }) {
+  if (!active || !payload?.length) return null
+
+  const item = payload[0]
+
+  return (
+    <div className="flex min-w-36 items-center gap-2 rounded-(--radius) border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
+      <span
+        className="size-2.5 shrink-0 rounded-[2px]"
+        style={{ backgroundColor: item.payload.fill }}
+        aria-hidden="true"
+      />
+      <span className="min-w-0 flex-1 truncate text-muted-foreground">
+        {item.payload.category}
+      </span>
+      <span className="font-mono font-medium text-foreground tabular-nums">
+        {formatCurrency(item.value)}
+      </span>
+    </div>
+  )
 }
 
 export function ExpenseBreakdownChart({ transactions }) {
@@ -39,19 +49,36 @@ export function ExpenseBreakdownChart({ transactions }) {
     const totalsByCategory = transactions.reduce((totals, transaction) => {
       if (transaction.type !== FINANCIAL_TYPES.EXPENSE) return totals
 
-      const categoryName = transaction.category?.name ?? 'Sem categoria'
-      totals.set(categoryName, (totals.get(categoryName) ?? 0) + transaction.amount)
+      const categoryKey = transaction.category?.id ?? '__uncategorized__'
+      const currentCategory = totals.get(categoryKey) ?? {
+        category: transaction.category?.name ?? 'Sem categoria',
+        amount: 0,
+        fill: getCategoryColor(transaction.category?.color),
+      }
+
+      currentCategory.amount += transaction.amount
+      totals.set(categoryKey, currentCategory)
       return totals
     }, new Map())
 
-    return [...totalsByCategory.entries()]
-      .sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount)
-      .map(([category, amount], index) => ({
-        category,
-        amount,
-        fill: chartColors[index % chartColors.length],
-      }))
+    return [...totalsByCategory.values()].sort(
+      (firstCategory, secondCategory) =>
+        secondCategory.amount - firstCategory.amount,
+    )
   }, [transactions])
+  const chartConfig = useMemo(
+    () =>
+      Object.fromEntries(
+        data.map((item) => [
+          item.category,
+          {
+            label: item.category,
+            color: item.fill,
+          },
+        ]),
+      ),
+    [data],
+  )
 
   return (
     <Card className="h-full lg:col-span-2">
@@ -75,12 +102,7 @@ export function ExpenseBreakdownChart({ transactions }) {
             <PieChart>
               <ChartTooltip
                 cursor={false}
-                content={
-                  <ChartTooltipContent
-                    hideLabel
-                    formatter={(value) => formatCurrency(value)}
-                  />
-                }
+                content={<ExpenseTooltip />}
               />
               <Pie
                 data={data}
@@ -95,6 +117,14 @@ export function ExpenseBreakdownChart({ transactions }) {
                   <Cell key={item.category} fill={item.fill} />
                 ))}
               </Pie>
+              <ChartLegend
+                content={
+                  <ChartLegendContent
+                    nameKey="category"
+                    className="flex-wrap gap-x-3 gap-y-1"
+                  />
+                }
+              />
             </PieChart>
           </ChartContainer>
         )}

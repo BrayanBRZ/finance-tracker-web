@@ -13,10 +13,16 @@ import { useTransactions } from '@/hooks/useTransactions'
 import { useWallet } from '@/context/walletContext'
 import { WALLET_MEMBER_ROLES } from '@/domain/walletRoles'
 
+const TRANSACTIONS_PER_PAGE = 10
+
 function TransactionsContent() {
   const { currentWallet } = useWallet()
   const [editingTransaction, setEditingTransaction] = useState(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [pagination, setPagination] = useState({
+    walletId: null,
+    page: 1,
+  })
   const {
     categories,
     isLoading: isLoadingCategories,
@@ -36,6 +42,25 @@ function TransactionsContent() {
     currentWallet?.role === WALLET_MEMBER_ROLES.OWNER ||
     currentWallet?.role === WALLET_MEMBER_ROLES.EDITOR
   const loadErrorMessage = errorMessage ?? categoriesErrorMessage
+  const totalPages = Math.max(
+    1,
+    Math.ceil(transactions.length / TRANSACTIONS_PER_PAGE),
+  )
+  const currentPage =
+    pagination.walletId === currentWallet?.id
+      ? Math.min(pagination.page, totalPages)
+      : 1
+  const pageTransactions = transactions.slice(
+    (currentPage - 1) * TRANSACTIONS_PER_PAGE,
+    currentPage * TRANSACTIONS_PER_PAGE,
+  )
+
+  const changePage = (page) => {
+    setPagination({
+      walletId: currentWallet?.id ?? null,
+      page,
+    })
+  }
 
   const saveTransaction = async (transactionData) => {
     if (editingTransaction) {
@@ -46,6 +71,7 @@ function TransactionsContent() {
     }
 
     await createTransaction(transactionData)
+    changePage(1)
     setIsFormOpen(false)
   }
 
@@ -90,9 +116,12 @@ function TransactionsContent() {
         }
       />
       <TransactionList
-        transactions={transactions}
+        transactions={pageTransactions}
+        page={currentPage}
+        totalPages={totalPages}
         canEditTransaction={() => canManageTransactions}
         canDelete={canManageTransactions}
+        onPageChange={changePage}
         onEdit={openEditForm}
         onDelete={removeTransaction}
       />

@@ -1,4 +1,4 @@
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { ErrorSpan } from '@/components/forms/ErrorSpan'
@@ -11,11 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  FINANCIAL_TYPE_LABELS,
-  FINANCIAL_TYPE_OPTIONS,
-  FINANCIAL_TYPES,
-} from '@/domain/financialTypes'
+import { FINANCIAL_TYPE_OPTIONS, FINANCIAL_TYPES } from '@/domain/financialTypes'
 import { transactionSchema } from '@/schemas/transactionSchema'
 
 const currentDate = () => new Date().toISOString().slice(0, 10)
@@ -44,8 +40,30 @@ export function TransactionForm({
     register,
     handleSubmit,
     reset,
+    getValues,
+    setValue,
     formState: { errors, isSubmitting },
   } = form
+  const selectedType = useWatch({ control, name: 'type' })
+  const filteredCategories = categories.filter(
+    (category) => category.type === selectedType,
+  )
+
+  const changeTransactionType = (field, nextType) => {
+    field.onChange(nextType)
+
+    const selectedCategoryId = getValues('categoryId')
+    const selectedCategory = categories.find(
+      (category) => category.id === selectedCategoryId,
+    )
+
+    if (selectedCategory && selectedCategory.type !== nextType) {
+      setValue('categoryId', NO_CATEGORY_VALUE, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+    }
+  }
 
   const submit = async (transactionData) => {
     try {
@@ -80,7 +98,9 @@ export function TransactionForm({
                   <FieldLabel htmlFor="transaction-type">Tipo</FieldLabel>
                   <Select
                     value={field.value}
-                    onValueChange={field.onChange}
+                    onValueChange={(nextType) =>
+                      changeTransactionType(field, nextType)
+                    }
                     onOpenChange={(isOpen) => {
                       if (!isOpen) field.onBlur()
                     }}
@@ -128,9 +148,9 @@ export function TransactionForm({
                       <SelectItem value={NO_CATEGORY_VALUE}>
                         Sem categoria
                       </SelectItem>
-                      {categories.map((category) => (
+                      {filteredCategories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
-                          {category.name} · {FINANCIAL_TYPE_LABELS[category.type]}
+                          {category.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

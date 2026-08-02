@@ -1,5 +1,6 @@
-import { Pencil, Tags, Trash2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { CategoryIndicator } from '@/components/categories/CategoryIndicator'
 import { CategoryTypeBadge } from '@/components/categories/CategoryTypeBadge'
 import {
   Card,
@@ -32,18 +33,14 @@ function CategoryItem({ category, canManage, onEdit, onRemove }) {
   return (
     <li className="rounded-(--radius) border border-border bg-card p-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-(--radius) bg-primary/10 text-primary">
-            <Tags className="size-4" aria-hidden="true" />
-          </span>
-          <div className="min-w-0">
-            <p className="truncate font-medium text-card-foreground">{category.name}</p>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-              <span>{FINANCIAL_TYPE_LABELS[category.type]}</span>
-              {category.icon ? <span>Ícone: {category.icon}</span> : null}
-              {category.color ? <span>Cor: {category.color}</span> : null}
-            </div>
-          </div>
+        <div className="min-w-0">
+          <CategoryIndicator
+            category={category}
+            className="font-medium text-card-foreground"
+          />
+          <p className="mt-1 pl-9 text-xs text-muted-foreground">
+            Categoria de {FINANCIAL_TYPE_LABELS[category.type].toLowerCase()}
+          </p>
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
