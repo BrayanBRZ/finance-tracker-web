@@ -53,49 +53,53 @@ function CategoriesContent() {
 
   if (errorMessage) {
     return (
-      <StateCard
-        eyebrow="Não foi possível carregar categorias"
-        title="Algo saiu do trilho"
-        description={errorMessage}
-        role="alert"
-        action={{ label: 'Tentar novamente', onClick: () => void refreshCategories() }}
-      />
+      <div className="space-y-6">
+        <PageHeader
+          title="Categorias"
+          description="Organize categorias para classificar seus lançamentos."
+        />
+        <StateCard
+          eyebrow="Não foi possível carregar categorias"
+          title="Algo saiu do trilho"
+          description={errorMessage}
+          role="alert"
+          action={{ label: 'Tentar novamente', onClick: () => void refreshCategories() }}
+        />
+      </div>
     )
   }
 
-  return (
-    <ContentWithAside>
-      <div className="space-y-4">
-        {operationError ? (
-          <p role="alert" className="rounded-(--radius) border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-            {operationError}
-          </p>
-        ) : null}
-        <CategoryList
-          groupedCategories={groupedCategories}
-          hasCategories={hasCategories}
-          canManage
-          onEdit={setEditingCategory}
-          onRemove={deleteCategory}
-        />
-      </div>
-      <CategoryForm
-        category={editingCategory}
-        onSubmit={saveCategory}
-        onCancel={() => setEditingCategory(null)}
-      />
-    </ContentWithAside>
-  )
-}
-
-export function CategoriesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
         title="Categorias"
         description="Organize categorias para classificar seus lançamentos."
       />
-      <CategoriesContent />
+      <ContentWithAside>
+        <div className="space-y-4">
+          {operationError ? (
+            <p role="alert" className="rounded-(--radius) border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+              {operationError}
+            </p>
+          ) : null}
+          <CategoryList
+            groupedCategories={groupedCategories}
+            hasCategories={hasCategories}
+            canManage
+            onEdit={setEditingCategory}
+            onRemove={deleteCategory}
+          />
+        </div>
+        <CategoryForm
+          category={editingCategory}
+          onSubmit={saveCategory}
+          onCancel={() => setEditingCategory(null)}
+        />
+      </ContentWithAside>
     </div>
   )
+}
+
+export function CategoriesPage() {
+  return <CategoriesContent />
 }

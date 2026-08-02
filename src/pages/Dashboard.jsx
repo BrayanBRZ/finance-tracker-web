@@ -40,21 +40,31 @@ function DashboardContent() {
 
   if (errorMessage) {
     return (
-      <StateCard
-        eyebrow="Não foi possível carregar o dashboard"
-        title="Algo saiu do trilho"
-        description={errorMessage}
-        role="alert"
-        action={{
-          label: 'Tentar novamente',
-          onClick: () => void refreshTransactions(),
-        }}
-      />
+      <div className="space-y-6">
+        <PageHeader
+          title="Dashboard"
+          description="Visão geral da carteira selecionada"
+        />
+        <StateCard
+          eyebrow="Não foi possível carregar o dashboard"
+          title="Algo saiu do trilho"
+          description={errorMessage}
+          role="alert"
+          action={{
+            label: 'Tentar novamente',
+            onClick: () => void refreshTransactions(),
+          }}
+        />
+      </div>
     )
   }
 
   return (
-    <>
+    <div className="space-y-6">
+      <PageHeader
+        title="Dashboard"
+        description="Visão geral da carteira selecionada"
+      />
       <DashboardSummary
         totalIncome={totalIncome}
         totalExpenses={totalExpenses}
@@ -72,20 +82,10 @@ function DashboardContent() {
         <CashFlowChart transactions={transactions} />
         <ExpenseBreakdownChart transactions={transactions} />
       </div>
-    </>
+    </div>
   )
 }
 
 export function DashboardPage() {
-  return (
-    <WalletScope>
-      <div className="space-y-6">
-        <PageHeader
-          title="Dashboard"
-          description="Visão geral da carteira selecionada"
-        />
-        <DashboardContent />
-      </div>
-    </WalletScope>
-  )
+  return <WalletScope><DashboardContent /></WalletScope>
 }

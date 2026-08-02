@@ -44,55 +44,57 @@ function TransactionsContent() {
 
   if (errorMessage) {
     return (
-      <StateCard
-        eyebrow="Não foi possível carregar transações"
-        title="Algo saiu do trilho"
-        description={errorMessage}
-        role="alert"
-        action={{ label: 'Tentar novamente', onClick: () => void refreshTransactions() }}
-      />
-    )
-  }
-
-  return (
-    <ContentWithAside>
-      <TransactionList
-        transactions={transactions}
-        canEditTransaction={() => canManageTransactions}
-        canDelete={canManageTransactions}
-        onEdit={setEditingTransaction}
-        onDelete={removeTransaction}
-      />
-      {canManageTransactions ? (
-        <TransactionForm
-          categories={categories}
-          transaction={editingTransaction}
-          onSubmit={saveTransaction}
-          onCancel={() => setEditingTransaction(null)}
-        />
-      ) : (
-        <StateCard
-          eyebrow="Acesso de leitura"
-          title="Você não pode registrar transações"
-          description="Visualizadores podem apenas consultar os lançamentos."
-          role="status"
-          ariaLive="polite"
-        />
-      )}
-    </ContentWithAside>
-  )
-}
-
-export function TransactionsPage() {
-  return (
-    <WalletScope>
       <div className="space-y-6">
         <PageHeader
           title="Transações"
           description="Gerencie receitas e despesas da carteira selecionada."
         />
-        <TransactionsContent />
+        <StateCard
+          eyebrow="Não foi possível carregar transações"
+          title="Algo saiu do trilho"
+          description={errorMessage}
+          role="alert"
+          action={{ label: 'Tentar novamente', onClick: () => void refreshTransactions() }}
+        />
       </div>
-    </WalletScope>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Transações"
+        description="Gerencie receitas e despesas da carteira selecionada."
+      />
+      <ContentWithAside>
+        <TransactionList
+          transactions={transactions}
+          canEditTransaction={() => canManageTransactions}
+          canDelete={canManageTransactions}
+          onEdit={setEditingTransaction}
+          onDelete={removeTransaction}
+        />
+        {canManageTransactions ? (
+          <TransactionForm
+            categories={categories}
+            transaction={editingTransaction}
+            onSubmit={saveTransaction}
+            onCancel={() => setEditingTransaction(null)}
+          />
+        ) : (
+          <StateCard
+            eyebrow="Acesso de leitura"
+            title="Você não pode registrar transações"
+            description="Visualizadores podem apenas consultar os lançamentos."
+            role="status"
+            ariaLive="polite"
+          />
+        )}
+      </ContentWithAside>
+    </div>
   )
+}
+
+export function TransactionsPage() {
+  return <WalletScope><TransactionsContent /></WalletScope>
 }
