@@ -1,13 +1,6 @@
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { ErrorSpan } from '@/components/forms/ErrorSpan'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import {
@@ -58,18 +51,8 @@ export function CategoryForm({ category, onSubmit, onCancel }) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">
-          {isEditing ? 'Editar categoria' : 'Criar categoria'}
-        </CardTitle>
-        <CardDescription>
-          Categorias são pessoais e podem classificar lançamentos das suas carteiras.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form noValidate onSubmit={handleSubmit(submit)}>
-          <FieldGroup className="gap-4">
+    <form noValidate onSubmit={handleSubmit(submit)}>
+      <FieldGroup className="gap-4">
             <TextField
               id="category-name"
               label="Nome"
@@ -150,9 +133,7 @@ export function CategoryForm({ category, onSubmit, onCancel }) {
               error={errors.root?.server?.message}
               className="text-sm"
             />
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+      </FieldGroup>
+    </form>
   )
 }

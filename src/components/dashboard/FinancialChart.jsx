@@ -47,7 +47,7 @@ export function FinancialChart({ totalIncome, totalExpenses }) {
   ]
 
   return (
-    <Card className="h-full shadow-sm">
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="text-base">Receitas e despesas</CardTitle>
         <CardDescription>

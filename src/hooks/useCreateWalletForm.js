@@ -18,8 +18,9 @@ export function useCreateWalletForm() {
   const onSubmit = async (walletData) => {
     try {
       form.clearErrors('root')
-      await createWallet(walletData)
+      const wallet = await createWallet(walletData)
       form.reset()
+      return wallet
     } catch (error) {
       form.setError('root.server', {
         type: 'server',
@@ -28,6 +29,7 @@ export function useCreateWalletForm() {
             ? error.message
             : 'Não foi possível criar a carteira.',
       })
+      return null
     }
   }
 

@@ -1,14 +1,17 @@
 import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import { CategoryForm } from '@/components/categories/CategoryForm'
 import { CategoryList } from '@/components/categories/CategoryList'
+import { FormDialog } from '@/components/forms/FormDialog'
+import { PageErrorState } from '@/components/feedback/PageErrorState'
 import { PageLoader } from '@/components/feedback/PageLoader'
-import { StateCard } from '@/components/feedback/StateCard'
-import { ContentWithAside } from '@/components/layout/ContentWithAside'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { Button } from '@/components/ui/button'
 import { useCategories } from '@/hooks/useCategories'
 
 function CategoriesContent() {
   const [editingCategory, setEditingCategory] = useState(null)
+  const [isFormOpen, setIsFormOpen] = useState(false)
   const [operationError, setOperationError] = useState(null)
   const {
     createCategory,
@@ -27,10 +30,27 @@ function CategoriesContent() {
     if (editingCategory) {
       await updateCategory(editingCategory.id, categoryData)
       setEditingCategory(null)
+      setIsFormOpen(false)
       return
     }
 
     await createCategory(categoryData)
+    setIsFormOpen(false)
+  }
+
+  const openCreateForm = () => {
+    setEditingCategory(null)
+    setIsFormOpen(true)
+  }
+
+  const openEditForm = (category) => {
+    setEditingCategory(category)
+    setIsFormOpen(true)
+  }
+
+  const handleFormOpenChange = (isOpen) => {
+    setIsFormOpen(isOpen)
+    if (!isOpen) setEditingCategory(null)
   }
 
   const deleteCategory = async (categoryId) => {
@@ -47,55 +67,56 @@ function CategoriesContent() {
     }
   }
 
-  if (isLoading) {
-    return <PageLoader label="Carregando categorias..." />
-  }
-
-  if (errorMessage) {
-    return (
-      <div className="space-y-6">
-        <PageHeader
-          title="Categorias"
-          description="Organize categorias para classificar seus lançamentos."
-        />
-        <StateCard
-          eyebrow="Não foi possível carregar categorias"
-          title="Algo saiu do trilho"
-          description={errorMessage}
-          role="alert"
-          action={{ label: 'Tentar novamente', onClick: () => void refreshCategories() }}
-        />
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-6">
+  return isLoading ? (
+    <PageLoader />
+  ) : errorMessage ? (
+    <PageErrorState
+      eyebrow="Não foi possível carregar categorias"
+      description={errorMessage}
+      onRetry={() => void refreshCategories()}
+    />
+  ) : (
+    <div className="flex h-full min-h-0 flex-col gap-6">
       <PageHeader
         title="Categorias"
         description="Organize categorias para classificar seus lançamentos."
+        actions={
+          <Button type="button" onClick={openCreateForm}>
+            <Plus aria-hidden="true" />
+            Nova categoria
+          </Button>
+        }
       />
-      <ContentWithAside>
-        <div className="space-y-4">
-          {operationError ? (
-            <p role="alert" className="rounded-(--radius) border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-              {operationError}
-            </p>
-          ) : null}
-          <CategoryList
-            groupedCategories={groupedCategories}
-            hasCategories={hasCategories}
-            canManage
-            onEdit={setEditingCategory}
-            onRemove={deleteCategory}
-          />
-        </div>
+
+      {operationError ? (
+        <p
+          role="alert"
+          className="rounded-(--radius) border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
+        >
+          {operationError}
+        </p>
+      ) : null}
+      <CategoryList
+        className="min-h-0 flex-1"
+        groupedCategories={groupedCategories}
+        hasCategories={hasCategories}
+        canManage
+        onEdit={openEditForm}
+        onRemove={deleteCategory}
+      />
+
+      <FormDialog
+        open={isFormOpen}
+        onOpenChange={handleFormOpenChange}
+        title={editingCategory ? 'Editar categoria' : 'Nova categoria'}
+        description="Categorias são pessoais e podem classificar lançamentos das suas carteiras."
+      >
         <CategoryForm
           category={editingCategory}
           onSubmit={saveCategory}
-          onCancel={() => setEditingCategory(null)}
+          onCancel={() => handleFormOpenChange(false)}
         />
-      </ContentWithAside>
+      </FormDialog>
     </div>
   )
 }

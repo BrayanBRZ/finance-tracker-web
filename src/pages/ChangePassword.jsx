@@ -1,33 +1,34 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { useState } from 'react'
+import { KeyRound } from 'lucide-react'
 import { ChangePasswordForm } from '@/components/auth/ChangePasswordForm'
+import { FormDialog } from '@/components/forms/FormDialog'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { Button } from '@/components/ui/button'
 
 export function ChangePasswordPage() {
+  const [isFormOpen, setIsFormOpen] = useState(false)
+
   return (
-    <div className="space-y-6">
+    <div className="flex h-full min-h-0 flex-col gap-6">
       <PageHeader
         title="Alterar senha"
         description="Atualize as credenciais de acesso da sua conta."
+        actions={
+          <Button type="button" onClick={() => setIsFormOpen(true)}>
+            <KeyRound aria-hidden="true" />
+            Alterar senha
+          </Button>
+        }
       />
-      <div className="mx-auto max-w-md">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Nova senha</CardTitle>
-            <CardDescription>
-              Confirme sua senha atual antes de escolher uma nova.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChangePasswordForm />
-          </CardContent>
-        </Card>
-      </div>
+
+      <FormDialog
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        title="Nova senha"
+        description="Confirme sua senha atual antes de escolher uma nova."
+      >
+        <ChangePasswordForm />
+      </FormDialog>
     </div>
   )
 }

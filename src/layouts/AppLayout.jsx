@@ -33,6 +33,7 @@ export function AppLayout() {
   };
 
   const columnWidth = "w-50";
+  const isDashboard = pathname === "/dashboard";
   const currentPage =
     navigationItems.find((item) => item.to === pathname)?.label ?? "Perfil";
 
@@ -132,8 +133,20 @@ export function AppLayout() {
           </p>
         </header>
 
-        <main className="scrollbar-minimal min-h-0 min-w-0 flex-1 overflow-y-auto">
-          <div className="p-3 sm:p-4 md:p-6">
+        <main
+          className={cn(
+            "scrollbar-minimal min-h-0 min-w-0 flex-1",
+            isDashboard
+              ? "overflow-y-auto"
+              : "overflow-y-auto lg:overflow-hidden",
+          )}
+        >
+          <div
+            className={cn(
+              "p-3 sm:p-4 md:p-6",
+              !isDashboard && "lg:h-full",
+            )}
+          >
             <Outlet />
           </div>
         </main>

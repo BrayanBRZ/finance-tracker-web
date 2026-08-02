@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { ContentWithAside } from '@/components/layout/ContentWithAside'
+import { Plus } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { PageErrorState } from '@/components/feedback/PageErrorState'
 import { PageLoader } from '@/components/feedback/PageLoader'
-import { StateCard } from '@/components/feedback/StateCard'
+import { FormDialog } from '@/components/forms/FormDialog'
 import { TransactionForm } from '@/components/transactions/TransactionForm'
 import { TransactionList } from '@/components/transactions/TransactionList'
+import { Button } from '@/components/ui/button'
 import { WalletScope } from '@/components/wallets/WalletScope'
 import { useCategories } from '@/hooks/useCategories'
 import { useTransactions } from '@/hooks/useTransactions'
@@ -14,7 +16,13 @@ import { WALLET_MEMBER_ROLES } from '@/domain/walletRoles'
 function TransactionsContent() {
   const { currentWallet } = useWallet()
   const [editingTransaction, setEditingTransaction] = useState(null)
-  const { categories, isLoading: isLoadingCategories } = useCategories()
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const {
+    categories,
+    isLoading: isLoadingCategories,
+    errorMessage: categoriesErrorMessage,
+    refreshCategories,
+  } = useCategories()
   const {
     transactions,
     isLoading,
@@ -27,74 +35,89 @@ function TransactionsContent() {
   const canManageTransactions =
     currentWallet?.role === WALLET_MEMBER_ROLES.OWNER ||
     currentWallet?.role === WALLET_MEMBER_ROLES.EDITOR
+  const loadErrorMessage = errorMessage ?? categoriesErrorMessage
 
   const saveTransaction = async (transactionData) => {
     if (editingTransaction) {
       await updateTransaction(editingTransaction.id, transactionData)
       setEditingTransaction(null)
+      setIsFormOpen(false)
       return
     }
 
     await createTransaction(transactionData)
+    setIsFormOpen(false)
   }
 
-  if (isLoading || isLoadingCategories) {
-    return <PageLoader label="Carregando transações..." />
+  const openCreateForm = () => {
+    setEditingTransaction(null)
+    setIsFormOpen(true)
   }
 
-  if (errorMessage) {
-    return (
-      <div className="space-y-6">
-        <PageHeader
-          title="Transações"
-          description="Gerencie receitas e despesas da carteira selecionada."
-        />
-        <StateCard
-          eyebrow="Não foi possível carregar transações"
-          title="Algo saiu do trilho"
-          description={errorMessage}
-          role="alert"
-          action={{ label: 'Tentar novamente', onClick: () => void refreshTransactions() }}
-        />
-      </div>
-    )
+  const openEditForm = (transaction) => {
+    setEditingTransaction(transaction)
+    setIsFormOpen(true)
   }
 
-  return (
-    <div className="space-y-6">
+  const handleFormOpenChange = (isOpen) => {
+    setIsFormOpen(isOpen)
+    if (!isOpen) setEditingTransaction(null)
+  }
+
+  const retryPageData = () =>
+    void Promise.all([refreshTransactions(), refreshCategories()])
+
+  return isLoading || isLoadingCategories ? (
+    <PageLoader />
+  ) : loadErrorMessage ? (
+    <PageErrorState
+      eyebrow="Não foi possível carregar transações"
+      description={loadErrorMessage}
+      onRetry={retryPageData}
+    />
+  ) : (
+    <div className="flex h-full min-h-0 flex-col gap-6">
       <PageHeader
         title="Transações"
         description="Gerencie receitas e despesas da carteira selecionada."
+        actions={
+          canManageTransactions ? (
+            <Button type="button" onClick={openCreateForm}>
+              <Plus aria-hidden="true" />
+              Nova transação
+            </Button>
+          ) : null
+        }
       />
-      <ContentWithAside>
-        <TransactionList
-          transactions={transactions}
-          canEditTransaction={() => canManageTransactions}
-          canDelete={canManageTransactions}
-          onEdit={setEditingTransaction}
-          onDelete={removeTransaction}
+      <TransactionList
+        transactions={transactions}
+        canEditTransaction={() => canManageTransactions}
+        canDelete={canManageTransactions}
+        onEdit={openEditForm}
+        onDelete={removeTransaction}
+      />
+
+      <FormDialog
+        open={isFormOpen}
+        onOpenChange={handleFormOpenChange}
+        title={editingTransaction ? 'Editar transação' : 'Nova transação'}
+        description="Escolha o tipo da transação. A categoria pessoal é opcional."
+      >
+        <TransactionForm
+          categories={categories}
+          transaction={editingTransaction}
+          onSubmit={saveTransaction}
+          onCancel={() => handleFormOpenChange(false)}
         />
-        {canManageTransactions ? (
-          <TransactionForm
-            categories={categories}
-            transaction={editingTransaction}
-            onSubmit={saveTransaction}
-            onCancel={() => setEditingTransaction(null)}
-          />
-        ) : (
-          <StateCard
-            eyebrow="Acesso de leitura"
-            title="Você não pode registrar transações"
-            description="Visualizadores podem apenas consultar os lançamentos."
-            role="status"
-            ariaLive="polite"
-          />
-        )}
-      </ContentWithAside>
+      </FormDialog>
     </div>
   )
 }
 
 export function TransactionsPage() {
-  return <WalletScope><TransactionsContent /></WalletScope>
+  return (
+    <WalletScope>
+      <TransactionsContent />
+    </WalletScope>
+  )
 }

@@ -1,13 +1,6 @@
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { ErrorSpan } from '@/components/forms/ErrorSpan'
 import { TextField } from '@/components/forms/TextField'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
@@ -77,18 +70,8 @@ export function TransactionForm({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">
-          {isEditing ? 'Editar transação' : 'Nova transação'}
-        </CardTitle>
-        <CardDescription>
-          Escolha o tipo da transação. A categoria pessoal é opcional.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form noValidate onSubmit={handleSubmit(submit)}>
-          <FieldGroup className="gap-4">
+    <form noValidate onSubmit={handleSubmit(submit)}>
+      <FieldGroup className="gap-4">
             <Controller
               control={control}
               name="type"
@@ -207,9 +190,7 @@ export function TransactionForm({
               error={errors.root?.server?.message}
               className="text-sm"
             />
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+      </FieldGroup>
+    </form>
   )
 }

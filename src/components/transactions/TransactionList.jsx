@@ -3,9 +3,7 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import { CategoryTypeBadge } from '@/components/categories/CategoryTypeBadge'
 
@@ -17,34 +15,32 @@ export function TransactionList({
   onDelete,
 }) {
   return (
-    <Card>
+    <Card className="h-full min-h-0">
       <CardHeader>
         <p className="text-sm font-medium text-primary">Lançamentos</p>
-        <CardTitle className="text-2xl">Transações da carteira</CardTitle>
-        <CardDescription>
-          Registros ordenados da data financeira mais recente para a mais antiga.
-        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-h-0 flex-1">
         {transactions.length === 0 ? (
           <p className="rounded-(--radius) border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
             Ainda não há transações nesta carteira.
           </p>
         ) : (
-          <ul className="divide-y divide-border rounded-(--radius) border border-border">
+          <ul className="scrollbar-minimal h-full overflow-y-auto divide-y divide-border rounded-(--radius) border border-border">
             {transactions.map((transaction) => (
-              <li key={transaction.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <li key={transaction.id} className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-medium text-foreground">{transaction.description}</p>
                     <CategoryTypeBadge type={transaction.type} />
                   </div>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {transaction.category?.name ?? 'Categoria indisponível'} · {transaction.transactionDate}
-                  </p>
-                  <p className="mt-1 text-sm font-medium text-foreground">
-                    Valor: {transaction.amount}
-                  </p>
+                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                    <span className="text-muted-foreground">
+                      {transaction.category?.name ?? 'Categoria indisponível'} · {transaction.transactionDate}
+                    </span>
+                    <span className="font-medium text-foreground">
+                      Valor: {transaction.amount}
+                    </span>
+                  </div>
                 </div>
                 {canEditTransaction(transaction) || canDelete ? (
                   <div className="flex gap-2">

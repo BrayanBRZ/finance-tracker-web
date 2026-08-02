@@ -57,7 +57,7 @@ export function DashboardSummary({
         const Icon = item.icon
 
         return (
-          <Card key={item.key} className="shadow-sm">
+          <Card key={item.key}>
             <CardContent>
               <div className="flex items-start justify-between gap-3">
                 <p className="text-sm text-muted-foreground">{item.label}</p>

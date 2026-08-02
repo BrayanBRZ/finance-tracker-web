@@ -22,14 +22,14 @@ export function WalletMemberList({ members, canManage, onRoleChange, onRemove })
   }
 
   return (
-    <ul className="divide-y divide-border rounded-(--radius) border border-border">
+    <ul className="scrollbar-minimal min-h-0 flex-1 overflow-y-auto divide-y divide-border rounded-(--radius) border border-border">
       {members.map((member) => {
         const isOwner = member.role === WALLET_MEMBER_ROLES.OWNER
 
         return (
           <li
             key={member.userId}
-            className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
               <p className="font-medium text-foreground">

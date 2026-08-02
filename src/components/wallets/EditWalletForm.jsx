@@ -2,13 +2,6 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { FieldGroup } from '@/components/ui/field'
 import { ErrorSpan } from '@/components/forms/ErrorSpan'
 import { TextareaField } from '@/components/forms/TextareaField'
@@ -16,7 +9,7 @@ import { TextField } from '@/components/forms/TextField'
 import { useWallet } from '@/context/walletContext'
 import { walletSchema } from '@/schemas/walletSchema'
 
-export function EditWalletForm() {
+export function EditWalletForm({ onSuccess }) {
   const { currentWallet, updateWallet } = useWallet()
   const form = useForm({
     resolver: zodResolver(walletSchema),
@@ -44,6 +37,7 @@ export function EditWalletForm() {
     try {
       form.clearErrors('root')
       await updateWallet(walletData)
+      onSuccess?.()
     } catch (error) {
       form.setError('root.server', {
         type: 'server',
@@ -56,16 +50,8 @@ export function EditWalletForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">Informações da carteira</CardTitle>
-        <CardDescription>
-          Atualize o nome e a descrição visíveis aos membros.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form noValidate onSubmit={handleSubmit(onSubmit)}>
-          <FieldGroup className="gap-4">
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
+      <FieldGroup className="gap-4">
             <TextField
               id="edit-wallet-name"
               label="Nome"
@@ -90,9 +76,7 @@ export function EditWalletForm() {
               error={errors.root?.server?.message}
               className="text-sm"
             />
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+      </FieldGroup>
+    </form>
   )
 }

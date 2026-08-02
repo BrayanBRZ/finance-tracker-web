@@ -146,6 +146,7 @@
 
   html {
     @apply font-google-sans;
+    font-size: 80%;
   }
 }
 

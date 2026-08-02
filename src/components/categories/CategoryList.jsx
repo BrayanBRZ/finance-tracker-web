@@ -30,43 +30,36 @@ const categorySections = [
 
 function CategoryItem({ category, canManage, onEdit, onRemove }) {
   return (
-    <li className="rounded-(--radius) border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-(--radius) bg-primary/10 text-primary">
-              <Tags className="size-4" aria-hidden="true" />
-            </span>
-            <div className="min-w-0">
-              <p className="truncate font-medium text-card-foreground">{category.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {FINANCIAL_TYPE_LABELS[category.type]}
-              </p>
+    <li className="rounded-(--radius) border border-border bg-card p-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-(--radius) bg-primary/10 text-primary">
+            <Tags className="size-4" aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <p className="truncate font-medium text-card-foreground">{category.name}</p>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span>{FINANCIAL_TYPE_LABELS[category.type]}</span>
+              {category.icon ? <span>Ícone: {category.icon}</span> : null}
+              {category.color ? <span>Cor: {category.color}</span> : null}
             </div>
           </div>
         </div>
-        <CategoryTypeBadge type={category.type} />
-      </div>
-      {category.icon || category.color ? (
-        <dl className="mt-4 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
-          {category.icon ? (
-            <div><dt className="font-medium text-foreground">Ícone</dt><dd>{category.icon}</dd></div>
+
+        <div className="flex shrink-0 items-center gap-2">
+          <CategoryTypeBadge type={category.type} />
+          {canManage ? (
+            <>
+              <Button type="button" variant="outline" size="sm" onClick={() => onEdit(category)}>
+                <Pencil aria-hidden="true" /> Editar
+              </Button>
+              <Button type="button" variant="destructive" size="sm" onClick={() => void onRemove(category.id)}>
+                <Trash2 aria-hidden="true" /> Excluir
+              </Button>
+            </>
           ) : null}
-          {category.color ? (
-            <div><dt className="font-medium text-foreground">Cor</dt><dd>{category.color}</dd></div>
-          ) : null}
-        </dl>
-      ) : null}
-      {canManage ? (
-        <div className="mt-4 flex gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={() => onEdit(category)}>
-            <Pencil aria-hidden="true" /> Editar
-          </Button>
-          <Button type="button" variant="destructive" size="sm" onClick={() => void onRemove(category.id)}>
-            <Trash2 aria-hidden="true" /> Excluir
-          </Button>
         </div>
-      ) : null}
+      </div>
     </li>
   )
 }
@@ -101,7 +94,7 @@ export function CategoryList({ groupedCategories, hasCategories, canManage, onEd
         <CardTitle className="text-2xl">Organização financeira</CardTitle>
         <CardDescription>Separe receitas e despesas para classificar os lançamentos.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="scrollbar-minimal min-h-0 flex-1 space-y-5 overflow-y-auto">
         {!hasCategories ? (
           <div className="rounded-(--radius) border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
             Nenhuma categoria pessoal cadastrada.

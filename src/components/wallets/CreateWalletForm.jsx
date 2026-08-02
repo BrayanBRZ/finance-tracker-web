@@ -1,39 +1,28 @@
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { ErrorSpan } from '@/components/forms/ErrorSpan'
 import { FieldGroup } from '@/components/ui/field'
 import { TextareaField } from '@/components/forms/TextareaField'
 import { TextField } from '@/components/forms/TextField'
 import { useCreateWalletForm } from '@/hooks/useCreateWalletForm'
 
-export function CreateWalletForm({ title = 'Criar carteira' }) {
+export function CreateWalletForm({ onSuccess }) {
   const {
     form: {
       register,
       handleSubmit,
       formState: { errors, isSubmitting },
     },
-    onSubmit,
+    onSubmit: createWallet,
   } = useCreateWalletForm()
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">{title}</CardTitle>
-        <CardDescription>
-          Carteiras separam seus dados financeiros e definem permissões.
-        </CardDescription>
-      </CardHeader>
+  const onSubmit = async (walletData) => {
+    const wallet = await createWallet(walletData)
+    if (wallet) onSuccess?.()
+  }
 
-      <CardContent>
-        <form noValidate onSubmit={handleSubmit(onSubmit)}>
-          <FieldGroup className="gap-4">
+  return (
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
+      <FieldGroup className="gap-4">
             <TextField
               id="wallet-name"
               label="Nome"
@@ -63,9 +52,7 @@ export function CreateWalletForm({ title = 'Criar carteira' }) {
               error={errors.root?.server?.message}
               className="text-sm"
             />
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+      </FieldGroup>
+    </form>
   )
 }
