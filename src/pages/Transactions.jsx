@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ContentWithAside } from '@/components/layout/ContentWithAside'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { PageLoader } from '@/components/feedback/PageLoader'
 import { StateCard } from '@/components/feedback/StateCard'
 import { TransactionForm } from '@/components/transactions/TransactionForm'
 import { TransactionList } from '@/components/transactions/TransactionList'
@@ -38,15 +39,7 @@ function TransactionsContent() {
   }
 
   if (isLoading || isLoadingCategories) {
-    return (
-      <StateCard
-        eyebrow="Carregando transações"
-        title="Preparando os lançamentos da carteira"
-        description="Aguarde enquanto os dados são carregados."
-        role="status"
-        ariaLive="polite"
-      />
-    )
+    return <PageLoader label="Carregando transações..." />
   }
 
   if (errorMessage) {

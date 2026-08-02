@@ -1,4 +1,5 @@
 import { ContentWithAside } from '@/components/layout/ContentWithAside'
+import { PageLoader } from '@/components/feedback/PageLoader'
 import { StateCard } from '@/components/feedback/StateCard'
 import { CreateWalletForm } from '@/components/wallets/CreateWalletForm'
 import { useWallet } from '@/context/walletContext'
@@ -12,15 +13,7 @@ export function WalletScope({ children }) {
   } = useWallet()
 
   if (isLoading) {
-    return (
-      <StateCard
-        eyebrow="Carregando carteira"
-        title="Preparando sua área financeira..."
-        description="Estamos carregando a carteira atual antes de exibir os dados."
-        role="status"
-        ariaLive="polite"
-      />
-    )
+    return <PageLoader label="Carregando carteira..." />
   }
 
   if (errorMessage) {

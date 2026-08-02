@@ -4,6 +4,7 @@ import { CashFlowChart } from '@/components/dashboard/CashFlowChart'
 import { ExpenseBreakdownChart } from '@/components/dashboard/ExpenseBreakdownChart'
 import { FinancialChart } from '@/components/dashboard/FinancialChart'
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions'
+import { PageLoader } from '@/components/feedback/PageLoader'
 import { StateCard } from '@/components/feedback/StateCard'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { WalletScope } from '@/components/wallets/WalletScope'
@@ -34,15 +35,7 @@ function DashboardContent() {
   }, [transactions])
 
   if (isLoading) {
-    return (
-      <StateCard
-        eyebrow="Carregando dashboard"
-        title="Calculando o resumo da carteira"
-        description="Aguarde enquanto consolidamos os lançamentos da carteira atual."
-        role="status"
-        ariaLive="polite"
-      />
-    )
+    return <PageLoader label="Carregando dashboard..." />
   }
 
   if (errorMessage) {

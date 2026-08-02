@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CategoryForm } from '@/components/categories/CategoryForm'
 import { CategoryList } from '@/components/categories/CategoryList'
+import { PageLoader } from '@/components/feedback/PageLoader'
 import { StateCard } from '@/components/feedback/StateCard'
 import { ContentWithAside } from '@/components/layout/ContentWithAside'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -47,15 +48,7 @@ function CategoriesContent() {
   }
 
   if (isLoading) {
-    return (
-      <StateCard
-        eyebrow="Carregando categorias"
-        title="Buscando suas categorias"
-        description="Estamos preparando suas categorias de receitas e despesas."
-        role="status"
-        ariaLive="polite"
-      />
-    )
+    return <PageLoader label="Carregando categorias..." />
   }
 
   if (errorMessage) {

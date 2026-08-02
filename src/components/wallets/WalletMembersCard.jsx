@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { PageLoader } from '@/components/feedback/PageLoader'
 import { StateCard } from '@/components/feedback/StateCard'
 import { AddWalletMemberForm } from '@/components/wallets/AddWalletMemberForm'
 import { WalletMemberList } from '@/components/wallets/WalletMemberList'
@@ -26,15 +27,7 @@ export function WalletMembersCard() {
   const canManage = currentWallet?.role === WALLET_MEMBER_ROLES.OWNER
 
   if (isLoading) {
-    return (
-      <StateCard
-        eyebrow="Carregando membros"
-        title="Buscando participantes da carteira"
-        description="Aguarde enquanto carregamos os acessos ativos."
-        role="status"
-        ariaLive="polite"
-      />
-    )
+    return <PageLoader className="min-h-64" label="Carregando membros..." />
   }
 
   if (errorMessage) {
