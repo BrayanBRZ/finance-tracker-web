@@ -6,7 +6,7 @@ import {
   ChartLegendContent,
   ChartTooltip,
 } from '@/components/ui/chart'
-import { getCategoryColor } from '@/components/categories/categoryAppearance'
+import { getCategoryColor } from '@/lib/categoryAppearance'
 import {
   Card,
   CardContent,
@@ -15,12 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { FINANCIAL_TYPES } from '@/domain/financialTypes'
-
-const formatCurrency = (value) =>
-  Number(value).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
+import { formatCurrency } from '@/utils/formatters'
 
 function ExpenseTooltip({ active, payload }) {
   if (!active || !payload?.length) return null
@@ -100,10 +95,7 @@ export function ExpenseBreakdownChart({ transactions }) {
             aria-label="Gráfico de despesas por categoria"
           >
             <PieChart>
-              <ChartTooltip
-                cursor={false}
-                content={<ExpenseTooltip />}
-              />
+              <ChartTooltip cursor={false} content={<ExpenseTooltip />} />
               <Pie
                 data={data}
                 dataKey="amount"

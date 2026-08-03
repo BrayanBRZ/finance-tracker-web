@@ -1,11 +1,5 @@
 import { useMemo } from 'react'
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import {
   ChartContainer,
   ChartLegend,
@@ -21,18 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { FINANCIAL_TYPES } from '@/domain/financialTypes'
-
-const formatCurrency = (value) =>
-  Number(value).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
-
-const formatDate = (value) =>
-  new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-  }).format(new Date(`${value}T00:00:00`))
+import { formatCurrency, formatLocalDate } from '@/utils/formatters'
 
 const chartConfig = {
   income: {
@@ -66,7 +49,7 @@ export function CashFlowChart({ transactions }) {
     return [...totalsByDate.entries()]
       .sort(([firstDate], [secondDate]) => firstDate.localeCompare(secondDate))
       .map(([date, totals]) => ({
-        date: formatDate(date),
+        date: formatLocalDate(date),
         ...totals,
       }))
   }, [transactions])
@@ -90,7 +73,11 @@ export function CashFlowChart({ transactions }) {
             className="h-72 w-full"
             aria-label="Gráfico de evolução financeira"
           >
-            <AreaChart accessibilityLayer data={data} margin={{ left: 0, right: 12 }}>
+            <AreaChart
+              accessibilityLayer
+              data={data}
+              margin={{ left: 0, right: 12 }}
+            >
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="date"

@@ -1,4 +1,7 @@
-import { readTransactions, writeTransactions } from '@/mocks/data/transactionData'
+import {
+  readTransactions,
+  writeTransactions,
+} from '@/mocks/data/transactionData'
 import { isSameId } from '@/mocks/utils/id'
 
 export function listTransactions() {
@@ -39,8 +42,16 @@ export function replaceTransaction(nextTransaction) {
 
 export function removeTransaction(transactionId) {
   writeTransactions(
-    listTransactions().filter((transaction) =>
-      !isSameId(transaction.id, transactionId),
+    listTransactions().filter(
+      (transaction) => !isSameId(transaction.id, transactionId),
+    ),
+  )
+}
+
+export function removeTransactionsByWalletId(walletId) {
+  writeTransactions(
+    listTransactions().filter(
+      (transaction) => !isSameId(transaction.walletId, walletId),
     ),
   )
 }

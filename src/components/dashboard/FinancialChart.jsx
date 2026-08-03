@@ -1,10 +1,4 @@
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import {
   ChartContainer,
   ChartLegend,
@@ -19,12 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-
-const formatCurrency = (value) =>
-  Number(value).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
+import { formatCurrency } from '@/utils/formatters'
 
 const chartConfig = {
   income: {

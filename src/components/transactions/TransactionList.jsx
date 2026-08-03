@@ -4,17 +4,7 @@ import { CategoryIndicator } from '@/components/categories/CategoryIndicator'
 import { CollectionCard } from '@/components/collections/CollectionCard'
 import { DataTable } from '@/components/collections/DataTable'
 import { Pagination } from '@/components/collections/Pagination'
-
-const formatCurrency = (value) =>
-  Number(value).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
-
-const formatDate = (value) => {
-  const [year, month, day] = value.split('-').map(Number)
-  return new Intl.DateTimeFormat('pt-BR').format(new Date(year, month - 1, day))
-}
+import { formatCurrency, formatLocalDate } from '@/utils/formatters'
 
 export function TransactionList({
   transactions,
@@ -49,7 +39,7 @@ export function TransactionList({
       key: 'date',
       header: 'Data',
       cellClassName: 'whitespace-nowrap text-muted-foreground',
-      render: (transaction) => formatDate(transaction.transactionDate),
+      render: (transaction) => formatLocalDate(transaction.transactionDate),
     },
     {
       key: 'amount',

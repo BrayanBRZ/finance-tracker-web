@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil, Plus, UserPlus } from 'lucide-react'
+import { Pencil, Plus, Trash2, UserPlus } from 'lucide-react'
 import { ConfirmDialog } from '@/components/feedback/ConfirmDialog'
 import { PageErrorState } from '@/components/feedback/PageErrorState'
 import { PageLoader } from '@/components/feedback/PageLoader'
@@ -22,11 +22,13 @@ const getErrorMessage = (error) =>
     : 'Não foi possível concluir a operação.'
 
 function WalletSettingsContent() {
-  const { currentWallet } = useWallet()
+  const { currentWallet, removeWallet } = useWallet()
   const { toast } = useToast()
   const [activeForm, setActiveForm] = useState(null)
   const [removingMember, setRemovingMember] = useState(null)
   const [isRemovePending, setIsRemovePending] = useState(false)
+  const [isDeleteWalletPending, setIsDeleteWalletPending] = useState(false)
+  const [isDeleteWalletOpen, setIsDeleteWalletOpen] = useState(false)
   const {
     members,
     isLoading,
@@ -86,6 +88,21 @@ function WalletSettingsContent() {
     toast({ message: getErrorMessage(error), variant: 'error' })
   }
 
+  const confirmDeleteWallet = async () => {
+    setIsDeleteWalletPending(true)
+
+    try {
+      await removeWallet()
+      toast({ message: 'Carteira excluída com sucesso.', variant: 'success' })
+      setIsDeleteWalletOpen(false)
+    } catch (error) {
+      toast({ message: getErrorMessage(error), variant: 'error' })
+      setIsDeleteWalletOpen(false)
+    } finally {
+      setIsDeleteWalletPending(false)
+    }
+  }
+
   return isLoading ? (
     <PageLoader />
   ) : errorMessage ? (
@@ -118,6 +135,14 @@ function WalletSettingsContent() {
                 >
                   <UserPlus aria-hidden="true" />
                   Adicionar membro
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setIsDeleteWalletOpen(true)}
+                >
+                  <Trash2 aria-hidden="true" />
+                  Excluir carteira
                 </Button>
               </>
             ) : null}
@@ -192,6 +217,17 @@ function WalletSettingsContent() {
         confirmLabel="Remover membro"
         isPending={isRemovePending}
         onConfirm={confirmRemoveMember}
+      />
+      <ConfirmDialog
+        open={isDeleteWalletOpen}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !isDeleteWalletPending) setIsDeleteWalletOpen(false)
+        }}
+        title="Excluir carteira"
+        description={`A carteira “${currentWallet?.name ?? ''}”, seus membros e todos os seus lançamentos serão removidos permanentemente.`}
+        confirmLabel="Excluir carteira"
+        isPending={isDeleteWalletPending}
+        onConfirm={confirmDeleteWallet}
       />
     </div>
   )

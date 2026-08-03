@@ -19,14 +19,20 @@ import {
   listActiveMembershipsForUser,
   listMembershipsForWallet,
   replaceWalletMember,
+  removeWalletMembersByWalletId,
 } from '@/mocks/repositories/walletMemberRepository.mock'
 import {
   appendWallet,
   findWalletById,
   listWallets,
+  removeWallet as removeWalletRecord,
   replaceWallet,
 } from '@/mocks/repositories/walletRepository.mock'
-import { findUserByEmail, findUserById } from '@/mocks/repositories/userRepository.mock'
+import { removeTransactionsByWalletId } from '@/mocks/repositories/transactionRepository.mock'
+import {
+  findUserByEmail,
+  findUserById,
+} from '@/mocks/repositories/userRepository.mock'
 import { latency } from '@/mocks/utils/fakeLatency'
 import { isSameId } from '@/mocks/utils/id'
 import {
@@ -96,7 +102,12 @@ export async function getWalletMembership({ walletId, userId }) {
   return toPublicMembership(membership)
 }
 
-export async function updateWallet({ walletId, userId, name, description = '' }) {
+export async function updateWallet({
+  walletId,
+  userId,
+  name,
+  description = '',
+}) {
   await latency()
 
   ensureAuthenticatedUser(userId)
@@ -110,14 +121,26 @@ export async function updateWallet({ walletId, userId, name, description = '' })
   return { wallet: toPublicWallet(nextWallet, membership) }
 }
 
+export async function removeWallet({ walletId, userId }) {
+  await latency()
+
+  ensureAuthenticatedUser(userId)
+  ensureWalletOwner({ walletId, userId })
+  ensureWalletExists(walletId)
+
+  removeTransactionsByWalletId(walletId)
+  removeWalletMembersByWalletId(walletId)
+  removeWalletRecord(walletId)
+
+  return null
+}
+
 const toPublicWalletMember = (membership) => {
   const user = findUserById(membership.userId)
 
   return {
     ...toPublicMembership(membership),
-    user: user
-      ? { id: user.id, name: user.name, email: user.email }
-      : null,
+    user: user ? { id: user.id, name: user.name, email: user.email } : null,
   }
 }
 
@@ -175,7 +198,12 @@ export async function addWalletMember({ walletId, userId, email, role }) {
   return { member: toPublicWalletMember(membership) }
 }
 
-export async function updateWalletMemberRole({ walletId, userId, memberUserId, role }) {
+export async function updateWalletMemberRole({
+  walletId,
+  userId,
+  memberUserId,
+  role,
+}) {
   await latency()
 
   ensureAuthenticatedUser(userId)

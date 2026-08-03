@@ -1,12 +1,7 @@
 import { CollectionCard } from '@/components/collections/CollectionCard'
 import { DataList } from '@/components/collections/DataList'
 import { CategoryTypeBadge } from '@/components/categories/CategoryTypeBadge'
-
-const formatCurrency = (value) =>
-  Number(value).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
+import { formatCurrency, formatLocalDate } from '@/utils/formatters'
 
 export function RecentTransactions({ transactions }) {
   const recentTransactions = transactions.slice(0, 5)
@@ -40,7 +35,7 @@ export function RecentTransactions({ transactions }) {
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
                 {transaction.category?.name ?? 'Sem categoria'} ·{' '}
-                {transaction.transactionDate}
+                {formatLocalDate(transaction.transactionDate)}
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">

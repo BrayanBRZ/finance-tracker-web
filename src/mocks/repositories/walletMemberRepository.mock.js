@@ -53,3 +53,11 @@ export function replaceWalletMember(nextMembership) {
     ),
   )
 }
+
+export function removeWalletMembersByWalletId(walletId) {
+  writeWalletMembers(
+    listWalletMembers().filter(
+      (membership) => !isSameId(membership.walletId, walletId),
+    ),
+  )
+}

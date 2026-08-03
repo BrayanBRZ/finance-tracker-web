@@ -1,11 +1,11 @@
-import { ArrowDownRight, ArrowUpRight, Landmark, ReceiptText } from 'lucide-react'
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  Landmark,
+  ReceiptText,
+} from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-
-const formatCurrency = (value) =>
-  Number(value).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
+import { formatCurrency } from '@/utils/formatters'
 
 const summaryItems = [
   {
@@ -52,7 +52,10 @@ export function DashboardSummary({
   }
 
   return (
-    <section className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4" aria-label="Resumo financeiro">
+    <section
+      className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4"
+      aria-label="Resumo financeiro"
+    >
       {summaryItems.map((item) => {
         const Icon = item.icon
 
@@ -61,12 +64,20 @@ export function DashboardSummary({
             <CardContent>
               <div className="flex items-start justify-between gap-3">
                 <p className="text-sm text-muted-foreground">{item.label}</p>
-                <Icon className={`size-4 ${item.tone}`} strokeWidth={1.7} aria-hidden="true" />
+                <Icon
+                  className={`size-4 ${item.tone}`}
+                  strokeWidth={1.7}
+                  aria-hidden="true"
+                />
               </div>
-              <p className={`mt-6 text-2xl font-semibold tracking-tight ${item.tone}`}>
+              <p
+                className={`mt-6 text-2xl font-semibold tracking-tight ${item.tone}`}
+              >
                 {values[item.key]}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">{item.description}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {item.description}
+              </p>
             </CardContent>
           </Card>
         )

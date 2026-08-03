@@ -13,7 +13,7 @@ import {
   Utensils,
   Wallet,
 } from 'lucide-react'
-import { getCategoryColor } from '@/components/categories/categoryAppearance'
+import { getCategoryColor } from '@/lib/categoryAppearance'
 import { cn } from '@/lib/utils'
 
 const categoryIcons = {

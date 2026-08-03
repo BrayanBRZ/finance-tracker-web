@@ -20,3 +20,7 @@ export function replaceWallet(nextWallet) {
     ),
   )
 }
+
+export function removeWallet(walletId) {
+  writeWallets(listWallets().filter((wallet) => !isSameId(wallet.id, walletId)))
+}

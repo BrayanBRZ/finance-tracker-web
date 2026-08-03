@@ -7,6 +7,7 @@ import {
   createWallet as createWalletOperation,
   listWalletMembersForUser,
   listWalletsForUser,
+  removeWallet as removeWalletOperation,
   removeWalletMember as removeWalletMemberOperation,
   updateWallet as updateWalletOperation,
   updateWalletMemberRole as updateWalletMemberRoleOperation,
@@ -252,6 +253,41 @@ export function WalletProvider({ children }) {
     [captureScope, currentWallet, invalidateRequests, isScopeCurrent, userId],
   )
 
+  const removeCurrentWallet = useCallback(async () => {
+    if (!userId || !currentWallet) {
+      throw new Error('Selecione uma carteira antes de continuar.')
+    }
+
+    const mutationScope = captureScope()
+    const removedWalletId = currentWallet.id
+    await removeWalletOperation({ userId, walletId: removedWalletId })
+
+    if (!isScopeCurrent(mutationScope)) return
+
+    invalidateRequests()
+    setIsLoading(false)
+    const nextWallets = wallets.filter(
+      (wallet) => !isSameId(wallet.id, removedWalletId),
+    )
+    const nextCurrentWallet = nextWallets[0] ?? null
+
+    setWallets(nextWallets)
+    setCurrentWallet(nextCurrentWallet)
+
+    if (nextCurrentWallet) {
+      writeSelectedWalletId({ userId, walletId: nextCurrentWallet.id })
+    } else {
+      clearSelectedWalletId(userId)
+    }
+  }, [
+    captureScope,
+    currentWallet,
+    invalidateRequests,
+    isScopeCurrent,
+    userId,
+    wallets,
+  ])
+
   const requireCurrentWallet = useCallback(() => {
     if (!userId || !currentWallet) {
       throw new Error('Selecione uma carteira antes de continuar.')
@@ -337,6 +373,7 @@ export function WalletProvider({ children }) {
         selectWallet: handleSelectWallet,
         createWallet: handleCreateWallet,
         updateWallet: updateCurrentWallet,
+        removeWallet: removeCurrentWallet,
         listWalletMembers: listCurrentWalletMembers,
         addWalletMember: addCurrentWalletMember,
         updateWalletMemberRole: updateCurrentWalletMemberRole,

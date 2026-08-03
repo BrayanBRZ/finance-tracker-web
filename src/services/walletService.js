@@ -10,6 +10,8 @@ export const getWalletMembership = (params) =>
 
 export const updateWallet = (params) => walletApi.updateWallet(params)
 
+export const removeWallet = (params) => walletApi.removeWallet(params)
+
 export const listWalletMembersForUser = (params) =>
   walletApi.listWalletMembersForUser(params)
 

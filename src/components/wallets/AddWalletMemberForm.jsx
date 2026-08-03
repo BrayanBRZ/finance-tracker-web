@@ -1,21 +1,19 @@
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@/components/ui/button'
-import { ErrorSpan } from '@/components/forms/ErrorSpan'
+import { ControlledSelectField } from '@/components/forms/ControlledSelectField'
+import { FormActions } from '@/components/forms/FormActions'
 import { TextField } from '@/components/forms/TextField'
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { FieldGroup } from '@/components/ui/field'
 import {
   ASSIGNABLE_WALLET_MEMBER_ROLES,
   WALLET_MEMBER_ROLE_LABELS,
 } from '@/domain/walletRoles'
 import { walletMemberSchema } from '@/schemas/walletMemberSchema'
+
+const roleOptions = ASSIGNABLE_WALLET_MEMBER_ROLES.map((role) => ({
+  value: role,
+  label: WALLET_MEMBER_ROLE_LABELS[role],
+}))
 
 export function AddWalletMemberForm({ onAdd, onSuccess, onError }) {
   const form = useForm({
@@ -34,7 +32,7 @@ export function AddWalletMemberForm({ onAdd, onSuccess, onError }) {
     formState: { errors, isSubmitting },
   } = form
 
-  const onSubmit = async (memberData) => {
+  const submit = async (memberData) => {
     try {
       form.clearErrors('root')
       await onAdd(memberData)
@@ -53,7 +51,7 @@ export function AddWalletMemberForm({ onAdd, onSuccess, onError }) {
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit(onSubmit)}>
+    <form noValidate onSubmit={handleSubmit(submit)}>
       <FieldGroup className="gap-4">
         <TextField
           id="wallet-member-email"
@@ -64,45 +62,20 @@ export function AddWalletMemberForm({ onAdd, onSuccess, onError }) {
           disabled={isSubmitting}
           error={errors.email?.message}
         />
-        <Controller
+        <ControlledSelectField
           control={control}
           name="role"
-          render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="wallet-member-role">Papel</FieldLabel>
-              <Select
-                value={field.value}
-                onValueChange={field.onChange}
-                onOpenChange={(isOpen) => {
-                  if (!isOpen) field.onBlur()
-                }}
-                disabled={isSubmitting}
-              >
-                <SelectTrigger id="wallet-member-role">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {ASSIGNABLE_WALLET_MEMBER_ROLES.map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {WALLET_MEMBER_ROLE_LABELS[role]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <ErrorSpan
-                id="wallet-member-role-error"
-                error={errors.role?.message}
-              />
-            </Field>
-          )}
+          id="wallet-member-role"
+          label="Papel"
+          options={roleOptions}
+          disabled={isSubmitting}
         />
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Adicionando...' : 'Adicionar membro'}
-        </Button>
-        <ErrorSpan
-          id="wallet-member-form-error"
+        <FormActions
+          submitLabel="Adicionar membro"
+          pendingLabel="Adicionando..."
+          isPending={isSubmitting}
           error={errors.root?.server?.message}
-          className="text-sm"
+          errorId="wallet-member-form-error"
         />
       </FieldGroup>
     </form>
