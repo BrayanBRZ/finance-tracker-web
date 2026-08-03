@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useSession } from '@/context/sessionContext'
 import { useWallet } from '@/context/walletContext'
+import { useAsyncScopeGuard } from '@/hooks/useAsyncScopeGuard'
 
 const getErrorMessage = (error) =>
   error instanceof Error
@@ -7,6 +9,7 @@ const getErrorMessage = (error) =>
     : 'Não foi possível carregar os membros da carteira.'
 
 export function useWalletMembers() {
+  const { session } = useSession()
   const {
     currentWallet,
     listWalletMembers,
@@ -14,14 +17,29 @@ export function useWalletMembers() {
     updateWalletMemberRole,
     removeWalletMember,
   } = useWallet()
+  const userId = session?.user.id
+  const walletId = currentWallet?.id
   const [members, setMembers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
+  const {
+    beginRequest,
+    captureScope,
+    invalidateRequests,
+    isRequestCurrent,
+    isScopeCurrent,
+  } = useAsyncScopeGuard(JSON.stringify([userId ?? null, walletId ?? null]))
 
   const refreshMembers = useCallback(async () => {
-    if (!currentWallet) {
-      setMembers([])
-      setErrorMessage(null)
+    const request = beginRequest()
+
+    if (!userId || !walletId) {
+      if (isRequestCurrent(request)) {
+        setMembers([])
+        setIsLoading(false)
+        setErrorMessage(null)
+      }
+
       return []
     }
 
@@ -30,16 +48,23 @@ export function useWalletMembers() {
 
     try {
       const nextMembers = await listWalletMembers()
+
+      if (!isRequestCurrent(request)) return []
+
       setMembers(nextMembers)
       return nextMembers
     } catch (error) {
+      if (!isRequestCurrent(request)) return []
+
       setMembers([])
       setErrorMessage(getErrorMessage(error))
       return []
     } finally {
-      setIsLoading(false)
+      if (isRequestCurrent(request)) {
+        setIsLoading(false)
+      }
     }
-  }, [currentWallet, listWalletMembers])
+  }, [beginRequest, isRequestCurrent, listWalletMembers, userId, walletId])
 
   useEffect(() => {
     const loadMembers = async () => {
@@ -51,32 +76,57 @@ export function useWalletMembers() {
   }, [refreshMembers])
 
   const addMember = async (memberData) => {
+    const mutationScope = captureScope()
     const { member } = await addWalletMember(memberData)
-    setMembers((currentMembers) => [...currentMembers, member])
+
+    if (isScopeCurrent(mutationScope)) {
+      invalidateRequests()
+      setIsLoading(false)
+      setMembers((currentMembers) => [...currentMembers, member])
+    }
+
     return member
   }
 
   const updateMemberRole = async (memberUserId, role) => {
+    const mutationScope = captureScope()
+
     try {
       const { member } = await updateWalletMemberRole(memberUserId, role)
-      setMembers((currentMembers) =>
-        currentMembers.map((currentMember) =>
-          currentMember.userId === member.userId ? member : currentMember,
-        ),
-      )
+
+      if (isScopeCurrent(mutationScope)) {
+        invalidateRequests()
+        setIsLoading(false)
+        setMembers((currentMembers) =>
+          currentMembers.map((currentMember) =>
+            currentMember.userId === member.userId ? member : currentMember,
+          ),
+        )
+      }
     } catch (error) {
-      setErrorMessage(getErrorMessage(error))
+      if (isScopeCurrent(mutationScope)) {
+        setErrorMessage(getErrorMessage(error))
+      }
     }
   }
 
   const removeMember = async (memberUserId) => {
+    const mutationScope = captureScope()
+
     try {
       await removeWalletMember(memberUserId)
-      setMembers((currentMembers) =>
-        currentMembers.filter((member) => member.userId !== memberUserId),
-      )
+
+      if (isScopeCurrent(mutationScope)) {
+        invalidateRequests()
+        setIsLoading(false)
+        setMembers((currentMembers) =>
+          currentMembers.filter((member) => member.userId !== memberUserId),
+        )
+      }
     } catch (error) {
-      setErrorMessage(getErrorMessage(error))
+      if (isScopeCurrent(mutationScope)) {
+        setErrorMessage(getErrorMessage(error))
+      }
     }
   }
 

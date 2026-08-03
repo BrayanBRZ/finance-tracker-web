@@ -20,7 +20,7 @@ const navigationItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/transacoes", label: "Transações", icon: ArrowLeftRight },
   { to: "/categorias", label: "Categorias", icon: Tags },
-  { to: "/carteiras", label: "Carteiras", icon: WalletCards },
+  { to: "/carteira", label: "Carteira", icon: WalletCards },
 ];
 
 export function AppLayout() {
@@ -52,7 +52,7 @@ export function AppLayout() {
         <aside
           className={cn(
             columnWidth,
-            "flex h-full -translate-x-full flex-col border-r border-sidebar-border/60 bg-sidebar/60 p-3 pt-15 backdrop-blur-md transition-transform md:w-full md:translate-x-0",
+            "relative flex h-full -translate-x-full flex-col bg-sidebar/60 p-3 pt-15 backdrop-blur-md transition-transform after:absolute after:top-12 after:right-0 after:bottom-0 after:w-px after:bg-sidebar-border/60 after:content-[''] md:w-full md:translate-x-0",
             isMenuVisible && "translate-x-0 shadow-xl md:shadow-none",
           )}
           onClick={(event) => event.stopPropagation()}
@@ -79,7 +79,7 @@ export function AppLayout() {
                           [
                             "flex h-8 items-center gap-3 rounded-(--radius) px-3 text-sm font-medium transition-colors",
                             isActive
-                              ? "bg-primary/10 text-primary ring-1 ring-primary/20"
+                              ? "bg-primary/10 text-primary ring-1 ring-primary"
                               : "text-sidebar-foreground hover:bg-sidebar-accent/70",
                           ].join(" ")
                         }

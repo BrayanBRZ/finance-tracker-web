@@ -17,6 +17,7 @@ import { latency } from '@/mocks/utils/fakeLatency'
 import { isSameId } from '@/mocks/utils/id'
 import { validateTransactionInput } from '@/mocks/validators/transactionValidator'
 import { WALLET_MEMBER_ROLES } from '@/domain/walletRoles'
+import { sortTransactionsByRecency } from '@/utils/transactions'
 
 const ensureCanCreateTransaction = (membership) => {
   if (
@@ -43,7 +44,9 @@ const findCategoryForTransaction = ({ userId, categoryId, type }) => {
   }
 
   if (category.type !== type) {
-    throw new Error('O tipo da categoria deve corresponder ao tipo da transação')
+    throw new Error(
+      'O tipo da categoria deve corresponder ao tipo da transação',
+    )
   }
 
   return category
@@ -52,23 +55,15 @@ const findCategoryForTransaction = ({ userId, categoryId, type }) => {
 const toPublicTransactionWithCategory = (transaction) =>
   toPublicTransaction(transaction, findCategoryById(transaction.categoryId))
 
-const compareRecentTransactions = (left, right) => {
-  const dateComparison = right.transactionDate.localeCompare(left.transactionDate)
-
-  if (dateComparison !== 0) return dateComparison
-
-  return right.createdAt.localeCompare(left.createdAt)
-}
-
 export async function listTransactionsForWallet({ walletId, userId }) {
   await latency()
 
   ensureAuthenticatedUser(userId)
   ensureWalletAccess({ walletId, userId })
 
-  return listTransactionsByWalletId(walletId)
-    .sort(compareRecentTransactions)
-    .map(toPublicTransactionWithCategory)
+  return sortTransactionsByRecency(listTransactionsByWalletId(walletId)).map(
+    toPublicTransactionWithCategory,
+  )
 }
 
 export async function createTransaction({

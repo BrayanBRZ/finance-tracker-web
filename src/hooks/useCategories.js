@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { FINANCIAL_TYPES } from '@/domain/financialTypes'
 import { useSession } from '@/context/sessionContext'
+import { FINANCIAL_TYPES } from '@/domain/financialTypes'
+import { useAsyncScopeGuard } from '@/hooks/useAsyncScopeGuard'
 import {
   createCategory as createCategoryOperation,
   listCategoryAppearanceOptions,
@@ -37,12 +38,25 @@ export function useCategories() {
   )
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
+  const {
+    beginRequest,
+    captureScope,
+    invalidateRequests,
+    isRequestCurrent,
+    isScopeCurrent,
+  } = useAsyncScopeGuard(JSON.stringify([userId ?? null]))
 
   const loadCategories = useCallback(async () => {
+    const request = beginRequest()
+
     if (!userId) {
-      setCategories([])
-      setAppearanceOptions(emptyAppearanceOptions)
-      setErrorMessage(null)
+      if (isRequestCurrent(request)) {
+        setCategories([])
+        setAppearanceOptions(emptyAppearanceOptions)
+        setIsLoading(false)
+        setErrorMessage(null)
+      }
+
       return []
     }
 
@@ -54,58 +68,95 @@ export function useCategories() {
         listCategoriesForUser({ userId }),
         listCategoryAppearanceOptions({ userId }),
       ])
+
+      if (!isRequestCurrent(request)) return []
+
       setCategories(nextCategories)
       setAppearanceOptions(nextAppearanceOptions)
       return nextCategories
     } catch (error) {
+      if (!isRequestCurrent(request)) return []
+
       setCategories([])
       setAppearanceOptions(emptyAppearanceOptions)
       setErrorMessage(getErrorMessage(error))
       return []
     } finally {
-      setIsLoading(false)
+      if (isRequestCurrent(request)) {
+        setIsLoading(false)
+      }
     }
-  }, [userId])
+  }, [beginRequest, isRequestCurrent, userId])
 
-  const createCategory = useCallback(async (categoryData) => {
-    if (!userId) {
-      const error = new Error('Faça login para criar categorias.')
-      setErrorMessage(error.message)
-      throw error
-    }
+  const createCategory = useCallback(
+    async (categoryData) => {
+      if (!userId) {
+        const error = new Error('Faça login para criar categorias.')
+        setErrorMessage(error.message)
+        throw error
+      }
 
-    setErrorMessage(null)
-    const { category } = await createCategoryOperation({ userId, ...categoryData })
-    setCategories((currentCategories) => [...currentCategories, category])
-    return category
-  }, [userId])
+      const mutationScope = captureScope()
+      setErrorMessage(null)
+      const { category } = await createCategoryOperation({
+        userId,
+        ...categoryData,
+      })
 
-  const updateCategory = useCallback(async (categoryId, categoryData) => {
-    if (!userId) throw new Error('Faça login para editar categorias.')
+      if (isScopeCurrent(mutationScope)) {
+        invalidateRequests()
+        setIsLoading(false)
+        setCategories((currentCategories) => [...currentCategories, category])
+      }
 
-    const { category } = await updateCategoryOperation({
-      userId,
-      categoryId,
-      ...categoryData,
-    })
+      return category
+    },
+    [captureScope, invalidateRequests, isScopeCurrent, userId],
+  )
 
-    setCategories((currentCategories) =>
-      currentCategories.map((currentCategory) =>
-        currentCategory.id === category.id ? category : currentCategory,
-      ),
-    )
+  const updateCategory = useCallback(
+    async (categoryId, categoryData) => {
+      if (!userId) throw new Error('Faça login para editar categorias.')
 
-    return category
-  }, [userId])
+      const mutationScope = captureScope()
+      const { category } = await updateCategoryOperation({
+        userId,
+        categoryId,
+        ...categoryData,
+      })
 
-  const removeCategory = useCallback(async (categoryId) => {
-    if (!userId) throw new Error('Faça login para excluir categorias.')
+      if (isScopeCurrent(mutationScope)) {
+        invalidateRequests()
+        setIsLoading(false)
+        setCategories((currentCategories) =>
+          currentCategories.map((currentCategory) =>
+            currentCategory.id === category.id ? category : currentCategory,
+          ),
+        )
+      }
 
-    await removeCategoryOperation({ userId, categoryId })
-    setCategories((currentCategories) =>
-      currentCategories.filter((category) => category.id !== categoryId),
-    )
-  }, [userId])
+      return category
+    },
+    [captureScope, invalidateRequests, isScopeCurrent, userId],
+  )
+
+  const removeCategory = useCallback(
+    async (categoryId) => {
+      if (!userId) throw new Error('Faça login para excluir categorias.')
+
+      const mutationScope = captureScope()
+      await removeCategoryOperation({ userId, categoryId })
+
+      if (isScopeCurrent(mutationScope)) {
+        invalidateRequests()
+        setIsLoading(false)
+        setCategories((currentCategories) =>
+          currentCategories.filter((category) => category.id !== categoryId),
+        )
+      }
+    },
+    [captureScope, invalidateRequests, isScopeCurrent, userId],
+  )
 
   useEffect(() => {
     const synchronizeCategories = async () => {

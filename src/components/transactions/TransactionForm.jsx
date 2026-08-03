@@ -11,10 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { FINANCIAL_TYPE_OPTIONS, FINANCIAL_TYPES } from '@/domain/financialTypes'
+import {
+  FINANCIAL_TYPE_OPTIONS,
+  FINANCIAL_TYPES,
+} from '@/domain/financialTypes'
 import { transactionSchema } from '@/schemas/transactionSchema'
+import { toDateInputValue } from '@/utils/formatters'
 
-const currentDate = () => new Date().toISOString().slice(0, 10)
 const NO_CATEGORY_VALUE = '__no_category__'
 
 export function TransactionForm({
@@ -32,7 +35,7 @@ export function TransactionForm({
       type: transaction?.type ?? FINANCIAL_TYPES.EXPENSE,
       description: transaction?.description ?? '',
       amount: transaction?.amount ?? '',
-      transactionDate: transaction?.transactionDate ?? currentDate(),
+      transactionDate: transaction?.transactionDate ?? toDateInputValue(),
     },
   })
   const {
@@ -90,126 +93,134 @@ export function TransactionForm({
   return (
     <form noValidate onSubmit={handleSubmit(submit)}>
       <FieldGroup className="gap-4">
-            <Controller
-              control={control}
-              name="type"
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor="transaction-type">Tipo</FieldLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={(nextType) =>
-                      changeTransactionType(field, nextType)
-                    }
-                    onOpenChange={(isOpen) => {
-                      if (!isOpen) field.onBlur()
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    <SelectTrigger
-                      id="transaction-type"
-                      aria-invalid={errors.type ? true : undefined}
-                    >
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {FINANCIAL_TYPE_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <ErrorSpan id="transaction-type-error" error={errors.type?.message} />
-                </Field>
-              )}
-            />
-            <Controller
-              control={control}
-              name="categoryId"
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor="transaction-category">Categoria</FieldLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    onOpenChange={(isOpen) => {
-                      if (!isOpen) field.onBlur()
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    <SelectTrigger
-                      id="transaction-category"
-                      aria-invalid={errors.categoryId ? true : undefined}
-                    >
-                      <SelectValue placeholder="Sem categoria" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={NO_CATEGORY_VALUE}>
-                        Sem categoria
-                      </SelectItem>
-                      {filteredCategories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <ErrorSpan
-                    id="transaction-category-error"
-                    error={errors.categoryId?.message}
-                  />
-                </Field>
-              )}
-            />
-            <TextField
-              id="transaction-description"
-              label="Descrição"
-              autoComplete="off"
-              {...register('description')}
+        <Controller
+          control={control}
+          name="type"
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor="transaction-type">Tipo</FieldLabel>
+              <Select
+                value={field.value}
+                onValueChange={(nextType) =>
+                  changeTransactionType(field, nextType)
+                }
+                onOpenChange={(isOpen) => {
+                  if (!isOpen) field.onBlur()
+                }}
+                disabled={isSubmitting}
+              >
+                <SelectTrigger
+                  id="transaction-type"
+                  aria-invalid={errors.type ? true : undefined}
+                >
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {FINANCIAL_TYPE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <ErrorSpan
+                id="transaction-type-error"
+                error={errors.type?.message}
+              />
+            </Field>
+          )}
+        />
+        <Controller
+          control={control}
+          name="categoryId"
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor="transaction-category">Categoria</FieldLabel>
+              <Select
+                value={field.value}
+                onValueChange={field.onChange}
+                onOpenChange={(isOpen) => {
+                  if (!isOpen) field.onBlur()
+                }}
+                disabled={isSubmitting}
+              >
+                <SelectTrigger
+                  id="transaction-category"
+                  aria-invalid={errors.categoryId ? true : undefined}
+                >
+                  <SelectValue placeholder="Sem categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_CATEGORY_VALUE}>
+                    Sem categoria
+                  </SelectItem>
+                  {filteredCategories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <ErrorSpan
+                id="transaction-category-error"
+                error={errors.categoryId?.message}
+              />
+            </Field>
+          )}
+        />
+        <TextField
+          id="transaction-description"
+          label="Descrição"
+          autoComplete="off"
+          {...register('description')}
+          disabled={isSubmitting}
+          error={errors.description?.message}
+        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField
+            id="transaction-amount"
+            label="Valor"
+            type="number"
+            min="0.01"
+            step="0.01"
+            inputMode="decimal"
+            {...register('amount')}
+            disabled={isSubmitting}
+            error={errors.amount?.message}
+          />
+          <TextField
+            id="transaction-date"
+            label="Data"
+            type="date"
+            {...register('transactionDate')}
+            disabled={isSubmitting}
+            error={errors.transactionDate?.message}
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting
+              ? 'Salvando...'
+              : isEditing
+                ? 'Salvar alterações'
+                : 'Registrar transação'}
+          </Button>
+          {isEditing ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
               disabled={isSubmitting}
-              error={errors.description?.message}
-            />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <TextField
-                id="transaction-amount"
-                label="Valor"
-                type="number"
-                min="0.01"
-                step="0.01"
-                inputMode="decimal"
-                {...register('amount')}
-                disabled={isSubmitting}
-                error={errors.amount?.message}
-              />
-              <TextField
-                id="transaction-date"
-                label="Data"
-                type="date"
-                {...register('transactionDate')}
-                disabled={isSubmitting}
-                error={errors.transactionDate?.message}
-              />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting
-                  ? 'Salvando...'
-                  : isEditing
-                    ? 'Salvar alterações'
-                    : 'Registrar transação'}
-              </Button>
-              {isEditing ? (
-                <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-                  Cancelar
-                </Button>
-              ) : null}
-            </div>
-            <ErrorSpan
-              id="transaction-form-error"
-              error={errors.root?.server?.message}
-              className="text-sm"
-            />
+            >
+              Cancelar
+            </Button>
+          ) : null}
+        </div>
+        <ErrorSpan
+          id="transaction-form-error"
+          error={errors.root?.server?.message}
+          className="text-sm"
+        />
       </FieldGroup>
     </form>
   )

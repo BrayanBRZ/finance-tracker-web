@@ -16,7 +16,7 @@ export function CategoryTypeBadge({ type, className }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-(--radius) bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border',
+        'inline-flex min-w-22 justify-center items-center gap-1 rounded-(--radius) bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border',
         className,
       )}
     >

@@ -34,7 +34,7 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/categorias" element={<CategoriesPage />} />
             <Route path="/transacoes" element={<TransactionsPage />} />
-            <Route path="/carteiras" element={<WalletSettingsPage />} />
+            <Route path="/carteira" element={<WalletSettingsPage />} />
           </Route>
         </Route>
 

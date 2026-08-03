@@ -4,8 +4,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useWallet } from "@/context/walletContext";
+} from '@/components/ui/select'
+import { useWallet } from '@/context/walletContext'
 
 export function WalletSelector() {
   const {
@@ -15,22 +15,22 @@ export function WalletSelector() {
     isLoading,
     errorMessage,
     selectWallet,
-  } = useWallet();
+  } = useWallet()
 
   return (
     <div>
       <Select
-        value={currentWallet?.id ?? undefined}
+        value={currentWallet?.id ?? ''}
         onValueChange={(walletId) => void selectWallet(walletId)}
         disabled={isLoading || !hasWallets}
       >
         <SelectTrigger
           id="wallet-selector"
-          aria-describedby={errorMessage ? "wallet-selector-error" : undefined}
+          aria-describedby={errorMessage ? 'wallet-selector-error' : undefined}
           aria-invalid={errorMessage ? true : undefined}
         >
           <SelectValue
-            placeholder={isLoading ? "Carregando..." : "Nenhuma carteira"}
+            placeholder={isLoading ? 'Carregando...' : 'Nenhuma carteira'}
           />
         </SelectTrigger>
 
@@ -49,5 +49,5 @@ export function WalletSelector() {
         </p>
       ) : null}
     </div>
-  );
+  )
 }

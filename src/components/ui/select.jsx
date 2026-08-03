@@ -30,6 +30,7 @@ function SelectValue({
 function SelectTrigger({
   className,
   size = "default",
+  icon: Icon = ChevronDownIcon,
   children,
   ...props
 }) {
@@ -44,7 +45,7 @@ function SelectTrigger({
       {...props}>
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+        <Icon className="pointer-events-none size-4 text-muted-foreground" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );

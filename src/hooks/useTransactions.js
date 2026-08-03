@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from '@/context/sessionContext'
 import { useWallet } from '@/context/walletContext'
+import { useAsyncScopeGuard } from '@/hooks/useAsyncScopeGuard'
 import {
   createTransaction as createTransactionOperation,
   listTransactionsForWallet,
   removeTransaction as removeTransactionOperation,
   updateTransaction as updateTransactionOperation,
 } from '@/services/transactionService'
+import { sortTransactionsByRecency } from '@/utils/transactions'
 
 const getErrorMessage = (error) =>
   error instanceof Error
@@ -21,11 +23,24 @@ export function useTransactions() {
   const [transactions, setTransactions] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
+  const {
+    beginRequest,
+    captureScope,
+    invalidateRequests,
+    isRequestCurrent,
+    isScopeCurrent,
+  } = useAsyncScopeGuard(JSON.stringify([userId ?? null, walletId ?? null]))
 
   const refreshTransactions = useCallback(async () => {
+    const request = beginRequest()
+
     if (!userId || !walletId) {
-      setTransactions([])
-      setErrorMessage(null)
+      if (isRequestCurrent(request)) {
+        setTransactions([])
+        setIsLoading(false)
+        setErrorMessage(null)
+      }
+
       return []
     }
 
@@ -33,17 +48,26 @@ export function useTransactions() {
     setErrorMessage(null)
 
     try {
-      const nextTransactions = await listTransactionsForWallet({ userId, walletId })
+      const nextTransactions = sortTransactionsByRecency(
+        await listTransactionsForWallet({ userId, walletId }),
+      )
+
+      if (!isRequestCurrent(request)) return []
+
       setTransactions(nextTransactions)
       return nextTransactions
     } catch (error) {
+      if (!isRequestCurrent(request)) return []
+
       setTransactions([])
       setErrorMessage(getErrorMessage(error))
       return []
     } finally {
-      setIsLoading(false)
+      if (isRequestCurrent(request)) {
+        setIsLoading(false)
+      }
     }
-  }, [userId, walletId])
+  }, [beginRequest, isRequestCurrent, userId, walletId])
 
   useEffect(() => {
     const loadTransactions = async () => {
@@ -59,12 +83,21 @@ export function useTransactions() {
       throw new Error('Selecione uma carteira antes de criar transações.')
     }
 
+    const mutationScope = captureScope()
     const { transaction } = await createTransactionOperation({
       userId,
       walletId,
       ...transactionData,
     })
-    setTransactions((currentTransactions) => [transaction, ...currentTransactions])
+
+    if (isScopeCurrent(mutationScope)) {
+      invalidateRequests()
+      setIsLoading(false)
+      setTransactions((currentTransactions) =>
+        sortTransactionsByRecency([transaction, ...currentTransactions]),
+      )
+    }
+
     return transaction
   }
 
@@ -73,17 +106,28 @@ export function useTransactions() {
       throw new Error('Selecione uma carteira antes de editar transações.')
     }
 
+    const mutationScope = captureScope()
     const { transaction } = await updateTransactionOperation({
       userId,
       walletId,
       transactionId,
       ...transactionData,
     })
-    setTransactions((currentTransactions) =>
-      currentTransactions.map((currentTransaction) =>
-        currentTransaction.id === transaction.id ? transaction : currentTransaction,
-      ),
-    )
+
+    if (isScopeCurrent(mutationScope)) {
+      invalidateRequests()
+      setIsLoading(false)
+      setTransactions((currentTransactions) =>
+        sortTransactionsByRecency(
+          currentTransactions.map((currentTransaction) =>
+            currentTransaction.id === transaction.id
+              ? transaction
+              : currentTransaction,
+          ),
+        ),
+      )
+    }
+
     return transaction
   }
 
@@ -92,10 +136,18 @@ export function useTransactions() {
       throw new Error('Selecione uma carteira antes de excluir transações.')
     }
 
+    const mutationScope = captureScope()
     await removeTransactionOperation({ userId, walletId, transactionId })
-    setTransactions((currentTransactions) =>
-      currentTransactions.filter((transaction) => transaction.id !== transactionId),
-    )
+
+    if (isScopeCurrent(mutationScope)) {
+      invalidateRequests()
+      setIsLoading(false)
+      setTransactions((currentTransactions) =>
+        currentTransactions.filter(
+          (transaction) => transaction.id !== transactionId,
+        ),
+      )
+    }
   }
 
   return {

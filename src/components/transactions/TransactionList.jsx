@@ -99,7 +99,6 @@ export function TransactionList({
     <CollectionCard
       className="h-full"
       contentClassName="flex min-h-0 flex-1 flex-col gap-4"
-      eyebrow="Lançamentos"
       title="Histórico de transações"
       description="Consulte receitas e despesas registradas nesta carteira."
     >

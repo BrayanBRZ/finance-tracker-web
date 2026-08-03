@@ -29,7 +29,7 @@ export function WalletScope({ children }) {
   ) : !currentWallet ? (
     <div className="flex h-full min-h-0 flex-col gap-6">
       <PageHeader
-        title="Carteiras"
+        title="Carteira"
         description="Crie uma carteira para começar a organizar suas finanças."
         actions={
           <Button type="button" onClick={() => setIsCreateFormOpen(true)}>

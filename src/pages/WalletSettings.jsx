@@ -55,7 +55,7 @@ function WalletSettingsContent() {
   ) : (
     <div className="flex h-full min-h-0 flex-col gap-6">
       <PageHeader
-        title="Carteiras"
+        title="Carteira"
         description="Gerencie informações, membros e acessos da carteira."
         actions={
           <>

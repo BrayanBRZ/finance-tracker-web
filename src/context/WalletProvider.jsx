@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from '@/context/sessionContext'
 import { WalletContext } from '@/context/walletContext'
+import { useAsyncScopeGuard } from '@/hooks/useAsyncScopeGuard'
 import {
   addWalletMember as addWalletMemberOperation,
   createWallet as createWalletOperation,
@@ -50,43 +51,75 @@ export function WalletProvider({ children }) {
   const [currentWallet, setCurrentWallet] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
+  const {
+    beginRequest,
+    captureScope,
+    invalidateRequests,
+    isRequestCurrent,
+    isScopeCurrent,
+  } = useAsyncScopeGuard(
+    JSON.stringify([userId ?? null, currentWallet?.id ?? null]),
+  )
 
   const resetWalletState = useCallback(() => {
+    invalidateRequests()
     setWallets([])
     setCurrentWallet(null)
+    setIsLoading(false)
     setErrorMessage(null)
-  }, [])
+  }, [invalidateRequests])
 
-  const loadWalletState = useCallback(async (userId) => {
-    setIsLoading(true)
-    setErrorMessage(null)
+  const loadWalletState = useCallback(
+    async (targetUserId) => {
+      const request = beginRequest()
+      setIsLoading(true)
+      setErrorMessage(null)
 
-    try {
-      const nextWallets = await listWalletsForUser(userId)
-      const nextCurrentWallet = resolveCurrentWallet({
-        userId,
-        wallets: nextWallets,
-      })
+      try {
+        const nextWallets = await listWalletsForUser(targetUserId)
 
-      setWallets(nextWallets)
-      setCurrentWallet(nextCurrentWallet)
+        if (!isRequestCurrent(request)) {
+          return {
+            wallets: [],
+            currentWallet: null,
+          }
+        }
 
-      return {
-        wallets: nextWallets,
-        currentWallet: nextCurrentWallet,
+        const nextCurrentWallet = resolveCurrentWallet({
+          userId: targetUserId,
+          wallets: nextWallets,
+        })
+
+        setWallets(nextWallets)
+        setCurrentWallet(nextCurrentWallet)
+
+        return {
+          wallets: nextWallets,
+          currentWallet: nextCurrentWallet,
+        }
+      } catch (error) {
+        if (!isRequestCurrent(request)) {
+          return {
+            wallets: [],
+            currentWallet: null,
+          }
+        }
+
+        resetWalletState()
+        setErrorMessage(getErrorMessage(error))
+
+        return {
+          wallets: [],
+          currentWallet: null,
+        }
+      } finally {
+        if (isRequestCurrent(request)) {
+          setIsLoading(false)
+        }
       }
-    } catch (error) {
-      resetWalletState()
-      setErrorMessage(getErrorMessage(error))
-
-      return {
-        wallets: [],
-        currentWallet: null,
-      }
-    } finally {
-      setIsLoading(false)
-    }
-  }, [resetWalletState])
+    },
+    [beginRequest, isRequestCurrent, resetWalletState],
+  )
 
   const refreshWallets = useCallback(async () => {
     if (!userId) {
@@ -101,91 +134,123 @@ export function WalletProvider({ children }) {
     return loadWalletState(userId)
   }, [loadWalletState, resetWalletState, userId])
 
-  const handleSelectWallet = useCallback(async (walletId) => {
-    if (!userId) {
-      resetWalletState()
+  const handleSelectWallet = useCallback(
+    async (walletId) => {
+      if (!userId) {
+        resetWalletState()
 
-      return null
-    }
-
-    setErrorMessage(null)
-
-    try {
-      const wallet = wallets.find((candidate) =>
-        isSameId(candidate.id, walletId),
-      )
-
-      if (!wallet) {
-        throw new Error('Carteira não encontrada ou sem acesso')
+        return null
       }
 
-      setCurrentWallet(wallet)
-      writeSelectedWalletId({ userId, walletId: wallet.id })
+      setErrorMessage(null)
 
-      return wallet
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error))
-      return null
-    }
-  }, [resetWalletState, userId, wallets])
+      try {
+        const wallet = wallets.find((candidate) =>
+          isSameId(candidate.id, walletId),
+        )
 
-  const handleCreateWallet = useCallback(async (walletData) => {
-    if (!userId) {
-      const error = new Error('Sessão expirada. Faça login novamente.')
+        if (!wallet) {
+          throw new Error('Carteira não encontrada ou sem acesso')
+        }
 
-      resetWalletState()
-      setErrorMessage(error.message)
+        invalidateRequests()
+        setIsLoading(false)
+        setCurrentWallet(wallet)
+        writeSelectedWalletId({ userId, walletId: wallet.id })
 
-      throw error
-    }
+        return wallet
+      } catch (error) {
+        setErrorMessage(getErrorMessage(error))
+        return null
+      }
+    },
+    [invalidateRequests, resetWalletState, userId, wallets],
+  )
 
-    setErrorMessage(null)
+  const handleCreateWallet = useCallback(
+    async (walletData) => {
+      if (!userId) {
+        const error = new Error('Sessão expirada. Faça login novamente.')
 
-    try {
-      const { wallet } = await createWalletOperation({
+        resetWalletState()
+        setErrorMessage(error.message)
+
+        throw error
+      }
+
+      const mutationScope = captureScope()
+      setErrorMessage(null)
+
+      try {
+        const { wallet } = await createWalletOperation({
+          userId,
+          ...walletData,
+        })
+
+        if (isScopeCurrent(mutationScope)) {
+          invalidateRequests()
+          setIsLoading(false)
+          setWallets((currentWallets) => {
+            if (
+              currentWallets.some((current) => isSameId(current.id, wallet.id))
+            ) {
+              return currentWallets.map((current) =>
+                isSameId(current.id, wallet.id) ? wallet : current,
+              )
+            }
+
+            return [...currentWallets, wallet]
+          })
+          setCurrentWallet(wallet)
+          writeSelectedWalletId({ userId, walletId: wallet.id })
+        }
+
+        return wallet
+      } catch (error) {
+        if (isScopeCurrent(mutationScope)) {
+          setErrorMessage(getErrorMessage(error))
+        }
+
+        throw error
+      }
+    },
+    [
+      captureScope,
+      invalidateRequests,
+      isScopeCurrent,
+      resetWalletState,
+      userId,
+    ],
+  )
+
+  const updateCurrentWallet = useCallback(
+    async (walletData) => {
+      if (!userId || !currentWallet) {
+        throw new Error('Selecione uma carteira antes de continuar.')
+      }
+
+      const mutationScope = captureScope()
+      const { wallet } = await updateWalletOperation({
         userId,
+        walletId: currentWallet.id,
         ...walletData,
       })
 
-      setWallets((currentWallets) => {
-        if (currentWallets.some((current) => isSameId(current.id, wallet.id))) {
-          return currentWallets.map((current) =>
-            isSameId(current.id, wallet.id) ? wallet : current,
-          )
-        }
-
-        return [...currentWallets, wallet]
-      })
-      setCurrentWallet(wallet)
-      writeSelectedWalletId({ userId, walletId: wallet.id })
+      if (isScopeCurrent(mutationScope)) {
+        invalidateRequests()
+        setIsLoading(false)
+        setWallets((currentWallets) =>
+          currentWallets.map((candidate) =>
+            isSameId(candidate.id, wallet.id) ? wallet : candidate,
+          ),
+        )
+        setCurrentWallet(wallet)
+      }
 
       return wallet
-    } catch (error) {
-      setErrorMessage(getErrorMessage(error))
-      throw error
-    }
-  }, [resetWalletState, userId])
-
-  const updateCurrentWallet = useCallback(async (walletData) => {
-    if (!userId || !currentWallet) {
-      throw new Error('Selecione uma carteira antes de continuar.')
-    }
-
-    const { wallet } = await updateWalletOperation({
-      userId,
-      walletId: currentWallet.id,
-      ...walletData,
-    })
-
-    setWallets((currentWallets) =>
-      currentWallets.map((candidate) =>
-        isSameId(candidate.id, wallet.id) ? wallet : candidate,
-      ),
-    )
-    setCurrentWallet(wallet)
-
-    return wallet
-  }, [currentWallet, userId])
+    },
+    [captureScope, currentWallet, invalidateRequests, isScopeCurrent, userId],
+  )
 
   const requireCurrentWallet = useCallback(() => {
     if (!userId || !currentWallet) {
@@ -199,56 +264,61 @@ export function WalletProvider({ children }) {
     return listWalletMembersForUser(requireCurrentWallet())
   }, [requireCurrentWallet])
 
-  const addCurrentWalletMember = useCallback((memberData) => {
-    return addWalletMemberOperation({
-      ...requireCurrentWallet(),
-      ...memberData,
-    })
-  }, [requireCurrentWallet])
+  const addCurrentWalletMember = useCallback(
+    (memberData) => {
+      return addWalletMemberOperation({
+        ...requireCurrentWallet(),
+        ...memberData,
+      })
+    },
+    [requireCurrentWallet],
+  )
 
-  const updateCurrentWalletMemberRole = useCallback((memberUserId, role) => {
-    return updateWalletMemberRoleOperation({
-      ...requireCurrentWallet(),
-      memberUserId,
-      role,
-    })
-  }, [requireCurrentWallet])
+  const updateCurrentWalletMemberRole = useCallback(
+    (memberUserId, role) => {
+      return updateWalletMemberRoleOperation({
+        ...requireCurrentWallet(),
+        memberUserId,
+        role,
+      })
+    },
+    [requireCurrentWallet],
+  )
 
-  const removeCurrentWalletMember = useCallback((memberUserId) => {
-    return removeWalletMemberOperation({
-      ...requireCurrentWallet(),
-      memberUserId,
-    })
-  }, [requireCurrentWallet])
+  const removeCurrentWalletMember = useCallback(
+    (memberUserId) => {
+      return removeWalletMemberOperation({
+        ...requireCurrentWallet(),
+        memberUserId,
+      })
+    },
+    [requireCurrentWallet],
+  )
 
   useEffect(() => {
-    let isActive = true
+    if (isSessionLoading) {
+      invalidateRequests()
+      return undefined
+    }
 
     const syncWalletState = async () => {
+      await Promise.resolve()
+
       if (!userId) {
-        await Promise.resolve()
-
-        if (isActive) {
-          resetWalletState()
-          setIsLoading(false)
-        }
-
+        resetWalletState()
         return
       }
 
       await loadWalletState(userId)
     }
 
-    if (isSessionLoading) {
-      return undefined
-    }
-
     void syncWalletState()
 
     return () => {
-      isActive = false
+      invalidateRequests()
     }
   }, [
+    invalidateRequests,
     isSessionLoading,
     loadWalletState,
     resetWalletState,

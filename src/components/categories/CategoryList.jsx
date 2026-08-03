@@ -60,10 +60,7 @@ function CategorySection({ section, categories, canManage, onEdit, onRemove }) {
   return (
     <CollectionCard
       className="h-full"
-      contentClassName="flex min-h-0 flex-1 flex-col"
-      eyebrow={`${categories.length} ${
-        categories.length === 1 ? 'categoria' : 'categorias'
-      }`}
+      contentClassName="flex min-h-0 flex-1 flex-col border-(--radius)"
       title={section.title}
       description={section.description}
     >
