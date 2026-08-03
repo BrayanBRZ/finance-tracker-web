@@ -44,7 +44,7 @@ function CategoryItem({ category, canManage, onEdit, onRemove }) {
               type="button"
               variant="destructive"
               size="sm"
-              onClick={() => void onRemove(category.id)}
+              onClick={() => onRemove(category)}
             >
               <Trash2 aria-hidden="true" />
               Excluir

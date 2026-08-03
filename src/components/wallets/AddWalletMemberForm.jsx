@@ -17,7 +17,7 @@ import {
 } from '@/domain/walletRoles'
 import { walletMemberSchema } from '@/schemas/walletMemberSchema'
 
-export function AddWalletMemberForm({ onAdd, onSuccess }) {
+export function AddWalletMemberForm({ onAdd, onSuccess, onError }) {
   const form = useForm({
     resolver: zodResolver(walletMemberSchema),
     mode: 'onTouched',
@@ -41,6 +41,7 @@ export function AddWalletMemberForm({ onAdd, onSuccess }) {
       reset()
       onSuccess?.()
     } catch (error) {
+      onError?.(error)
       form.setError('root.server', {
         type: 'server',
         message:

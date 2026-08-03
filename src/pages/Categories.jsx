@@ -2,17 +2,26 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { CategoryForm } from '@/components/categories/CategoryForm'
 import { CategoryList } from '@/components/categories/CategoryList'
-import { FormDialog } from '@/components/forms/FormDialog'
+import { ConfirmDialog } from '@/components/feedback/ConfirmDialog'
 import { PageErrorState } from '@/components/feedback/PageErrorState'
 import { PageLoader } from '@/components/feedback/PageLoader'
+import { FormDialog } from '@/components/forms/FormDialog'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import { useCategories } from '@/hooks/useCategories'
+import { useToast } from '@/hooks/useToast'
+
+const getErrorMessage = (error) =>
+  error instanceof Error
+    ? error.message
+    : 'Não foi possível concluir a operação.'
 
 function CategoriesContent() {
+  const { toast } = useToast()
   const [editingCategory, setEditingCategory] = useState(null)
+  const [deletingCategory, setDeletingCategory] = useState(null)
+  const [isDeletePending, setIsDeletePending] = useState(false)
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [operationError, setOperationError] = useState(null)
   const {
     createCategory,
     appearanceOptions,
@@ -25,17 +34,43 @@ function CategoriesContent() {
   } = useCategories()
 
   const saveCategory = async (categoryData) => {
-    setOperationError(null)
+    try {
+      if (editingCategory) {
+        await updateCategory(editingCategory.id, categoryData)
+        toast({
+          message: 'Categoria atualizada com sucesso.',
+          variant: 'success',
+        })
+        setEditingCategory(null)
+        setIsFormOpen(false)
+        return
+      }
 
-    if (editingCategory) {
-      await updateCategory(editingCategory.id, categoryData)
-      setEditingCategory(null)
+      await createCategory(categoryData)
+      toast({ message: 'Categoria criada com sucesso.', variant: 'success' })
       setIsFormOpen(false)
-      return
+    } catch (error) {
+      toast({ message: getErrorMessage(error), variant: 'error' })
+      throw error
     }
+  }
 
-    await createCategory(categoryData)
-    setIsFormOpen(false)
+  const confirmDeleteCategory = async () => {
+    if (!deletingCategory) return
+
+    setIsDeletePending(true)
+
+    try {
+      await removeCategory(deletingCategory.id)
+      toast({ message: 'Categoria excluída com sucesso.', variant: 'success' })
+      if (editingCategory?.id === deletingCategory.id) setEditingCategory(null)
+      setDeletingCategory(null)
+    } catch (error) {
+      toast({ message: getErrorMessage(error), variant: 'error' })
+    } finally {
+      setIsDeletePending(false)
+      setDeletingCategory(null)
+    }
   }
 
   const openCreateForm = () => {
@@ -51,20 +86,6 @@ function CategoriesContent() {
   const handleFormOpenChange = (isOpen) => {
     setIsFormOpen(isOpen)
     if (!isOpen) setEditingCategory(null)
-  }
-
-  const deleteCategory = async (categoryId) => {
-    try {
-      setOperationError(null)
-      await removeCategory(categoryId)
-      if (editingCategory?.id === categoryId) setEditingCategory(null)
-    } catch (error) {
-      setOperationError(
-        error instanceof Error
-          ? error.message
-          : 'Não foi possível excluir a categoria.',
-      )
-    }
   }
 
   return isLoading ? (
@@ -87,21 +108,12 @@ function CategoriesContent() {
           </Button>
         }
       />
-
-      {operationError ? (
-        <p
-          role="alert"
-          className="rounded-(--radius) border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-        >
-          {operationError}
-        </p>
-      ) : null}
       <CategoryList
         className="min-h-0 flex-1"
         groupedCategories={groupedCategories}
         canManage
         onEdit={openEditForm}
-        onRemove={deleteCategory}
+        onRemove={setDeletingCategory}
       />
 
       <FormDialog
@@ -117,6 +129,18 @@ function CategoriesContent() {
           onCancel={() => handleFormOpenChange(false)}
         />
       </FormDialog>
+
+      <ConfirmDialog
+        open={Boolean(deletingCategory)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !isDeletePending) setDeletingCategory(null)
+        }}
+        title="Excluir categoria"
+        description={`A categoria “${deletingCategory?.name ?? ''}” será removida permanentemente.`}
+        confirmLabel="Excluir categoria"
+        isPending={isDeletePending}
+        onConfirm={confirmDeleteCategory}
+      />
     </div>
   )
 }

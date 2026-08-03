@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { walletSchema } from '@/schemas/walletSchema'
 import { useWallet } from '@/context/walletContext'
 
-export function useCreateWalletForm() {
+export function useCreateWalletForm({ onError } = {}) {
   const { createWallet } = useWallet()
 
   const form = useForm({
@@ -22,6 +22,7 @@ export function useCreateWalletForm() {
       form.reset()
       return wallet
     } catch (error) {
+      onError?.(error)
       form.setError('root.server', {
         type: 'server',
         message:

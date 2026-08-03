@@ -9,7 +9,7 @@ import { TextField } from '@/components/forms/TextField'
 import { useWallet } from '@/context/walletContext'
 import { walletSchema } from '@/schemas/walletSchema'
 
-export function EditWalletForm({ onSuccess }) {
+export function EditWalletForm({ onSuccess, onError }) {
   const { currentWallet, updateWallet } = useWallet()
   const form = useForm({
     resolver: zodResolver(walletSchema),
@@ -39,6 +39,7 @@ export function EditWalletForm({ onSuccess }) {
       await updateWallet(walletData)
       onSuccess?.()
     } catch (error) {
+      onError?.(error)
       form.setError('root.server', {
         type: 'server',
         message:
@@ -52,30 +53,30 @@ export function EditWalletForm({ onSuccess }) {
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <FieldGroup className="gap-4">
-            <TextField
-              id="edit-wallet-name"
-              label="Nome"
-              autoComplete="off"
-              {...register('name')}
-              disabled={isSubmitting}
-              error={errors.name?.message}
-            />
-            <TextareaField
-              id="edit-wallet-description"
-              label="Descrição"
-              rows={3}
-              {...register('description')}
-              disabled={isSubmitting}
-              error={errors.description?.message}
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Salvando...' : 'Salvar alterações'}
-            </Button>
-            <ErrorSpan
-              id="edit-wallet-error"
-              error={errors.root?.server?.message}
-              className="text-sm"
-            />
+        <TextField
+          id="edit-wallet-name"
+          label="Nome"
+          autoComplete="off"
+          {...register('name')}
+          disabled={isSubmitting}
+          error={errors.name?.message}
+        />
+        <TextareaField
+          id="edit-wallet-description"
+          label="Descrição"
+          rows={3}
+          {...register('description')}
+          disabled={isSubmitting}
+          error={errors.description?.message}
+        />
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Salvando...' : 'Salvar alterações'}
+        </Button>
+        <ErrorSpan
+          id="edit-wallet-error"
+          error={errors.root?.server?.message}
+          className="text-sm"
+        />
       </FieldGroup>
     </form>
   )

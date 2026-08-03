@@ -14,7 +14,12 @@ import {
   WALLET_MEMBER_ROLES,
 } from '@/domain/walletRoles'
 
-export function WalletMemberList({ members, canManage, onRoleChange, onRemove }) {
+export function WalletMemberList({
+  members,
+  canManage,
+  onRoleChange,
+  onRemove,
+}) {
   const columns = [
     {
       key: 'member',
@@ -77,7 +82,7 @@ export function WalletMemberList({ members, canManage, onRoleChange, onRemove })
             type="button"
             variant="destructive"
             size="sm"
-            onClick={() => void onRemove(member.userId)}
+            onClick={() => onRemove(member)}
           >
             <Trash2 aria-hidden="true" />
             Remover

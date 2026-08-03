@@ -1,23 +1,33 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { PageHeader } from '@/components/layout/PageHeader'
+import { ConfirmDialog } from '@/components/feedback/ConfirmDialog'
 import { PageErrorState } from '@/components/feedback/PageErrorState'
 import { PageLoader } from '@/components/feedback/PageLoader'
 import { FormDialog } from '@/components/forms/FormDialog'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { TransactionForm } from '@/components/transactions/TransactionForm'
 import { TransactionList } from '@/components/transactions/TransactionList'
 import { Button } from '@/components/ui/button'
 import { WalletScope } from '@/components/wallets/WalletScope'
-import { useCategories } from '@/hooks/useCategories'
-import { useTransactions } from '@/hooks/useTransactions'
 import { useWallet } from '@/context/walletContext'
 import { WALLET_MEMBER_ROLES } from '@/domain/walletRoles'
+import { useCategories } from '@/hooks/useCategories'
+import { useTransactions } from '@/hooks/useTransactions'
+import { useToast } from '@/hooks/useToast'
 
 const TRANSACTIONS_PER_PAGE = 10
 
+const getErrorMessage = (error) =>
+  error instanceof Error
+    ? error.message
+    : 'Não foi possível concluir a operação.'
+
 function TransactionsContent() {
   const { currentWallet } = useWallet()
+  const { toast } = useToast()
   const [editingTransaction, setEditingTransaction] = useState(null)
+  const [deletingTransaction, setDeletingTransaction] = useState(null)
+  const [isDeletePending, setIsDeletePending] = useState(false)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [pagination, setPagination] = useState({
     walletId: null,
@@ -63,16 +73,46 @@ function TransactionsContent() {
   }
 
   const saveTransaction = async (transactionData) => {
-    if (editingTransaction) {
-      await updateTransaction(editingTransaction.id, transactionData)
-      setEditingTransaction(null)
-      setIsFormOpen(false)
-      return
-    }
+    try {
+      if (editingTransaction) {
+        await updateTransaction(editingTransaction.id, transactionData)
+        toast({
+          message: 'Transação atualizada com sucesso.',
+          variant: 'success',
+        })
+        setEditingTransaction(null)
+        setIsFormOpen(false)
+        return
+      }
 
-    await createTransaction(transactionData)
-    changePage(1)
-    setIsFormOpen(false)
+      await createTransaction(transactionData)
+      toast({
+        message: 'Transação registrada com sucesso.',
+        variant: 'success',
+      })
+      changePage(1)
+      setIsFormOpen(false)
+    } catch (error) {
+      toast({ message: getErrorMessage(error), variant: 'error' })
+      throw error
+    }
+  }
+
+  const confirmDeleteTransaction = async () => {
+    if (!deletingTransaction) return
+
+    setIsDeletePending(true)
+
+    try {
+      await removeTransaction(deletingTransaction.id)
+      toast({ message: 'Transação excluída com sucesso.', variant: 'success' })
+      setDeletingTransaction(null)
+    } catch (error) {
+      toast({ message: getErrorMessage(error), variant: 'error' })
+    } finally {
+      setIsDeletePending(false)
+      setDeletingTransaction(null)
+    }
   }
 
   const openCreateForm = () => {
@@ -123,7 +163,7 @@ function TransactionsContent() {
         canDelete={canManageTransactions}
         onPageChange={changePage}
         onEdit={openEditForm}
-        onDelete={removeTransaction}
+        onDelete={setDeletingTransaction}
       />
 
       <FormDialog
@@ -139,6 +179,18 @@ function TransactionsContent() {
           onCancel={() => handleFormOpenChange(false)}
         />
       </FormDialog>
+
+      <ConfirmDialog
+        open={Boolean(deletingTransaction)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !isDeletePending) setDeletingTransaction(null)
+        }}
+        title="Excluir transação"
+        description={`A transação “${deletingTransaction?.description ?? ''}” será removida permanentemente.`}
+        confirmLabel="Excluir transação"
+        isPending={isDeletePending}
+        onConfirm={confirmDeleteTransaction}
+      />
     </div>
   )
 }

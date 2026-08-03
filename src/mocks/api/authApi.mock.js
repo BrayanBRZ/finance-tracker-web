@@ -63,7 +63,14 @@ export async function requestPasswordReset({ email }) {
   await latency()
 
   const user = findUserByEmail(email)
-  const token = createPasswordResetToken(user?.id ?? null)
+  if (!user) {
+    return {
+      message: neutralRecoveryMessage,
+      debugToken: null,
+    }
+  }
+
+  const token = createPasswordResetToken(user.id)
   appendPasswordResetToken(token)
 
   return {
@@ -78,13 +85,17 @@ export async function resetPassword({ token, newPassword }) {
   const resetToken = findPasswordResetToken(token)
 
   if (!isPasswordResetTokenUsable(resetToken)) {
-    throw new Error('O link de redefinição é inválido, expirou ou já foi utilizado.')
+    throw new Error(
+      'O link de redefinição é inválido, expirou ou já foi utilizado.',
+    )
   }
 
   const user = findUserById(resetToken.userId)
 
   if (!user) {
-    throw new Error('O link de redefinição é inválido, expirou ou já foi utilizado.')
+    throw new Error(
+      'O link de redefinição é inválido, expirou ou já foi utilizado.',
+    )
   }
 
   replaceUser({ ...user, password: newPassword })

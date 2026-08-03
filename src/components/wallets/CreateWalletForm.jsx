@@ -5,7 +5,7 @@ import { TextareaField } from '@/components/forms/TextareaField'
 import { TextField } from '@/components/forms/TextField'
 import { useCreateWalletForm } from '@/hooks/useCreateWalletForm'
 
-export function CreateWalletForm({ onSuccess }) {
+export function CreateWalletForm({ onSuccess, onError }) {
   const {
     form: {
       register,
@@ -13,7 +13,7 @@ export function CreateWalletForm({ onSuccess }) {
       formState: { errors, isSubmitting },
     },
     onSubmit: createWallet,
-  } = useCreateWalletForm()
+  } = useCreateWalletForm({ onError })
 
   const onSubmit = async (walletData) => {
     const wallet = await createWallet(walletData)
@@ -23,35 +23,35 @@ export function CreateWalletForm({ onSuccess }) {
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <FieldGroup className="gap-4">
-            <TextField
-              id="wallet-name"
-              label="Nome"
-              placeholder="Ex.: Casa, Pessoal, Família"
-              autoComplete="off"
-              {...register('name')}
-              disabled={isSubmitting}
-              error={errors.name?.message}
-            />
+        <TextField
+          id="wallet-name"
+          label="Nome"
+          placeholder="Ex.: Casa, Pessoal, Família"
+          autoComplete="off"
+          {...register('name')}
+          disabled={isSubmitting}
+          error={errors.name?.message}
+        />
 
-            <TextareaField
-              id="wallet-description"
-              label="Descrição"
-              rows={3}
-              placeholder="Opcional"
-              {...register('description')}
-              disabled={isSubmitting}
-              error={errors.description?.message}
-            />
+        <TextareaField
+          id="wallet-description"
+          label="Descrição"
+          rows={3}
+          placeholder="Opcional"
+          {...register('description')}
+          disabled={isSubmitting}
+          error={errors.description?.message}
+        />
 
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Criando...' : 'Criar carteira'}
-            </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Criando...' : 'Criar carteira'}
+        </Button>
 
-            <ErrorSpan
-              id="wallet-form-error"
-              error={errors.root?.server?.message}
-              className="text-sm"
-            />
+        <ErrorSpan
+          id="wallet-form-error"
+          error={errors.root?.server?.message}
+          className="text-sm"
+        />
       </FieldGroup>
     </form>
   )

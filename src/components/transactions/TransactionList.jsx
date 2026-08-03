@@ -13,9 +13,7 @@ const formatCurrency = (value) =>
 
 const formatDate = (value) => {
   const [year, month, day] = value.split('-').map(Number)
-  return new Intl.DateTimeFormat('pt-BR').format(
-    new Date(year, month - 1, day),
-  )
+  return new Intl.DateTimeFormat('pt-BR').format(new Date(year, month - 1, day))
 }
 
 export function TransactionList({
@@ -84,7 +82,7 @@ export function TransactionList({
                 type="button"
                 variant="destructive"
                 size="sm"
-                onClick={() => void onDelete(transaction.id)}
+                onClick={() => onDelete(transaction)}
               >
                 <Trash2 aria-hidden="true" />
                 Excluir

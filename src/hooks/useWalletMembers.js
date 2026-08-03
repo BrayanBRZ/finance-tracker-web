@@ -91,42 +91,30 @@ export function useWalletMembers() {
   const updateMemberRole = async (memberUserId, role) => {
     const mutationScope = captureScope()
 
-    try {
-      const { member } = await updateWalletMemberRole(memberUserId, role)
+    const { member } = await updateWalletMemberRole(memberUserId, role)
 
-      if (isScopeCurrent(mutationScope)) {
-        invalidateRequests()
-        setIsLoading(false)
-        setMembers((currentMembers) =>
-          currentMembers.map((currentMember) =>
-            currentMember.userId === member.userId ? member : currentMember,
-          ),
-        )
-      }
-    } catch (error) {
-      if (isScopeCurrent(mutationScope)) {
-        setErrorMessage(getErrorMessage(error))
-      }
+    if (isScopeCurrent(mutationScope)) {
+      invalidateRequests()
+      setIsLoading(false)
+      setMembers((currentMembers) =>
+        currentMembers.map((currentMember) =>
+          currentMember.userId === member.userId ? member : currentMember,
+        ),
+      )
     }
   }
 
   const removeMember = async (memberUserId) => {
     const mutationScope = captureScope()
 
-    try {
-      await removeWalletMember(memberUserId)
+    await removeWalletMember(memberUserId)
 
-      if (isScopeCurrent(mutationScope)) {
-        invalidateRequests()
-        setIsLoading(false)
-        setMembers((currentMembers) =>
-          currentMembers.filter((member) => member.userId !== memberUserId),
-        )
-      }
-    } catch (error) {
-      if (isScopeCurrent(mutationScope)) {
-        setErrorMessage(getErrorMessage(error))
-      }
+    if (isScopeCurrent(mutationScope)) {
+      invalidateRequests()
+      setIsLoading(false)
+      setMembers((currentMembers) =>
+        currentMembers.filter((member) => member.userId !== memberUserId),
+      )
     }
   }
 
