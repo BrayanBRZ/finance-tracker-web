@@ -28,7 +28,7 @@ export function ensureWalletOwner({ walletId, userId }) {
   const membership = ensureWalletAccess({ walletId, userId })
 
   if (membership.role !== WALLET_MEMBER_ROLES.OWNER) {
-    throw new Error('Apenas o proprietário pode gerenciar categorias')
+    throw new Error('Apenas o proprietário pode gerenciar esta carteira')
   }
 
   return membership

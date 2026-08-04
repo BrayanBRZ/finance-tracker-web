@@ -7,3 +7,18 @@ export const createWallet = (walletData) => walletApi.createWallet(walletData)
 
 export const getWalletMembership = (params) =>
   walletApi.getWalletMembership(params)
+
+export const updateWallet = (params) => walletApi.updateWallet(params)
+
+export const removeWallet = (params) => walletApi.removeWallet(params)
+
+export const listWalletMembersForUser = (params) =>
+  walletApi.listWalletMembersForUser(params)
+
+export const addWalletMember = (params) => walletApi.addWalletMember(params)
+
+export const updateWalletMemberRole = (params) =>
+  walletApi.updateWalletMemberRole(params)
+
+export const removeWalletMember = (params) =>
+  walletApi.removeWalletMember(params)

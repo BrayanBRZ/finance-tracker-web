@@ -1,4 +1,3 @@
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -19,22 +18,14 @@ export function WalletSelector() {
   } = useWallet()
 
   return (
-    <div className="min-w-52">
-      <Label
-        htmlFor="wallet-selector"
-        className="text-muted-foreground text-xs"
-      >
-        Carteira atual
-      </Label>
-
+    <div>
       <Select
-        value={currentWallet?.id ?? undefined}
+        value={currentWallet?.id ?? ''}
         onValueChange={(walletId) => void selectWallet(walletId)}
         disabled={isLoading || !hasWallets}
       >
         <SelectTrigger
           id="wallet-selector"
-          className="mt-1 w-full"
           aria-describedby={errorMessage ? 'wallet-selector-error' : undefined}
           aria-invalid={errorMessage ? true : undefined}
         >
@@ -53,7 +44,7 @@ export function WalletSelector() {
       </Select>
 
       {errorMessage ? (
-        <p id="wallet-selector-error" className="text-destructive mt-1 text-xs">
+        <p id="wallet-selector-error" className="mt-1 text-xs text-destructive">
           {errorMessage}
         </p>
       ) : null}

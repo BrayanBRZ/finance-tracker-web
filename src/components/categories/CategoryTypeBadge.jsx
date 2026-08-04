@@ -1,5 +1,8 @@
 import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react'
-import { FINANCIAL_TYPE_LABELS, FINANCIAL_TYPES } from '@/domain/financialTypes'
+import {
+  FINANCIAL_TYPE_LABELS,
+  FINANCIAL_TYPES,
+} from '@/domain/financialTypes'
 import { cn } from '@/lib/utils'
 
 const typeIcon = {
@@ -13,7 +16,7 @@ export function CategoryTypeBadge({ type, className }) {
   return (
     <span
       className={cn(
-        'bg-muted text-muted-foreground ring-border inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1',
+        'inline-flex min-w-22 justify-center items-center gap-1 rounded-(--radius) bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border',
         className,
       )}
     >

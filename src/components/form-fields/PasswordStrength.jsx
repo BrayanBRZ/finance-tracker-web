@@ -23,7 +23,7 @@ export function PasswordStrength({ password, className }) {
         <div
           key={index}
           className={cn(
-            'h-1 w-3 rounded-2xl transition-all duration-300',
+            'h-1 w-3 rounded-(--radius) transition-all duration-300',
             index < strength.score
               ? strengthClasses[strength.score]
               : 'bg-muted',

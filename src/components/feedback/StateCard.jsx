@@ -10,7 +10,7 @@ export function StateCard({
   ariaLive,
 }) {
   return (
-    <Card role={role} aria-live={ariaLive} className="p-4">
+    <Card role={role} aria-live={ariaLive}>
       <CardHeader>
         {eyebrow ? (
           <p className="text-primary text-sm font-medium">{eyebrow}</p>

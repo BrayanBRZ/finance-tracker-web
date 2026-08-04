@@ -5,10 +5,11 @@ import {
   normalizeOptionalText,
   normalizeRequiredText,
 } from '@/mocks/utils/text'
+
 export { FINANCIAL_TYPES, isKnownFinancialType }
 
 export function createCategory({
-  walletId,
+  userId,
   name,
   type,
   color = '',
@@ -16,7 +17,7 @@ export function createCategory({
 }) {
   return {
     id: createMockId(),
-    walletId,
+    userId,
     name: normalizeRequiredText(name),
     type,
     color: normalizeOptionalText(color),
@@ -25,10 +26,20 @@ export function createCategory({
   }
 }
 
+export function updateCategory({ category, name, type, color = '', icon = '' }) {
+  return {
+    ...category,
+    name: normalizeRequiredText(name),
+    type,
+    color: normalizeOptionalText(color),
+    icon: normalizeOptionalText(icon),
+  }
+}
+
 export function toPublicCategory(category) {
   return {
     id: category.id,
-    walletId: category.walletId,
+    userId: category.userId,
     name: category.name,
     type: category.type,
     color: category.color,

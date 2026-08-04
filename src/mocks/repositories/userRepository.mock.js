@@ -17,3 +17,11 @@ export function findUserByEmail(email) {
 export function appendUser(user) {
   writeUsers([...listUsers(), user])
 }
+
+export function replaceUser(nextUser) {
+  writeUsers(
+    listUsers().map((user) =>
+      isSameId(user.id, nextUser.id) ? nextUser : user,
+    ),
+  )
+}

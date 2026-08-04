@@ -1,15 +1,12 @@
 import { Link } from 'react-router-dom'
-import {
-  AuthScreenLayout,
-  AuthFormLayout,
-  AuthFormHeader,
-} from '@/components/auth/AuthLayout'
-import { SubmitButton } from '@/components/form-fields/SubmitButton'
-import { FormPasswordField } from '@/components/form-fields/FormPasswordField'
-import { PasswordStrength } from '@/components/form-fields/PasswordStrength'
+import { AuthFormHeader, AuthScreenLayout } from '@/components/auth/AuthLayout'
+import { AuthForm } from '@/components/auth/form/AuthForm'
+import { AuthFormError } from '@/components/auth/form/AuthFormError'
+import { AuthFormSubmit } from '@/components/auth/form/AuthFormSubmit'
+import { AuthPasswordField } from '@/components/auth/form/AuthPasswordField'
+import { AuthPasswordStrengthIndicator } from '@/components/auth/form/AuthPasswordStrengthIndicator'
+import { AuthTextField } from '@/components/auth/form/AuthTextField'
 import { useRegisterForm } from '@/hooks/useRegisterForm'
-import { ErrorSpan } from '../form-fields/ErrorSpan'
-import { FormInputField } from '../form-fields/FormInputField'
 
 export function RegisterForm() {
   const {
@@ -24,7 +21,7 @@ export function RegisterForm() {
 
   return (
     <AuthScreenLayout visualSide="left">
-      <AuthFormLayout onSubmit={handleSubmit(onSubmit)}>
+      <AuthForm onSubmit={handleSubmit(onSubmit)}>
         <AuthFormHeader
           title="Criar conta"
           description="Já tem uma conta?"
@@ -38,7 +35,7 @@ export function RegisterForm() {
           }
         />
 
-        <FormInputField
+        <AuthTextField
           id="name"
           label="Nome completo"
           autoComplete="name"
@@ -48,7 +45,7 @@ export function RegisterForm() {
           error={errors.name?.message}
         />
 
-        <FormInputField
+        <AuthTextField
           id="register-email"
           label="E-mail"
           type="email"
@@ -59,7 +56,7 @@ export function RegisterForm() {
           error={errors.email?.message}
         />
 
-        <FormPasswordField
+        <AuthPasswordField
           id="register-password"
           label="Senha"
           autoComplete="new-password"
@@ -67,10 +64,12 @@ export function RegisterForm() {
           {...register('password')}
           disabled={isSubmitting}
           error={errors.password?.message}
-          labelAddon={<PasswordStrength password={watch('password', '')} />}
+          labelAddon={
+            <AuthPasswordStrengthIndicator password={watch('password', '')} />
+          }
         />
 
-        <FormPasswordField
+        <AuthPasswordField
           id="confirm-password"
           label="Confirmar senha"
           autoComplete="new-password"
@@ -80,17 +79,12 @@ export function RegisterForm() {
           error={errors.confirmPassword?.message}
         />
 
-        <SubmitButton
-          buttonText="Cadastrar-se"
-          isSubmitting={isSubmitting}
-          className="mt-3 h-10 w-full"
-        />
-
-        <ErrorSpan
+        <AuthFormSubmit buttonText="Cadastrar-se" isSubmitting={isSubmitting} />
+        <AuthFormError
+          id="register-error"
           error={errors.root?.server?.message}
-          className="text-center"
         />
-      </AuthFormLayout>
+      </AuthForm>
     </AuthScreenLayout>
   )
 }

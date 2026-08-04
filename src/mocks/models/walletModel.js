@@ -31,6 +31,25 @@ export function createOwnerMembership({ walletId, userId }) {
   }
 }
 
+export function createWalletMembership({ walletId, userId, role }) {
+  return {
+    walletId,
+    userId,
+    role,
+    status: WALLET_MEMBER_STATUS.ACTIVE,
+    addedAt: createIsoTimestamp(),
+  }
+}
+
+export function updateWallet({ wallet, name, description }) {
+  return {
+    ...wallet,
+    name: normalizeRequiredText(name),
+    description: normalizeOptionalText(description),
+    updatedAt: createIsoTimestamp(),
+  }
+}
+
 export function isActiveMembership(membership) {
   return membership?.status === WALLET_MEMBER_STATUS.ACTIVE
 }

@@ -6,18 +6,36 @@ export function listCategories() {
   return readCategories()
 }
 
-export function listCategoriesByWalletId(walletId) {
+export function listCategoriesByUserId(userId) {
   return listCategories().filter((category) =>
-    isSameId(category.walletId, walletId),
+    isSameId(category.userId, userId),
   )
 }
 
-export function findCategoryByNameInWallet({ walletId, name }) {
-  return listCategoriesByWalletId(walletId).find((category) =>
+export function findCategoryByNameForUser({ userId, name }) {
+  return listCategoriesByUserId(userId).find((category) =>
     isSameNormalizedText(category.name, name),
   )
 }
 
+export function findCategoryById(categoryId) {
+  return listCategories().find((category) => isSameId(category.id, categoryId))
+}
+
 export function appendCategory(category) {
   writeCategories([...listCategories(), category])
+}
+
+export function replaceCategory(nextCategory) {
+  writeCategories(
+    listCategories().map((category) =>
+      isSameId(category.id, nextCategory.id) ? nextCategory : category,
+    ),
+  )
+}
+
+export function removeCategory(categoryId) {
+  writeCategories(
+    listCategories().filter((category) => !isSameId(category.id, categoryId)),
+  )
 }

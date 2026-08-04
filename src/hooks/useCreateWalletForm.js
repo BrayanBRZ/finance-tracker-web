@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { walletSchema } from '@/schemas/walletSchema'
 import { useWallet } from '@/context/walletContext'
 
-export function useCreateWalletForm() {
+export function useCreateWalletForm({ onError } = {}) {
   const { createWallet } = useWallet()
 
   const form = useForm({
@@ -18,9 +18,11 @@ export function useCreateWalletForm() {
   const onSubmit = async (walletData) => {
     try {
       form.clearErrors('root')
-      await createWallet(walletData)
+      const wallet = await createWallet(walletData)
       form.reset()
+      return wallet
     } catch (error) {
+      onError?.(error)
       form.setError('root.server', {
         type: 'server',
         message:
@@ -28,6 +30,7 @@ export function useCreateWalletForm() {
             ? error.message
             : 'Não foi possível criar a carteira.',
       })
+      return null
     }
   }
 

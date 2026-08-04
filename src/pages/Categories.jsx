@@ -1,83 +1,150 @@
-import { CreateCategoryForm } from '@/components/categories/CreateCategoryForm'
+import { useState } from 'react'
+import { Plus } from 'lucide-react'
+import { CategoryForm } from '@/components/categories/CategoryForm'
 import { CategoryList } from '@/components/categories/CategoryList'
-import { StateCard } from '@/components/feedback/StateCard'
-import { ContentWithAside } from '@/components/layout/ContentWithAside'
-import { WalletScope } from '@/components/wallets/WalletScope'
-import { useWallet } from '@/context/walletContext'
-import { WALLET_MEMBER_ROLES } from '@/domain/walletRoles'
+import { ConfirmDialog } from '@/components/feedback/ConfirmDialog'
+import { PageErrorState } from '@/components/feedback/PageErrorState'
+import { PageLoader } from '@/components/feedback/PageLoader'
+import { FormDialog } from '@/components/form-fields/FormDialog'
+import { PageHeader } from '@/components/layout/PageHeader'
+import { Button } from '@/components/ui/button'
 import { useCategories } from '@/hooks/useCategories'
+import { useToast } from '@/hooks/useToast'
 
-function CategoryAccessCard() {
-  return (
-    <StateCard
-      eyebrow="Permissão da carteira"
-      title="Somente o proprietário pode criar categorias"
-      description="Você ainda pode visualizar as categorias desta carteira, mas a criação fica restrita ao proprietário."
-      role="status"
-      ariaLive="polite"
-    />
-  )
-}
+const getErrorMessage = (error) =>
+  error instanceof Error
+    ? error.message
+    : 'Não foi possível concluir a operação.'
 
 function CategoriesContent() {
-  const { currentWallet } = useWallet()
+  const { toast } = useToast()
+  const [editingCategory, setEditingCategory] = useState(null)
+  const [deletingCategory, setDeletingCategory] = useState(null)
+  const [isDeletePending, setIsDeletePending] = useState(false)
+  const [isFormOpen, setIsFormOpen] = useState(false)
   const {
     createCategory,
+    appearanceOptions,
     errorMessage,
     groupedCategories,
-    hasCategories,
     isLoading,
     refreshCategories,
+    updateCategory,
+    removeCategory,
   } = useCategories()
-  const canManageCategories = currentWallet?.role === WALLET_MEMBER_ROLES.OWNER
 
-  if (isLoading) {
-    return (
-      <StateCard
-        eyebrow="Carregando categorias"
-        title="Buscando categorias da carteira..."
-        description="Estamos preparando receitas e despesas da carteira atual."
-        role="status"
-        ariaLive="polite"
-      />
-    )
+  const saveCategory = async (categoryData) => {
+    try {
+      if (editingCategory) {
+        await updateCategory(editingCategory.id, categoryData)
+        toast({
+          message: 'Categoria atualizada com sucesso.',
+          variant: 'success',
+        })
+        setEditingCategory(null)
+        setIsFormOpen(false)
+        return
+      }
+
+      await createCategory(categoryData)
+      toast({ message: 'Categoria criada com sucesso.', variant: 'success' })
+      setIsFormOpen(false)
+    } catch (error) {
+      toast({ message: getErrorMessage(error), variant: 'error' })
+      throw error
+    }
   }
 
-  if (errorMessage) {
-    return (
-      <StateCard
-        eyebrow="Não foi possível carregar categorias"
-        title="Algo saiu do trilho"
-        description={errorMessage}
-        role="alert"
-        action={{
-          label: 'Tentar novamente',
-          onClick: () => void refreshCategories(),
-        }}
-      />
-    )
+  const confirmDeleteCategory = async () => {
+    if (!deletingCategory) return
+
+    setIsDeletePending(true)
+
+    try {
+      await removeCategory(deletingCategory.id)
+      toast({ message: 'Categoria excluída com sucesso.', variant: 'success' })
+      if (editingCategory?.id === deletingCategory.id) setEditingCategory(null)
+      setDeletingCategory(null)
+    } catch (error) {
+      toast({ message: getErrorMessage(error), variant: 'error' })
+    } finally {
+      setIsDeletePending(false)
+      setDeletingCategory(null)
+    }
   }
 
-  return (
-    <ContentWithAside>
+  const openCreateForm = () => {
+    setEditingCategory(null)
+    setIsFormOpen(true)
+  }
+
+  const openEditForm = (category) => {
+    setEditingCategory(category)
+    setIsFormOpen(true)
+  }
+
+  const handleFormOpenChange = (isOpen) => {
+    setIsFormOpen(isOpen)
+    if (!isOpen) setEditingCategory(null)
+  }
+
+  return isLoading ? (
+    <PageLoader />
+  ) : errorMessage ? (
+    <PageErrorState
+      eyebrow="Não foi possível carregar categorias"
+      description={errorMessage}
+      onRetry={() => void refreshCategories()}
+    />
+  ) : (
+    <div className="flex h-full min-h-0 flex-col gap-6">
+      <PageHeader
+        title="Categorias"
+        description="Organize categorias para classificar seus lançamentos."
+        actions={
+          <Button type="button" onClick={openCreateForm}>
+            <Plus aria-hidden="true" />
+            Nova categoria
+          </Button>
+        }
+      />
       <CategoryList
+        className="min-h-0 flex-1"
         groupedCategories={groupedCategories}
-        hasCategories={hasCategories}
+        canManage
+        onEdit={openEditForm}
+        onRemove={setDeletingCategory}
       />
 
-      {canManageCategories ? (
-        <CreateCategoryForm createCategory={createCategory} />
-      ) : (
-        <CategoryAccessCard />
-      )}
-    </ContentWithAside>
+      <FormDialog
+        open={isFormOpen}
+        onOpenChange={handleFormOpenChange}
+        title={editingCategory ? 'Editar categoria' : 'Nova categoria'}
+        description="Categorias são pessoais e podem classificar lançamentos das suas carteiras."
+      >
+        <CategoryForm
+          appearanceOptions={appearanceOptions}
+          category={editingCategory}
+          onSubmit={saveCategory}
+          onCancel={() => handleFormOpenChange(false)}
+        />
+      </FormDialog>
+
+      <ConfirmDialog
+        open={Boolean(deletingCategory)}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !isDeletePending) setDeletingCategory(null)
+        }}
+        title="Excluir categoria"
+        description={`A categoria “${deletingCategory?.name ?? ''}” será removida permanentemente.`}
+        confirmLabel="Excluir categoria"
+        isPending={isDeletePending}
+        onConfirm={confirmDeleteCategory}
+      />
+    </div>
   )
 }
 
 export function CategoriesPage() {
-  return (
-    <WalletScope>
-      <CategoriesContent />
-    </WalletScope>
-  )
+  return <CategoriesContent />
 }

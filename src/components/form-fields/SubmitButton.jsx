@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils'
 export function SubmitButton({ buttonText, className, isSubmitting }) {
   return (
     <Button
-      type="submit"
       disabled={isSubmitting}
       className={cn('h-10 w-10', className)}
     >

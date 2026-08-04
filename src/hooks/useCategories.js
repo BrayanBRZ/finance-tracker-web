@@ -1,11 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { FINANCIAL_TYPES } from '@/domain/financialTypes'
 import { useSession } from '@/context/sessionContext'
-import { useWallet } from '@/context/walletContext'
+import { FINANCIAL_TYPES } from '@/domain/financialTypes'
+import { useAsyncScopeGuard } from '@/hooks/useAsyncScopeGuard'
 import {
   createCategory as createCategoryOperation,
-  listCategoriesForWallet,
+  listCategoryAppearanceOptions,
+  listCategoriesForUser,
+  removeCategory as removeCategoryOperation,
+  updateCategory as updateCategoryOperation,
 } from '@/services/categoryService'
+
+const emptyAppearanceOptions = {
+  colors: [],
+  icons: [],
+}
 
 const getErrorMessage = (error) =>
   error instanceof Error
@@ -23,17 +31,31 @@ const groupCategoriesByType = (categories) => ({
 
 export function useCategories() {
   const { session } = useSession()
-  const { currentWallet } = useWallet()
   const userId = session?.user.id
-  const walletId = currentWallet?.id
   const [categories, setCategories] = useState([])
+  const [appearanceOptions, setAppearanceOptions] = useState(
+    emptyAppearanceOptions,
+  )
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
+  const {
+    beginRequest,
+    captureScope,
+    invalidateRequests,
+    isRequestCurrent,
+    isScopeCurrent,
+  } = useAsyncScopeGuard(JSON.stringify([userId ?? null]))
 
   const loadCategories = useCallback(async () => {
-    if (!userId || !walletId) {
-      setCategories([])
-      setErrorMessage(null)
+    const request = beginRequest()
+
+    if (!userId) {
+      if (isRequestCurrent(request)) {
+        setCategories([])
+        setAppearanceOptions(emptyAppearanceOptions)
+        setIsLoading(false)
+        setErrorMessage(null)
+      }
 
       return []
     }
@@ -42,71 +64,107 @@ export function useCategories() {
     setErrorMessage(null)
 
     try {
-      const nextCategories = await listCategoriesForWallet({
-        userId,
-        walletId,
-      })
+      const [nextCategories, nextAppearanceOptions] = await Promise.all([
+        listCategoriesForUser({ userId }),
+        listCategoryAppearanceOptions({ userId }),
+      ])
+
+      if (!isRequestCurrent(request)) return []
 
       setCategories(nextCategories)
-
+      setAppearanceOptions(nextAppearanceOptions)
       return nextCategories
     } catch (error) {
-      setCategories([])
-      setErrorMessage(getErrorMessage(error))
+      if (!isRequestCurrent(request)) return []
 
+      setCategories([])
+      setAppearanceOptions(emptyAppearanceOptions)
+      setErrorMessage(getErrorMessage(error))
       return []
     } finally {
-      setIsLoading(false)
+      if (isRequestCurrent(request)) {
+        setIsLoading(false)
+      }
     }
-  }, [userId, walletId])
+  }, [beginRequest, isRequestCurrent, userId])
 
   const createCategory = useCallback(
     async (categoryData) => {
-      if (!userId || !walletId) {
-        const error = new Error(
-          'Selecione uma carteira antes de criar categorias.',
-        )
-
+      if (!userId) {
+        const error = new Error('Faça login para criar categorias.')
         setErrorMessage(error.message)
         throw error
       }
 
+      const mutationScope = captureScope()
       setErrorMessage(null)
+      const { category } = await createCategoryOperation({
+        userId,
+        ...categoryData,
+      })
 
-      try {
-        const { category } = await createCategoryOperation({
-          userId,
-          walletId,
-          ...categoryData,
-        })
-
+      if (isScopeCurrent(mutationScope)) {
+        invalidateRequests()
+        setIsLoading(false)
         setCategories((currentCategories) => [...currentCategories, category])
+      }
 
-        return category
-      } catch (error) {
-        setErrorMessage(getErrorMessage(error))
-        throw error
+      return category
+    },
+    [captureScope, invalidateRequests, isScopeCurrent, userId],
+  )
+
+  const updateCategory = useCallback(
+    async (categoryId, categoryData) => {
+      if (!userId) throw new Error('Faça login para editar categorias.')
+
+      const mutationScope = captureScope()
+      const { category } = await updateCategoryOperation({
+        userId,
+        categoryId,
+        ...categoryData,
+      })
+
+      if (isScopeCurrent(mutationScope)) {
+        invalidateRequests()
+        setIsLoading(false)
+        setCategories((currentCategories) =>
+          currentCategories.map((currentCategory) =>
+            currentCategory.id === category.id ? category : currentCategory,
+          ),
+        )
+      }
+
+      return category
+    },
+    [captureScope, invalidateRequests, isScopeCurrent, userId],
+  )
+
+  const removeCategory = useCallback(
+    async (categoryId) => {
+      if (!userId) throw new Error('Faça login para excluir categorias.')
+
+      const mutationScope = captureScope()
+      await removeCategoryOperation({ userId, categoryId })
+
+      if (isScopeCurrent(mutationScope)) {
+        invalidateRequests()
+        setIsLoading(false)
+        setCategories((currentCategories) =>
+          currentCategories.filter((category) => category.id !== categoryId),
+        )
       }
     },
-    [userId, walletId],
+    [captureScope, invalidateRequests, isScopeCurrent, userId],
   )
 
   useEffect(() => {
-    let isActive = true
-
-    const syncCategories = async () => {
+    const synchronizeCategories = async () => {
       await Promise.resolve()
-
-      if (isActive) {
-        await loadCategories()
-      }
+      await loadCategories()
     }
 
-    void syncCategories()
-
-    return () => {
-      isActive = false
-    }
+    void synchronizeCategories()
   }, [loadCategories])
 
   const groupedCategories = useMemo(
@@ -116,11 +174,14 @@ export function useCategories() {
 
   return {
     categories,
+    appearanceOptions,
     groupedCategories,
     hasCategories: categories.length > 0,
     isLoading,
     errorMessage,
     refreshCategories: loadCategories,
     createCategory,
+    updateCategory,
+    removeCategory,
   }
 }

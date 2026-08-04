@@ -25,6 +25,39 @@ export function findActiveMembership({ walletId, userId }) {
   )
 }
 
+export function findMembership({ walletId, userId }) {
+  return listWalletMembers().find(
+    (membership) =>
+      isSameId(membership.walletId, walletId) &&
+      isSameId(membership.userId, userId),
+  )
+}
+
 export function appendWalletMember(walletMember) {
   writeWalletMembers([...listWalletMembers(), walletMember])
+}
+
+export function listMembershipsForWallet(walletId) {
+  return listWalletMembers().filter((membership) =>
+    isSameId(membership.walletId, walletId),
+  )
+}
+
+export function replaceWalletMember(nextMembership) {
+  writeWalletMembers(
+    listWalletMembers().map((membership) =>
+      isSameId(membership.walletId, nextMembership.walletId) &&
+      isSameId(membership.userId, nextMembership.userId)
+        ? nextMembership
+        : membership,
+    ),
+  )
+}
+
+export function removeWalletMembersByWalletId(walletId) {
+  writeWalletMembers(
+    listWalletMembers().filter(
+      (membership) => !isSameId(membership.walletId, walletId),
+    ),
+  )
 }

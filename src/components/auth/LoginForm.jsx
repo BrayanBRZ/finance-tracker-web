@@ -1,31 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Controller } from 'react-hook-form'
-import { Link, useLocation } from 'react-router-dom'
-import {
-  AuthFormLayout,
-  AuthFormHeader,
-  AuthScreenLayout,
-} from '@/components/auth/AuthLayout'
-
-import { ErrorSpan } from '@/components/form-fields/ErrorSpan'
-
-import { SubmitButton } from '@/components/form-fields/SubmitButton'
-import { FormPasswordField } from '@/components/form-fields/FormPasswordField'
-
-import { Toast } from '@/components/feedback/Toast'
-
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { AuthFormHeader, AuthScreenLayout } from '@/components/auth/AuthLayout'
+import { AuthForm } from '@/components/auth/form/AuthForm'
+import { AuthFormError } from '@/components/auth/form/AuthFormError'
+import { AuthFormSubmit } from '@/components/auth/form/AuthFormSubmit'
+import { AuthPasswordField } from '@/components/auth/form/AuthPasswordField'
+import { AuthTextField } from '@/components/auth/form/AuthTextField'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
-
 import { useLoginForm } from '@/hooks/useLoginForm'
-import { FormInputField } from '../form-fields/FormInputField'
+import { useToast } from '@/hooks/useToast'
 
 export function LoginForm() {
   const location = useLocation()
-  const [toastMessage, setToastMessage] = useState(
-    () => location.state?.toast ?? null,
-  )
-
+  const navigate = useNavigate()
+  const { toast } = useToast()
+  const handledToastRef = useRef(null)
   const {
     form: {
       control,
@@ -36,98 +27,94 @@ export function LoginForm() {
     onSubmit,
   } = useLoginForm()
 
+  useEffect(() => {
+    const message = location.state?.toast
+
+    if (!message || handledToastRef.current === message) return
+
+    handledToastRef.current = message
+    toast({ message, variant: 'success' })
+    navigate(location.pathname, { replace: true, state: null })
+  }, [location.pathname, location.state?.toast, navigate, toast])
+
   return (
-    <>
-      {toastMessage ? (
-        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
-      ) : null}
-
-      <AuthScreenLayout visualSide="right">
-        <AuthFormLayout onSubmit={handleSubmit(onSubmit)}>
-          <AuthFormHeader
-            title="Efetuar login"
-            description="Não possui uma conta?"
-            action={
-              <Link
-                to="/cadastro"
-                className="text-foreground font-medium underline-offset-4 hover:underline"
-              >
-                Cadastre-se
-              </Link>
-            }
-          />
-
-          <FormInputField
-            id="email"
-            label="E-mail"
-            type="email"
-            autoComplete="email"
-            placeholder="nome@exemplo.com"
-            {...register('email')}
-            disabled={isSubmitting}
-            error={errors.email?.message}
-          />
-
-          <FormPasswordField
-            id="password"
-            label="Senha"
-            autoComplete="current-password"
-            placeholder="Sua senha"
-            {...register('password')}
-            disabled={isSubmitting}
-            error={errors.password?.message}
-          />
-
-          <div className="flex justify-between gap-3">
-            <Field
-              orientation="horizontal"
-              className="flex max-w-40 items-center gap-1.5"
-            >
-              <Controller
-                name="rememberMe"
-                control={control}
-                render={({ field }) => (
-                  <Checkbox
-                    id="rememberMe"
-                    name={field.name}
-                    ref={field.ref}
-                    checked={field.value}
-                    onBlur={field.onBlur}
-                    onCheckedChange={(checked) =>
-                      field.onChange(checked === true)
-                    }
-                    disabled={isSubmitting}
-                    className="size-3.5 cursor-pointer"
-                  />
-                )}
-              />
-              <FieldLabel
-                htmlFor="rememberMe"
-                className="text-foreground cursor-pointer text-xs hover:underline"
-              >
-                Lembre-se de mim
-              </FieldLabel>
-            </Field>
-
+    <AuthScreenLayout visualSide="right">
+      <AuthForm onSubmit={handleSubmit(onSubmit)}>
+        <AuthFormHeader
+          title="Efetuar login"
+          description="Não possui uma conta?"
+          action={
             <Link
-              to="/recuperar-senha"
-              className="text-foreground max-w-36 text-xs underline-offset-4 hover:underline"
+              to="/cadastro"
+              className="text-foreground font-medium underline-offset-4 hover:underline"
             >
-              Esqueceu a senha?
+              Cadastre-se
             </Link>
-          </div>
+          }
+        />
 
-          <SubmitButton
-            buttonText="Entrar"
-            isSubmitting={isSubmitting}
-            className="mt-3 h-10 w-full"
-          />
-          <ErrorSpan
-            error={errors.root?.server?.message}
-            className="text-center"
-          />
-        </AuthFormLayout>
-      </AuthScreenLayout>
-    </>
+        <AuthTextField
+          id="email"
+          label="E-mail"
+          type="email"
+          autoComplete="email"
+          placeholder="nome@exemplo.com"
+          {...register('email')}
+          disabled={isSubmitting}
+          error={errors.email?.message}
+        />
+
+        <AuthPasswordField
+          id="password"
+          label="Senha"
+          autoComplete="current-password"
+          placeholder="Sua senha"
+          {...register('password')}
+          disabled={isSubmitting}
+          error={errors.password?.message}
+        />
+
+        <div className="flex gap-3">
+          <Field
+            orientation="horizontal"
+            className="flex max-w-40 items-center gap-1.5"
+          >
+            <Controller
+              name="rememberMe"
+              control={control}
+              render={({ field }) => (
+                <Checkbox
+                  id="rememberMe"
+                  name={field.name}
+                  ref={field.ref}
+                  checked={field.value}
+                  onBlur={field.onBlur}
+                  onCheckedChange={(checked) =>
+                    field.onChange(checked === true)
+                  }
+                  disabled={isSubmitting}
+                  className="size-3.5 cursor-pointer"
+                />
+              )}
+            />
+            <FieldLabel
+              htmlFor="rememberMe"
+              className="text-foreground cursor-pointer text-xs hover:underline"
+            >
+              Lembre-se de mim
+            </FieldLabel>
+          </Field>
+          <Link
+            to="/recuperar-senha"
+            className="text-foreground ml-auto text-xs font-medium underline-offset-4 hover:underline"
+          >
+            Recuperar senha
+          </Link>
+        </div>
+
+        <AuthFormSubmit buttonText="Entrar" isSubmitting={isSubmitting} />
+        <AuthFormError id="login-error" error={errors.root?.server?.message} />
+      </AuthForm>
+    </AuthScreenLayout>
   )
 }
