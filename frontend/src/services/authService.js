@@ -1,11 +1,17 @@
-import * as authApi from '@/mocks/api/authApi.mock'
+import * as mockAuth from '@/mocks/api/authApi.mock'
+import * as apiAuth from '@/services/authApiService'
 
-export const registerUser = (credentials) => authApi.registerUser(credentials)
+const provider =
+  (import.meta.env.VITE_AUTH_PROVIDER ?? 'mock').toLowerCase() === 'api'
+    ? apiAuth
+    : mockAuth
 
-export const login = (credentials) => authApi.login(credentials)
+export const registerUser = (credentials) => provider.registerUser(credentials)
 
-export async function requestPasswordReset(data) {
-  const result = await authApi.requestPasswordReset(data)
+export const login = (credentials) => provider.login(credentials)
+
+export async function requestPasswordReset(credentials) {
+  const result = await provider.requestPasswordReset(credentials)
 
   if (result.debugToken) {
     const resetUrl = new URL(
@@ -18,13 +24,13 @@ export async function requestPasswordReset(data) {
   return result
 }
 
-export const resetPassword = (data) => authApi.resetPassword(data)
+export const resetPassword = (data) => provider.resetPassword(data)
 
-export const changePassword = (data) => authApi.changePassword(data)
+export const changePassword = (data) => provider.changePassword(data)
 
-export const restoreSession = () => authApi.restoreSession()
+export const restoreSession = () => provider.restoreSession()
 
-export const logout = () => authApi.logout()
+export const logout = () => provider.logout()
 
 export const subscribeToAuthStateChanges = (listener) =>
-  authApi.subscribeToAuthStateChanges(listener)
+  provider.subscribeToAuthStateChanges(listener)

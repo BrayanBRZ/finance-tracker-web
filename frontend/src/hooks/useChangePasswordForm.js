@@ -1,14 +1,14 @@
-import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSession } from '@/context/sessionContext'
 import { changePasswordSchema } from '@/schemas/changePasswordSchema'
 import { changePassword } from '@/services/authService'
 import { getErrorMessage } from '@/utils/errors'
+import { useToast } from '@/hooks/useToast'
 
 export function useChangePasswordForm() {
   const { session } = useSession()
-  const [successMessage, setSuccessMessage] = useState(null)
+  const { toast } = useToast()
   const form = useForm({
     resolver: zodResolver(changePasswordSchema),
     mode: 'onTouched',
@@ -29,10 +29,8 @@ export function useChangePasswordForm() {
         newPassword,
       })
       form.reset()
-      setSuccessMessage(response.message)
+      toast({ message: response.message, variant: 'success' })
     } catch (error) {
-      setSuccessMessage(null)
-
       if (error instanceof Error && error.field === 'currentPassword') {
         form.setError('currentPassword', {
           type: 'server',
@@ -48,5 +46,5 @@ export function useChangePasswordForm() {
     }
   }
 
-  return { form, newPassword, successMessage, onSubmit }
+  return { form, newPassword, onSubmit }
 }

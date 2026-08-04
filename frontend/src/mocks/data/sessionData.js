@@ -1,23 +1,31 @@
 export const SESSION_STORAGE_KEY = '@project:user_session_data'
 
 export function readSessionRecord() {
-  try {
-    return JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY))
-  } catch {
-    return null
+  for (const storage of [localStorage, sessionStorage]) {
+    try {
+      const value = storage.getItem(SESSION_STORAGE_KEY)
+      if (value) return JSON.parse(value)
+    } catch {
+      // Continue with the other browser storage.
+    }
   }
+  return null
 }
 
 export function writeSessionRecord(session) {
   const serializedSession = JSON.stringify(session)
 
-  localStorage.setItem(SESSION_STORAGE_KEY, serializedSession)
+  clearSessionRecord()
+  const storage = session.rememberMe ? localStorage : sessionStorage
+  storage.setItem(SESSION_STORAGE_KEY, serializedSession)
 }
 
 export function clearSessionRecord() {
-  try {
-    localStorage.removeItem(SESSION_STORAGE_KEY)
-  } catch {
-    // The React session is still cleared when browser storage is unavailable.
+  for (const storage of [localStorage, sessionStorage]) {
+    try {
+      storage.removeItem(SESSION_STORAGE_KEY)
+    } catch {
+      // The React session is still cleared when storage is unavailable.
+    }
   }
 }

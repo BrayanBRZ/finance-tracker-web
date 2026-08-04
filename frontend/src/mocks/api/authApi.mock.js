@@ -80,6 +80,8 @@ export async function requestPasswordReset({ email }) {
   const user = findUserByEmail(email)
   if (!user) {
     return {
+      message:
+        'Se este e-mail estiver cadastrado, você receberá as instruções em breve.',
       debugToken: null,
     }
   }
@@ -88,6 +90,8 @@ export async function requestPasswordReset({ email }) {
   appendPasswordResetToken(token)
 
   return {
+    message:
+      'Se este e-mail estiver cadastrado, você receberá as instruções em breve.',
     debugToken: token.token,
   }
 }

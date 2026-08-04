@@ -10,11 +10,24 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+backend/target/
+backend/.m2/
+backend/.jdk21/
+backend/.jdk21.zip
+backend/.classpath
+backend/.project
+backend/.settings/
+.env
+frontend/.env
 _docs
 *.local
 AGENTS.md
 .codex
 graphify-out
+
+# Credentials
+application.properties
+application-secrets.properties
 
 # Editor directories and files
 .vscode/*

@@ -16,10 +16,9 @@ export function useForgotPasswordForm() {
   const onSubmit = async (data) => {
     try {
       form.clearErrors('root')
-      await requestPasswordReset(data)
+      const response = await requestPasswordReset(data)
       toast({
-        message:
-          'Se este e-mail estiver cadastrado, você receberá as instruções em breve.',
+        message: response.message,
         variant: 'success',
       })
     } catch (error) {

@@ -7,8 +7,7 @@ import { AuthPasswordStrengthIndicator } from '@/components/auth/form/AuthPasswo
 import { useChangePasswordForm } from '@/hooks/useChangePasswordForm'
 
 export function ChangePasswordForm() {
-  const { form, newPassword, successMessage, onSubmit } =
-    useChangePasswordForm()
+  const { form, newPassword, onSubmit } = useChangePasswordForm()
   const {
     register,
     handleSubmit,
@@ -53,11 +52,6 @@ export function ChangePasswordForm() {
         id="change-password-error"
         error={errors.root?.server?.message}
       />
-      {successMessage ? (
-        <p role="status" className="text-center text-sm text-primary">
-          {successMessage}
-        </p>
-      ) : null}
     </AuthForm>
   )
 }

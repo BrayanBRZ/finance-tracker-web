@@ -1,11 +1,7 @@
-import { findUserById } from '@/mocks/repositories/userRepository.mock'
-
 export function ensureAuthenticatedUser(userId) {
-  const user = userId ? findUserById(userId) : null
-
-  if (!user) {
+  if (userId == null || userId === '') {
     throw new Error('Usuário autenticado não encontrado')
   }
 
-  return user
+  return { id: userId }
 }

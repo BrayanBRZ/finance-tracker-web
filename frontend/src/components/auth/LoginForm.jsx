@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { Controller } from 'react-hook-form'
 import { AuthFormHeader, AuthScreenLayout } from '@/components/auth/AuthLayout'
 import { AuthForm } from '@/components/auth/form/AuthForm'
 import { AuthFormError } from '@/components/auth/form/AuthFormError'
@@ -13,6 +14,7 @@ export function LoginForm() {
   const {
     form: {
       register,
+      control,
       handleSubmit,
       formState: { errors, isSubmitting },
     },
@@ -61,10 +63,18 @@ export function LoginForm() {
             orientation="horizontal"
             className="flex max-w-40 items-center gap-1.5"
           >
-            <Checkbox
-              id="rememberMe"
-              disabled={isSubmitting}
-              className="size-3.5 cursor-pointer"
+            <Controller
+              name="rememberMe"
+              control={control}
+              render={({ field }) => (
+                <Checkbox
+                  id="rememberMe"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  disabled={isSubmitting}
+                  className="size-3.5 cursor-pointer"
+                />
+              )}
             />
             <FieldLabel
               htmlFor="rememberMe"

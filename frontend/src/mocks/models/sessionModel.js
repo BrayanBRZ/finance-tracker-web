@@ -20,6 +20,7 @@ export function createSessionRecord(userId, { rememberMe = false } = {}) {
     expiresAt: toIsoString(expiresAt),
     revokedAt: null,
     lastAccessAt: toIsoString(now),
+    rememberMe,
   }
 }
 
