@@ -16,7 +16,7 @@ export function useResetPasswordController() {
     },
   })
 
-  const onSubmit = async (newPassword) => {
+  const onSubmit = async ({ newPassword }) => {
     if (!token) {
       return
     }
@@ -24,7 +24,7 @@ export function useResetPasswordController() {
     try {
       form.clearErrors('root')
 
-      await resetPassword({
+      const response = await resetPassword({
         token,
         newPassword,
       })
@@ -32,7 +32,7 @@ export function useResetPasswordController() {
       navigate('/login', {
         replace: true,
         state: {
-          toast: 'Senha redefinida com sucesso. Faça login para continuar.',
+          toast: response.message,
         },
       })
     } catch (error) {

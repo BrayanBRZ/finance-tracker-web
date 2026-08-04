@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/useToast'
 export function useLoginForm() {
   const location = useLocation()
   const handledToastRef = useRef(null)
-  const { navigate } = useNavigate()
+  const navigate = useNavigate()
   const { toast } = useToast()
   const { handleLogin } = useSession()
   const form = useForm({
