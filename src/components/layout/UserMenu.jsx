@@ -3,43 +3,38 @@ import {
   KeyRoundIcon,
   LogOutIcon,
   UserRoundIcon,
-} from "lucide-react";
+} from 'lucide-react'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select'
 
-export function UserMenu({
-  name,
-  isLoggingOut,
-  onChangePassword,
-  onLogout,
-}) {
+export function UserMenu({ name, isLoggingOut, onChangePassword, onLogout }) {
   const handleValueChange = (value) => {
-    if (value === "change-password") {
-      onChangePassword();
+    if (value === 'change-password') {
+      onChangePassword()
     }
 
-    if (value === "logout") {
-      void onLogout();
+    if (value === 'logout') {
+      void onLogout()
     }
-  };
+  }
 
   return (
     <Select value="" onValueChange={handleValueChange}>
       <SelectTrigger
         icon={ChevronUpIcon}
         className="data-placeholder:text-foreground"
-        aria-label={`Abrir menu de ${name ?? "usuário"}`}
+        aria-label={`Abrir menu de ${name ?? 'usuário'}`}
       >
         <SelectValue
           placeholder={
             <>
               <UserRoundIcon aria-hidden="true" />
-              {name ?? "Usuário"}
+              {name ?? 'Usuário'}
             </>
           }
         />
@@ -52,9 +47,9 @@ export function UserMenu({
         </SelectItem>
         <SelectItem value="logout" disabled={isLoggingOut}>
           <LogOutIcon aria-hidden="true" />
-          {isLoggingOut ? "Saindo..." : "Sair"}
+          {isLoggingOut ? 'Saindo...' : 'Sair'}
         </SelectItem>
       </SelectContent>
     </Select>
-  );
+  )
 }

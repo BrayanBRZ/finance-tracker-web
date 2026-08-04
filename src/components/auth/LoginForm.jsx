@@ -1,6 +1,4 @@
-import { useEffect, useRef } from 'react'
-import { Controller } from 'react-hook-form'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AuthFormHeader, AuthScreenLayout } from '@/components/auth/AuthLayout'
 import { AuthForm } from '@/components/auth/form/AuthForm'
 import { AuthFormError } from '@/components/auth/form/AuthFormError'
@@ -10,32 +8,16 @@ import { AuthTextField } from '@/components/auth/form/AuthTextField'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { useLoginForm } from '@/hooks/useLoginForm'
-import { useToast } from '@/hooks/useToast'
 
 export function LoginForm() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { toast } = useToast()
-  const handledToastRef = useRef(null)
   const {
     form: {
-      control,
       register,
       handleSubmit,
       formState: { errors, isSubmitting },
     },
     onSubmit,
   } = useLoginForm()
-
-  useEffect(() => {
-    const message = location.state?.toast
-
-    if (!message || handledToastRef.current === message) return
-
-    handledToastRef.current = message
-    toast({ message, variant: 'success' })
-    navigate(location.pathname, { replace: true, state: null })
-  }, [location.pathname, location.state?.toast, navigate, toast])
 
   return (
     <AuthScreenLayout visualSide="right">
@@ -79,23 +61,10 @@ export function LoginForm() {
             orientation="horizontal"
             className="flex max-w-40 items-center gap-1.5"
           >
-            <Controller
-              name="rememberMe"
-              control={control}
-              render={({ field }) => (
-                <Checkbox
-                  id="rememberMe"
-                  name={field.name}
-                  ref={field.ref}
-                  checked={field.value}
-                  onBlur={field.onBlur}
-                  onCheckedChange={(checked) =>
-                    field.onChange(checked === true)
-                  }
-                  disabled={isSubmitting}
-                  className="size-3.5 cursor-pointer"
-                />
-              )}
+            <Checkbox
+              id="rememberMe"
+              disabled={isSubmitting}
+              className="size-3.5 cursor-pointer"
             />
             <FieldLabel
               htmlFor="rememberMe"

@@ -1,5 +1,3 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledSelectField } from '@/components/form-fields/ControlledSelectField'
 import { FormActions } from '@/components/form-fields/FormActions'
 import { TextField } from '@/components/form-fields/TextField'
@@ -8,7 +6,7 @@ import {
   ASSIGNABLE_WALLET_MEMBER_ROLES,
   WALLET_MEMBER_ROLE_LABELS,
 } from '@/domain/walletRoles'
-import { walletMemberSchema } from '@/schemas/walletMemberSchema'
+import { useAddWalletMemberForm } from '@/hooks/useAddWalletMemberForm'
 
 const roleOptions = ASSIGNABLE_WALLET_MEMBER_ROLES.map((role) => ({
   value: role,
@@ -16,42 +14,20 @@ const roleOptions = ASSIGNABLE_WALLET_MEMBER_ROLES.map((role) => ({
 }))
 
 export function AddWalletMemberForm({ onAdd, onSuccess, onError }) {
-  const form = useForm({
-    resolver: zodResolver(walletMemberSchema),
-    mode: 'onTouched',
-    defaultValues: {
-      email: '',
-      role: ASSIGNABLE_WALLET_MEMBER_ROLES[0],
-    },
+  const { form, onSubmit } = useAddWalletMemberForm({
+    onAdd,
+    onSuccess,
+    onError,
   })
   const {
     control,
     register,
     handleSubmit,
-    reset,
     formState: { errors, isSubmitting },
   } = form
 
-  const submit = async (memberData) => {
-    try {
-      form.clearErrors('root')
-      await onAdd(memberData)
-      reset()
-      onSuccess?.()
-    } catch (error) {
-      onError?.(error)
-      form.setError('root.server', {
-        type: 'server',
-        message:
-          error instanceof Error
-            ? error.message
-            : 'Não foi possível adicionar o membro.',
-      })
-    }
-  }
-
   return (
-    <form noValidate onSubmit={handleSubmit(submit)}>
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <FieldGroup className="gap-4">
         <TextField
           id="wallet-member-email"

@@ -1,9 +1,13 @@
 import { isKnownFinancialType } from '@/domain/financialTypes'
 import { hasText } from '@/mocks/utils/text'
+import { isFutureDateInputValue, isValidDateInputValue } from '@/utils/dates'
 
-const datePattern = /^\d{4}-\d{2}-\d{2}$/
-
-export function validateTransactionInput({ description, amount, type, transactionDate }) {
+export function validateTransactionInput({
+  description,
+  amount,
+  type,
+  transactionDate,
+}) {
   if (!hasText(description)) {
     throw new Error('A descrição da transação é obrigatória')
   }
@@ -16,16 +20,11 @@ export function validateTransactionInput({ description, amount, type, transactio
     throw new Error('Selecione um tipo de transação válido')
   }
 
-  if (!datePattern.test(transactionDate)) {
+  if (!isValidDateInputValue(transactionDate)) {
     throw new Error('Informe uma data válida')
   }
 
-  const parsedDate = new Date(`${transactionDate}T00:00:00`)
-
-  if (
-    Number.isNaN(parsedDate.getTime()) ||
-    parsedDate.toISOString().slice(0, 10) !== transactionDate
-  ) {
-    throw new Error('Informe uma data válida')
+  if (isFutureDateInputValue(transactionDate)) {
+    throw new Error('A data da transação não pode estar no futuro')
   }
 }

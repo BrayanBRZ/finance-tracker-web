@@ -6,13 +6,15 @@ const REMEMBER_ME_SESSION_DURATION_IN_MS = 1000 * 60 * 60 * 24 * 30
 
 export function createSessionRecord(userId, { rememberMe = false } = {}) {
   const now = new Date()
+  const accessToken = createMockId()
   const duration = rememberMe
     ? REMEMBER_ME_SESSION_DURATION_IN_MS
     : SESSION_DURATION_IN_MS
   const expiresAt = new Date(now.getTime() + duration)
 
   return {
-    id: createMockId(),
+    id: accessToken,
+    accessToken,
     userId,
     createdAt: toIsoString(now),
     expiresAt: toIsoString(expiresAt),
@@ -22,7 +24,10 @@ export function createSessionRecord(userId, { rememberMe = false } = {}) {
 }
 
 export function isSessionRecordActive(sessionRecord) {
-  if (!sessionRecord?.id || sessionRecord.userId == null) {
+  if (
+    !(sessionRecord?.accessToken ?? sessionRecord?.id) ||
+    sessionRecord.userId == null
+  ) {
     return false
   }
 

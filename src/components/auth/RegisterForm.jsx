@@ -60,7 +60,7 @@ export function RegisterForm() {
           id="register-password"
           label="Senha"
           autoComplete="new-password"
-          placeholder="Mínimo 6 caracteres"
+          placeholder="Mínimo 8 caracteres"
           {...register('password')}
           disabled={isSubmitting}
           error={errors.password?.message}

@@ -1,60 +1,21 @@
-import { useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { AuthPasswordStrengthIndicator } from '@/components/auth/form/AuthPasswordStrengthIndicator'
 import { ErrorSpan } from '@/components/form-fields/ErrorSpan'
 import { PasswordField } from '@/components/form-fields/PasswordField'
 import { Button } from '@/components/ui/button'
 import { FieldGroup } from '@/components/ui/field'
-import { changePasswordSchema } from '@/schemas/changePasswordSchema'
-import { changePassword } from '@/services/authService'
-import { useSession } from '@/context/sessionContext'
+import { useChangePasswordForm } from '@/hooks/useChangePasswordForm'
 
 export function ChangePasswordForm() {
-  const { session } = useSession()
-  const [successMessage, setSuccessMessage] = useState(null)
-  const form = useForm({
-    resolver: zodResolver(changePasswordSchema),
-    mode: 'onTouched',
-    defaultValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    },
-  })
+  const { form, newPassword, successMessage, onSubmit } =
+    useChangePasswordForm()
   const {
     register,
     handleSubmit,
-    reset,
-    control,
     formState: { errors, isSubmitting },
   } = form
-  const newPassword = useWatch({ control, name: 'newPassword' })
-
-  const submit = async ({ currentPassword, newPassword }) => {
-    try {
-      form.clearErrors('root')
-      const response = await changePassword({
-        userId: session?.user.id,
-        currentPassword,
-        newPassword,
-      })
-      reset()
-      setSuccessMessage(response.message)
-    } catch (error) {
-      setSuccessMessage(null)
-      form.setError('root.server', {
-        type: 'server',
-        message:
-          error instanceof Error
-            ? error.message
-            : 'Não foi possível alterar a senha.',
-      })
-    }
-  }
 
   return (
-    <form noValidate onSubmit={handleSubmit(submit)}>
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <FieldGroup className="gap-4">
         <PasswordField
           id="current-password"

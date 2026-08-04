@@ -1,25 +1,20 @@
-export function evaluatePasswordStrength(password) {
-  if (!password)
-    return { score: 0, label: '', color: '', textColor: '', criteria: [] }
+import { evaluatePasswordRequirements } from '@/domain/passwordPolicy'
 
-  const criteria = [
-    { test: password.length >= 6 },
-    { test: /[a-z]/.test(password) },
-    { test: /[A-Z]/.test(password) },
-    { test: /[0-9]/.test(password) },
-    { test: /[^a-zA-Z0-9]/.test(password) },
-  ]
+export function evaluatePasswordStrength(password = '') {
+  const criteria = evaluatePasswordRequirements(password)
+  const score = criteria.filter((criterion) => criterion.passed).length
 
-  const score = criteria.filter((c) => c.test).length
+  if (!password) {
+    return { score, level: 'empty', label: '', criteria }
+  }
 
-  const config = [
-    { color: '', textColor: '' },
-    { color: 'bg-red-500', textColor: 'text-red-500' },
-    { color: 'bg-orange-400', textColor: 'text-orange-400' },
-    { color: 'bg-amber-400', textColor: 'text-amber-500' },
-    { color: 'bg-lime-500', textColor: 'text-lime-600' },
-    { color: 'bg-green-500', textColor: 'text-green-600' },
-  ]
+  if (score <= 2) {
+    return { score, level: 'weak', label: 'Fraca', criteria }
+  }
 
-  return { score, ...config[score] }
+  if (score <= 4) {
+    return { score, level: 'medium', label: 'Média', criteria }
+  }
+
+  return { score, level: 'strong', label: 'Forte', criteria }
 }

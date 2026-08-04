@@ -1,18 +1,10 @@
-import { useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { CategoryIcon } from '@/components/categories/CategoryIndicator'
 import { ControlledSelectField } from '@/components/form-fields/ControlledSelectField'
 import { FormActions } from '@/components/form-fields/FormActions'
 import { TextField } from '@/components/form-fields/TextField'
 import { FieldGroup } from '@/components/ui/field'
 import { FINANCIAL_TYPE_OPTIONS } from '@/domain/financialTypes'
-import { categorySchema } from '@/schemas/categorySchema'
-
-const includeLegacyOption = (options, value, label) => {
-  if (!value || options.some((option) => option.value === value)) return options
-
-  return [{ value, label }, ...options]
-}
+import { useCategoryForm } from '@/hooks/useCategoryForm'
 
 export function CategoryForm({
   appearanceOptions,
@@ -20,51 +12,20 @@ export function CategoryForm({
   onSubmit,
   onCancel,
 }) {
-  const isEditing = Boolean(category)
-  const colorOptions = includeLegacyOption(
-    appearanceOptions.colors,
-    category?.color,
-    `Cor atual (${category?.color})`,
-  )
-  const iconOptions = includeLegacyOption(
-    appearanceOptions.icons,
-    category?.icon,
-    `Ícone atual (${category?.icon})`,
-  )
-  const form = useForm({
-    resolver: zodResolver(categorySchema),
-    mode: 'onTouched',
-    values: {
-      name: category?.name ?? '',
-      type: category?.type ?? '',
-      icon: category?.icon ?? appearanceOptions.icons[0]?.value ?? '',
-      color: category?.color ?? appearanceOptions.colors[0]?.value ?? '',
-    },
-  })
+  const {
+    form,
+    isEditing,
+    colorOptions,
+    iconOptions,
+    selectedColor,
+    onSubmit: submit,
+  } = useCategoryForm({ appearanceOptions, category, onSubmit })
   const {
     control,
     register,
     handleSubmit,
-    reset,
     formState: { errors, isSubmitting },
   } = form
-  const selectedColor = useWatch({ control, name: 'color' })
-
-  const submit = async (categoryData) => {
-    try {
-      form.clearErrors('root')
-      await onSubmit(categoryData)
-      if (!isEditing) reset()
-    } catch (error) {
-      form.setError('root.server', {
-        type: 'server',
-        message:
-          error instanceof Error
-            ? error.message
-            : 'Não foi possível salvar a categoria.',
-      })
-    }
-  }
 
   return (
     <form noValidate onSubmit={handleSubmit(submit)}>

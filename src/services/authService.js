@@ -4,7 +4,19 @@ export const registerUser = (credentials) => authApi.registerUser(credentials)
 
 export const login = (credentials) => authApi.login(credentials)
 
-export const requestPasswordReset = (data) => authApi.requestPasswordReset(data)
+export async function requestPasswordReset(data) {
+  const result = await authApi.requestPasswordReset(data)
+
+  if (result.debugToken) {
+    const resetUrl = new URL(
+      `/redefinir-senha/${encodeURIComponent(result.debugToken)}`,
+      window.location.origin,
+    )
+    console.log(`Para redefinir sua senha, utilize o link: ${resetUrl}`)
+  }
+
+  return result
+}
 
 export const resetPassword = (data) => authApi.resetPassword(data)
 

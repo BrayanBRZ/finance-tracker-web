@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   ArrowLeftRight,
   LayoutDashboard,
@@ -10,24 +10,26 @@ import {
 import { useSession } from '@/context/sessionContext'
 import { Button } from '@/components/ui/button'
 import { UserMenu } from '@/components/layout/UserMenu'
-import { ChangePasswordForm } from '@/components/auth/ChangePasswordForm'
-import { FormDialog } from '@/components/form-fields/FormDialog'
 import { WalletSelector } from '@/components/wallets/WalletSelector'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 
 const navigationItems = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/transacoes', label: 'Transações', icon: ArrowLeftRight },
-  { to: '/categorias', label: 'Categorias', icon: Tags },
-  { to: '/carteira', label: 'Carteira', icon: WalletCards },
+  { to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/app/transacoes', label: 'Transações', icon: ArrowLeftRight },
+  { to: '/app/categorias', label: 'Categorias', icon: Tags },
+  { to: '/app/carteira', label: 'Carteira', icon: WalletCards },
 ]
+
+const pageNames = {
+  '/app/perfil/senha': 'Alterar senha',
+}
 
 export function AppLayout() {
   const { session, handleLogout } = useSession()
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const [isMenuVisible, setIsMenuVisible] = useState(false)
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const logout = async () => {
@@ -36,9 +38,11 @@ export function AppLayout() {
   }
 
   const columnWidth = 'w-50'
-  const isDashboard = pathname === '/dashboard'
+  const isDashboard = pathname === '/app/dashboard'
   const currentPage =
-    navigationItems.find((item) => item.to === pathname)?.label ?? 'Perfil'
+    navigationItems.find((item) => item.to === pathname)?.label ??
+    pageNames[pathname] ??
+    'Finance Tracker'
 
   return (
     <div className="bg-background text-foreground flex h-dvh overflow-hidden">
@@ -111,7 +115,7 @@ export function AppLayout() {
               <UserMenu
                 name={session?.user?.name}
                 isLoggingOut={isLoggingOut}
-                onChangePassword={() => setIsChangePasswordOpen(true)}
+                onChangePassword={() => navigate('/app/perfil/senha')}
                 onLogout={logout}
               />
             </div>
@@ -150,17 +154,6 @@ export function AppLayout() {
           </div>
         </main>
       </div>
-
-      <FormDialog
-        open={isChangePasswordOpen}
-        onOpenChange={setIsChangePasswordOpen}
-        title="Alterar senha"
-        description="Confirme sua senha atual antes de escolher uma nova."
-        size="sm"
-        className="gap-4"
-      >
-        <ChangePasswordForm />
-      </FormDialog>
     </div>
   )
 }

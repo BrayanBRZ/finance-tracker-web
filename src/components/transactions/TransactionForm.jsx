@@ -1,17 +1,10 @@
-import { useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { ControlledSelectField } from '@/components/form-fields/ControlledSelectField'
 import { FormActions } from '@/components/form-fields/FormActions'
 import { TextField } from '@/components/form-fields/TextField'
 import { FieldGroup } from '@/components/ui/field'
-import {
-  FINANCIAL_TYPE_OPTIONS,
-  FINANCIAL_TYPES,
-} from '@/domain/financialTypes'
-import { transactionSchema } from '@/schemas/transactionSchema'
+import { FINANCIAL_TYPE_OPTIONS } from '@/domain/financialTypes'
+import { useTransactionForm } from '@/hooks/useTransactionForm'
 import { toDateInputValue } from '@/utils/formatters'
-
-const NO_CATEGORY_VALUE = '__no_category__'
 
 export function TransactionForm({
   categories,
@@ -19,71 +12,19 @@ export function TransactionForm({
   onSubmit,
   onCancel,
 }) {
-  const isEditing = Boolean(transaction)
-  const form = useForm({
-    resolver: zodResolver(transactionSchema),
-    mode: 'onTouched',
-    values: {
-      categoryId: transaction?.categoryId ?? NO_CATEGORY_VALUE,
-      type: transaction?.type ?? FINANCIAL_TYPES.EXPENSE,
-      description: transaction?.description ?? '',
-      amount: transaction?.amount ?? '',
-      transactionDate: transaction?.transactionDate ?? toDateInputValue(),
-    },
-  })
+  const {
+    form,
+    isEditing,
+    categoryOptions,
+    onTypeChange,
+    onSubmit: submit,
+  } = useTransactionForm({ categories, transaction, onSubmit })
   const {
     control,
     register,
     handleSubmit,
-    reset,
-    getValues,
-    setValue,
     formState: { errors, isSubmitting },
   } = form
-  const selectedType = useWatch({ control, name: 'type' })
-  const categoryOptions = [
-    { value: NO_CATEGORY_VALUE, label: 'Sem categoria' },
-    ...categories
-      .filter((category) => category.type === selectedType)
-      .map((category) => ({ value: category.id, label: category.name })),
-  ]
-
-  const changeTransactionType = (field, nextType) => {
-    field.onChange(nextType)
-
-    const selectedCategory = categories.find(
-      (category) => category.id === getValues('categoryId'),
-    )
-
-    if (selectedCategory && selectedCategory.type !== nextType) {
-      setValue('categoryId', NO_CATEGORY_VALUE, {
-        shouldDirty: true,
-        shouldValidate: true,
-      })
-    }
-  }
-
-  const submit = async (transactionData) => {
-    try {
-      form.clearErrors('root')
-      await onSubmit({
-        ...transactionData,
-        categoryId:
-          transactionData.categoryId === NO_CATEGORY_VALUE
-            ? null
-            : transactionData.categoryId,
-      })
-      if (!isEditing) reset()
-    } catch (error) {
-      form.setError('root.server', {
-        type: 'server',
-        message:
-          error instanceof Error
-            ? error.message
-            : 'Não foi possível salvar a transação.',
-      })
-    }
-  }
 
   return (
     <form noValidate onSubmit={handleSubmit(submit)}>
@@ -96,9 +37,7 @@ export function TransactionForm({
           placeholder="Selecione o tipo"
           options={FINANCIAL_TYPE_OPTIONS}
           disabled={isSubmitting}
-          onValueChange={(nextType, field) =>
-            changeTransactionType(field, nextType)
-          }
+          onValueChange={(nextType, field) => onTypeChange(field, nextType)}
         />
         <ControlledSelectField
           control={control}
@@ -133,6 +72,7 @@ export function TransactionForm({
             id="transaction-date"
             label="Data"
             type="date"
+            max={toDateInputValue()}
             {...register('transactionDate')}
             disabled={isSubmitting}
             error={errors.transactionDate?.message}

@@ -27,12 +27,27 @@ import {
   replaceUser,
 } from '@/mocks/repositories/userRepository.mock'
 import { createIsoTimestamp } from '@/mocks/utils/date'
+import {
+  isStrongPassword,
+  STRONG_PASSWORD_MESSAGE,
+} from '@/domain/passwordPolicy'
 
-const neutralRecoveryMessage =
-  'Se este e-mail estiver cadastrado, você receberá as instruções em breve.'
+const toAuthSession = (user, sessionRecord) => ({
+  user: toPublicUser(user),
+  accessToken: sessionRecord.accessToken ?? sessionRecord.id,
+  tokenType: 'Bearer',
+  expiresAt: sessionRecord.expiresAt,
+})
+
+const ensureStrongPassword = (password) => {
+  if (!isStrongPassword(password)) {
+    throw new Error(STRONG_PASSWORD_MESSAGE)
+  }
+}
 
 export async function registerUser({ name, email, password }) {
   await latency()
+  ensureStrongPassword(password)
 
   if (findUserByEmail(email)) {
     throw new Error('Este e-mail já está cadastrado')
@@ -56,7 +71,7 @@ export async function login({ email, password, rememberMe = false }) {
   const sessionRecord = createSessionRecord(user.id, { rememberMe })
   writeSessionRecord(sessionRecord)
 
-  return { user: toPublicUser(user) }
+  return toAuthSession(user, sessionRecord)
 }
 
 export async function requestPasswordReset({ email }) {
@@ -65,7 +80,6 @@ export async function requestPasswordReset({ email }) {
   const user = findUserByEmail(email)
   if (!user) {
     return {
-      message: neutralRecoveryMessage,
       debugToken: null,
     }
   }
@@ -74,7 +88,6 @@ export async function requestPasswordReset({ email }) {
   appendPasswordResetToken(token)
 
   return {
-    message: neutralRecoveryMessage,
     debugToken: token.token,
   }
 }
@@ -98,6 +111,7 @@ export async function resetPassword({ token, newPassword }) {
     )
   }
 
+  ensureStrongPassword(newPassword)
   replaceUser({ ...user, password: newPassword })
   replacePasswordResetToken({ ...resetToken, usedAt: createIsoTimestamp() })
 
@@ -112,9 +126,12 @@ export async function changePassword({ userId, currentPassword, newPassword }) {
   if (!user) throw new Error('Usuário não encontrado')
 
   if (user.password !== currentPassword) {
-    throw new Error('A senha atual está incorreta')
+    const error = new Error('A senha atual está incorreta')
+    error.field = 'currentPassword'
+    throw error
   }
 
+  ensureStrongPassword(newPassword)
   replaceUser({ ...user, password: newPassword })
 
   return { message: 'Senha alterada com sucesso.' }
@@ -137,7 +154,7 @@ export async function restoreSession() {
 
   writeSessionRecord(touchSessionRecord(sessionRecord))
 
-  return { user: toPublicUser(user) }
+  return toAuthSession(user, sessionRecord)
 }
 
 export async function logout() {
