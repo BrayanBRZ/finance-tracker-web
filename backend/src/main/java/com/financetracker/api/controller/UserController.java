@@ -1,8 +1,9 @@
 package com.financetracker.api.controller;
 
-import static com.financetracker.api.dto.AuthDtos.*;
-import static com.financetracker.api.dto.UserDtos.*;
-
+import com.financetracker.api.dto.common.MessageResponse;
+import com.financetracker.api.dto.user.ChangePasswordRequest;
+import com.financetracker.api.dto.user.UpdateUserRequest;
+import com.financetracker.api.dto.user.UserResponse;
 import com.financetracker.api.security.AuthenticatedUser;
 import com.financetracker.api.service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

@@ -1,8 +1,9 @@
 package com.financetracker.api.service;
 
-import static com.financetracker.api.dto.AuthDtos.*;
-import static com.financetracker.api.dto.UserDtos.*;
-
+import com.financetracker.api.dto.common.MessageResponse;
+import com.financetracker.api.dto.user.ChangePasswordRequest;
+import com.financetracker.api.dto.user.UpdateUserRequest;
+import com.financetracker.api.dto.user.UserResponse;
 import com.financetracker.api.entity.User;
 import com.financetracker.api.exception.ApiException;
 import com.financetracker.api.repository.UserRepository;

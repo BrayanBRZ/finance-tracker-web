@@ -1,6 +1,6 @@
 package com.financetracker.api.service;
 
-import com.financetracker.api.dto.AuthDtos.UserResponse;
+import com.financetracker.api.dto.user.UserResponse;
 import com.financetracker.api.entity.User;
 
 final class UserMapper {

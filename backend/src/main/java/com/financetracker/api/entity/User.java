@@ -1,7 +1,19 @@
 package com.financetracker.api.entity;
 
-import jakarta.persistence.*;
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(name = "uk_users_email", columnNames = "email"))
@@ -9,18 +21,36 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false, length = 120)
     private String name;
+
     @Column(nullable = false, length = 180)
     private String email;
+
     @Column(name = "password_hash", nullable = false, length = 100)
     private String passwordHash;
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
 
-    protected User() {}
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user")
+    private List<Category> categories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "owner")
+    private List<Wallet> ownedWallets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<WalletMember> walletMemberships = new ArrayList<>();
+
+    @OneToMany(mappedBy = "createdBy")
+    private List<Transaction> createdTransactions = new ArrayList<>();
+
+    protected User() {
+    }
 
     public User(String name, String email, String passwordHash) {
         this.name = name;
@@ -30,22 +60,69 @@ public class User {
 
     @PrePersist
     void onCreate() {
-        createdAt = Instant.now();
-        updatedAt = createdAt;
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
+        updatedAt = now;
     }
 
     @PreUpdate
     void onUpdate() {
-        updatedAt = Instant.now();
+        updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() { return id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getPasswordHash() { return passwordHash; }
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
+    // #region Getters
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public List<Wallet> getOwnedWallets() {
+        return ownedWallets;
+    }
+
+    public List<WalletMember> getWalletMemberships() {
+        return walletMemberships;
+    }
+
+    public List<Transaction> getCreatedTransactions() {
+        return createdTransactions;
+    }
+
+    // #endregion Getters
 }
