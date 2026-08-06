@@ -22,6 +22,7 @@ import com.financetracker.api.dto.user.UserResponse;
 import com.financetracker.api.entity.PasswordResetToken;
 import com.financetracker.api.entity.User;
 import com.financetracker.api.exception.ApiException;
+import com.financetracker.api.mapper.UserMapper;
 import com.financetracker.api.repository.PasswordResetTokenRepository;
 import com.financetracker.api.repository.UserRepository;
 import com.financetracker.api.security.JwtService;
@@ -112,7 +113,7 @@ public class AuthService {
         if (token.getIsUsed() || token.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, INVALID_RESET);
         }
-        
+
         token.getUser().setPasswordHash(passwordEncoder.encode(request.newPassword()));
         token.markUsed();
 

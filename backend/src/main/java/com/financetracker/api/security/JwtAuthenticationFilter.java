@@ -27,19 +27,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain chain)
             throws ServletException, IOException {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+
         if (header != null && header.startsWith("Bearer ")
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
             String token = header.substring(7);
+
             try {
                 userRepository.findById(jwtService.extractUserId(token))
                         .filter(user -> jwtService.isValid(token, user))
                         .ifPresent(user -> {
                             AuthenticatedUser principal = AuthenticatedUser.from(user);
                             SecurityContextHolder.getContext().setAuthentication(
-                                    new UsernamePasswordAuthenticationToken(principal, null,
+                                    new UsernamePasswordAuthenticationToken(
+                                            principal,
+                                            null,
                                             principal.getAuthorities()));
                         });
             } catch (JwtException | IllegalArgumentException ignored) {

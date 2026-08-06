@@ -1,15 +1,22 @@
 package com.financetracker.api.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.financetracker.api.dto.common.MessageResponse;
 import com.financetracker.api.dto.user.ChangePasswordRequest;
 import com.financetracker.api.dto.user.UpdateUserRequest;
 import com.financetracker.api.dto.user.UserResponse;
 import com.financetracker.api.security.AuthenticatedUser;
 import com.financetracker.api.service.UserService;
+
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users/me")
@@ -17,7 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    public UserController(UserService userService) { this.userService = userService; }
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     UserResponse getMe(@AuthenticationPrincipal AuthenticatedUser user) {
@@ -26,17 +35,15 @@ public class UserController {
 
     @PutMapping
     UserResponse updateMe(
-        @AuthenticationPrincipal AuthenticatedUser user,
-        @Valid @RequestBody UpdateUserRequest request
-    ) {
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @Valid @RequestBody UpdateUserRequest request) {
         return userService.updateMe(user.id(), request);
     }
 
     @PatchMapping("/password")
     MessageResponse changePassword(
-        @AuthenticationPrincipal AuthenticatedUser user,
-        @Valid @RequestBody ChangePasswordRequest request
-    ) {
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @Valid @RequestBody ChangePasswordRequest request) {
         return userService.changePassword(user.id(), request);
     }
 }

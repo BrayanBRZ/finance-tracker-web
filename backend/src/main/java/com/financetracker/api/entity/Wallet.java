@@ -88,4 +88,12 @@ public class Wallet {
     }
 
     // #endregion Getters
+
+    public void setMembers(List<WalletMember> members) {
+        this.members = members;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
 }

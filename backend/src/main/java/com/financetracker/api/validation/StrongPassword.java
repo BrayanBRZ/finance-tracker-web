@@ -7,14 +7,18 @@ import java.lang.annotation.*;
 
 @Documented
 @Constraint(validatedBy = {})
-@Pattern(
-    regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,100}$",
-    message = "Use pelo menos 8 caracteres, incluindo maiúscula, minúscula, número e símbolo"
-)
-@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.RECORD_COMPONENT, ElementType.ANNOTATION_TYPE})
+@Pattern(regexp = "^.{8,}$", message = "A senha deve conter pelo menos 8 caracteres.")
+@Target({
+        ElementType.FIELD,
+        ElementType.PARAMETER,
+        ElementType.RECORD_COMPONENT,
+        ElementType.ANNOTATION_TYPE
+})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface StrongPassword {
-    String message() default "Use pelo menos 8 caracteres, incluindo maiúscula, minúscula, número e símbolo";
+    String message() default "A senha deve conter pelo menos 8 caracteres.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

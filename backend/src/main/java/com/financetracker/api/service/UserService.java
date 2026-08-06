@@ -6,8 +6,11 @@ import com.financetracker.api.dto.user.UpdateUserRequest;
 import com.financetracker.api.dto.user.UserResponse;
 import com.financetracker.api.entity.User;
 import com.financetracker.api.exception.ApiException;
+import com.financetracker.api.mapper.UserMapper;
 import com.financetracker.api.repository.UserRepository;
+
 import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

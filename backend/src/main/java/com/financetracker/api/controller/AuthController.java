@@ -25,7 +25,9 @@ import jakarta.validation.Valid;
 public class AuthController {
     private final AuthService authService;
 
-    public AuthController(AuthService authService) { this.authService = authService; }
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping(Routes.Auth.REGISTER)
     ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -37,12 +39,12 @@ public class AuthController {
         return authService.login(request);
     }
 
-        @PostMapping(Routes.Auth.FORGOT_PASSWORD)
+    @PostMapping(Routes.Auth.FORGOT_PASSWORD)
     ForgotPasswordResponse forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         return authService.forgotPassword(request);
     }
 
-        @PostMapping(Routes.Auth.RESET_PASSWORD)
+    @PostMapping(Routes.Auth.RESET_PASSWORD)
     MessageResponse resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         return authService.resetPassword(request);
     }
