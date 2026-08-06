@@ -12,8 +12,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "password_reset_tokens", uniqueConstraints = @UniqueConstraint(name = "uk_password_reset_token", columnNames = "token"))
 public class PasswordResetToken {
     @Id
@@ -30,8 +32,8 @@ public class PasswordResetToken {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
-    @Column(name = "is_used")
-    private Boolean isUsed;
+    @Column(name = "is_used", nullable = false)
+    private boolean used;
 
     protected PasswordResetToken() {
     }
@@ -40,33 +42,10 @@ public class PasswordResetToken {
         this.user = user;
         this.token = token;
         this.expiresAt = expiresAt;
+        this.used = false;
     }
 
     public void markUsed() {
-        this.isUsed = true;
+        this.used = true;
     }
-
-    // #region Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
-    }
-
-    public Boolean getIsUsed() {
-        return isUsed;
-    }
-
-    // #endregion Getters
 }

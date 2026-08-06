@@ -18,9 +18,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
 @Entity
 @Table(name = "transactions")
+@Getter
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -78,44 +80,4 @@ public class Transaction {
     void onCreate() {
         createdAt = LocalDateTime.now();
     }
-
-    // #region Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public Wallet getWallet() {
-        return wallet;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    public TransactionType getType() {
-        return type;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDate getTransactionDate() {
-        return transactionDate;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    // #endregion Getters
 }

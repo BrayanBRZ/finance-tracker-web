@@ -17,8 +17,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "wallet_members", uniqueConstraints = @UniqueConstraint(name = "uk_wallet_members_wallet_user", columnNames = {
         "wallet_id", "user_id" }))
 public class WalletMember {
@@ -54,28 +56,4 @@ public class WalletMember {
     void onCreate() {
         joinedAt = LocalDateTime.now();
     }
-
-    // #region Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public Wallet getWallet() {
-        return wallet;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public WalletRole getRole() {
-        return role;
-    }
-
-    public LocalDateTime getJoinedAt() {
-        return joinedAt;
-    }
-
-    // #endregion Getters
 }

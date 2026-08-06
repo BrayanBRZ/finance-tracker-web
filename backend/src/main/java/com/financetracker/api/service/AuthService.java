@@ -40,19 +40,27 @@ public class AuthService {
 
     private final JwtService jwtService;
 
+    private final SendEmailService sendEmailService;
+
     private final long resetExpirationMs;
+
+    private final boolean exposeResetToken;
 
     public AuthService(
             UserRepository users,
             PasswordResetTokenRepository resetTokens,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            @Value("${app.password-reset.expiration}") long resetExpirationMs) {
+            SendEmailService sendEmailService,
+            @Value("${app.password-reset.expiration}") long resetExpirationMs,
+            @Value("${app.auth.expose-reset-token}") boolean exposeResetToken) {
         this.users = users;
         this.resetTokens = resetTokens;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.sendEmailService = sendEmailService;
         this.resetExpirationMs = resetExpirationMs;
+        this.exposeResetToken = exposeResetToken;
     }
 
     @Transactional
@@ -70,6 +78,8 @@ public class AuthService {
                         request.name().trim(),
                         email,
                         passwordEncoder.encode(request.password())));
+
+        sendEmailService.sendWelcomeEmail(user);
 
         return UserMapper.toResponse(user);
     }
@@ -93,14 +103,18 @@ public class AuthService {
     public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
         return users.findByEmail(normalizeEmail(request.email()))
                 .map(user -> {
-                    String token = UUID.randomUUID().toString();
+                    String rawToken = UUID.randomUUID().toString();
 
                     resetTokens.save(new PasswordResetToken(
                             user,
-                            token,
+                            rawToken,
                             LocalDateTime.now().plus(resetExpirationMs, ChronoUnit.MILLIS)));
 
-                    return new ForgotPasswordResponse(FORGOT_MESSAGE, token);
+                    sendEmailService.sendPasswordResetEmail(user, rawToken);
+
+                    return new ForgotPasswordResponse(
+                            FORGOT_MESSAGE,
+                            exposeResetToken ? rawToken : null);
                 })
                 .orElseGet(() -> new ForgotPasswordResponse(FORGOT_MESSAGE, null));
     }
@@ -108,10 +122,10 @@ public class AuthService {
     @Transactional
     public MessageResponse resetPassword(ResetPasswordRequest request) {
         PasswordResetToken token = resetTokens.findByToken(request.token())
-                .orElseThrow(() -> new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, INVALID_RESET));
+                .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, INVALID_RESET));
 
-        if (token.getIsUsed() || token.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, INVALID_RESET);
+        if (token.isUsed() || token.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, INVALID_RESET);
         }
 
         token.getUser().setPasswordHash(passwordEncoder.encode(request.newPassword()));

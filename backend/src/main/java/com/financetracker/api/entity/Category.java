@@ -13,8 +13,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "categories")
 public class Category {
     @Id
@@ -48,32 +50,4 @@ public class Category {
         this.color = color;
         this.icon = icon;
     }
-
-    // #region Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public TransactionType getType() {
-        return type;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    // #endregion Getters
 }

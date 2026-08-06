@@ -14,8 +14,10 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(name = "uk_users_email", columnNames = "email"))
 public class User {
     @Id
@@ -70,59 +72,19 @@ public class User {
         updatedAt = LocalDateTime.now();
     }
 
-    // #region Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
+    // #region Setters
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public List<Category> getCategories() {
-        return categories;
-    }
-
-    public List<Wallet> getOwnedWallets() {
-        return ownedWallets;
-    }
-
-    public List<WalletMember> getWalletMemberships() {
-        return walletMemberships;
-    }
-
-    public List<Transaction> getCreatedTransactions() {
-        return createdTransactions;
-    }
-
-    // #endregion Getters
+    // #endregion Setters
 }

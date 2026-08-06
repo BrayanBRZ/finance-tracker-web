@@ -16,8 +16,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "wallets")
 public class Wallet {
     @Id
@@ -57,37 +59,7 @@ public class Wallet {
         createdAt = LocalDateTime.now();
     }
 
-    // #region Getters
-
-    public Long getId() {
-        return id;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public List<WalletMember> getMembers() {
-        return members;
-    }
-
-    public List<Transaction> getTransactions() {
-        return transactions;
-    }
-
-    // #endregion Getters
+    // #region Setters
 
     public void setMembers(List<WalletMember> members) {
         this.members = members;
@@ -96,4 +68,6 @@ public class Wallet {
     public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
     }
+
+    // #endregion Setters
 }
