@@ -59,15 +59,8 @@ public class Wallet {
         createdAt = LocalDateTime.now();
     }
 
-    // #region Setters
-
-    public void setMembers(List<WalletMember> members) {
-        this.members = members;
+    public void update(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
-
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
-    }
-
-    // #endregion Setters
 }

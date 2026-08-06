@@ -52,6 +52,10 @@ public class WalletMember {
         this.role = role;
     }
 
+    public void changeRole(WalletRole role) {
+        this.role = role;
+    }
+
     @PrePersist
     void onCreate() {
         joinedAt = LocalDateTime.now();

@@ -48,10 +48,9 @@ public class UserService {
         User user = requireUser(userId);
         if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
             throw new ApiException(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                "A senha atual está incorreta",
-                Map.of("currentPassword", "A senha atual está incorreta")
-            );
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "A senha atual está incorreta",
+                    Map.of("currentPassword", "A senha atual está incorreta"));
         }
         user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
         return new MessageResponse("Senha alterada com sucesso.");
@@ -59,6 +58,6 @@ public class UserService {
 
     private User requireUser(Long userId) {
         return users.findById(userId)
-            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
     }
 }

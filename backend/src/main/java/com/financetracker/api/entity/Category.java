@@ -50,4 +50,11 @@ public class Category {
         this.color = color;
         this.icon = icon;
     }
+
+    public void update(String name, TransactionType type, String color, String icon) {
+        this.name = name;
+        this.type = type;
+        this.color = color;
+        this.icon = icon;
+    }
 }
