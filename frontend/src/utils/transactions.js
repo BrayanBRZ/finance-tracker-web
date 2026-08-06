@@ -1,7 +1,5 @@
 export function compareTransactionsByRecency(left, right) {
-  const dateComparison = String(right.transactionDate).localeCompare(
-    String(left.transactionDate),
-  )
+  const dateComparison = String(right.date).localeCompare(String(left.date))
 
   if (dateComparison !== 0) return dateComparison
 

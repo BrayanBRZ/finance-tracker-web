@@ -6,7 +6,7 @@ import { AuthFormSubmit } from '@/components/auth/form/AuthFormSubmit'
 import { AuthPasswordField } from '@/components/auth/form/AuthPasswordField'
 import { AuthPasswordStrengthIndicator } from '@/components/auth/form/AuthPasswordStrengthIndicator'
 import { AuthTextField } from '@/components/auth/form/AuthTextField'
-import { useRegisterForm } from '@/hooks/useRegisterForm'
+import { useRegisterForm } from '@/hooks/auth/useRegisterForm'
 
 export function RegisterForm() {
   const {

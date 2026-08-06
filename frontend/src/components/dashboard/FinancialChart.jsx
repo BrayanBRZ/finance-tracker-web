@@ -26,12 +26,12 @@ const chartConfig = {
   },
 }
 
-export function FinancialChart({ totalIncome, totalExpenses }) {
+export function FinancialChart({ totalIncome, totalExpense }) {
   const data = [
     {
       period: 'Carteira atual',
       income: totalIncome,
-      expenses: totalExpenses,
+      expenses: totalExpense,
     },
   ]
 

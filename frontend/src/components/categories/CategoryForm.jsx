@@ -4,7 +4,7 @@ import { FormActions } from '@/components/form-fields/FormActions'
 import { TextField } from '@/components/form-fields/TextField'
 import { FieldGroup } from '@/components/ui/field'
 import { FINANCIAL_TYPE_OPTIONS } from '@/domain/financialTypes'
-import { useCategoryForm } from '@/hooks/useCategoryForm'
+import { useCategoryForm } from '@/hooks/category/useCategoryForm'
 
 export function CategoryForm({
   appearanceOptions,

@@ -39,7 +39,7 @@ export function TransactionList({
       key: 'date',
       header: 'Data',
       cellClassName: 'whitespace-nowrap text-muted-foreground',
-      render: (transaction) => formatLocalDate(transaction.transactionDate),
+      render: (transaction) => formatLocalDate(transaction.date),
     },
     {
       key: 'amount',

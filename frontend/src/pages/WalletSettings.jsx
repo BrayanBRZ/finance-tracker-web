@@ -10,7 +10,7 @@ import { CreateWalletForm } from '@/components/wallets/CreateWalletForm'
 import { EditWalletForm } from '@/components/wallets/EditWalletForm'
 import { WalletMembersCard } from '@/components/wallets/WalletMembersCard'
 import { WalletScope } from '@/components/wallets/WalletScope'
-import { useWalletSettingsPage } from '@/hooks/useWalletSettingsPage'
+import { useWalletSettingsPage } from '@/hooks/wallet/useWalletSettingsPage'
 
 function WalletSettingsContent() {
   const {

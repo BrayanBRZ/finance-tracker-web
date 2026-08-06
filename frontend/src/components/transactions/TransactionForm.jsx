@@ -3,7 +3,7 @@ import { FormActions } from '@/components/form-fields/FormActions'
 import { TextField } from '@/components/form-fields/TextField'
 import { FieldGroup } from '@/components/ui/field'
 import { FINANCIAL_TYPE_OPTIONS } from '@/domain/financialTypes'
-import { useTransactionForm } from '@/hooks/useTransactionForm'
+import { useTransactionForm } from '@/hooks/transaction/useTransactionForm'
 import { toDateInputValue } from '@/utils/formatters'
 
 export function TransactionForm({
@@ -73,9 +73,9 @@ export function TransactionForm({
             label="Data"
             type="date"
             max={toDateInputValue()}
-            {...register('transactionDate')}
+            {...register('date')}
             disabled={isSubmitting}
-            error={errors.transactionDate?.message}
+            error={errors.date?.message}
           />
         </div>
         <FormActions

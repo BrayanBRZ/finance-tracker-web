@@ -1,7 +1,7 @@
 import { FormActions } from '@/components/form-fields/FormActions'
 import { FieldGroup } from '@/components/ui/field'
 import { WalletFormFields } from '@/components/wallets/WalletFormFields'
-import { useEditWalletForm } from '@/hooks/useEditWalletForm'
+import { useEditWalletForm } from '@/hooks/wallet/useEditWalletForm'
 
 export function EditWalletForm({ onSuccess, onError }) {
   const { form, onSubmit } = useEditWalletForm({ onSuccess, onError })

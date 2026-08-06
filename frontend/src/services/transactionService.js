@@ -1,10 +1,21 @@
-import * as transactionApi from '@/mocks/api/transactionApi.mock'
+import { apiRequest } from '@/services/apiClient'
 
-export const listTransactionsForWallet = (params) =>
-  transactionApi.listTransactionsForWallet(params)
+export const listTransactions = ({ walletId, signal, ...query }) =>
+  apiRequest(`/wallets/${walletId}/transactions`, { query, signal })
 
-export const createTransaction = (params) => transactionApi.createTransaction(params)
+export const createTransaction = (walletId, data) =>
+  apiRequest(`/wallets/${walletId}/transactions`, {
+    method: 'POST',
+    body: data,
+  })
 
-export const updateTransaction = (params) => transactionApi.updateTransaction(params)
+export const updateTransaction = (walletId, transactionId, data) =>
+  apiRequest(`/wallets/${walletId}/transactions/${transactionId}`, {
+    method: 'PUT',
+    body: data,
+  })
 
-export const removeTransaction = (params) => transactionApi.removeTransaction(params)
+export const removeTransaction = (walletId, transactionId) =>
+  apiRequest(`/wallets/${walletId}/transactions/${transactionId}`, {
+    method: 'DELETE',
+  })

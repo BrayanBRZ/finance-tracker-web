@@ -31,7 +31,7 @@ export function WalletMemberList({
             {member.user?.name ?? 'Usuário indisponível'}
           </p>
           <p className="text-xs text-muted-foreground">
-            {member.user?.email ?? member.userId}
+            {member.user?.email ?? 'E-mail indisponível'}
           </p>
         </div>
       ),
@@ -46,7 +46,7 @@ export function WalletMemberList({
         return canManage && !isOwner ? (
           <Select
             value={member.role}
-            onValueChange={(role) => void onRoleChange(member.userId, role)}
+            onValueChange={(role) => void onRoleChange(member.user.id, role)}
           >
             <SelectTrigger
               className="w-36"
@@ -96,7 +96,7 @@ export function WalletMemberList({
     <DataTable
       items={members}
       columns={columns}
-      getItemKey={(member) => member.userId}
+      getItemKey={(member) => member.user.id}
       emptyMessage="Esta carteira ainda não possui membros ativos."
       className="h-full flex-1"
       tableClassName="min-w-150"

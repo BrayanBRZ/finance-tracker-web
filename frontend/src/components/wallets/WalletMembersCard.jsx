@@ -11,7 +11,7 @@ export function WalletMembersCard({
 }) {
   const { currentWallet } = useWallet()
   const canManageMembers =
-    canManage ?? currentWallet?.role === WALLET_MEMBER_ROLES.OWNER
+    canManage ?? currentWallet?.currentUserRole === WALLET_MEMBER_ROLES.OWNER
 
   return (
     <CollectionCard

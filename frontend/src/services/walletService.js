@@ -1,24 +1,29 @@
-import * as walletApi from '@/mocks/api/walletApi.mock'
+import { apiRequest } from '@/services/apiClient'
 
-export const listWalletsForUser = (userId) =>
-  walletApi.listWalletsForUser(userId)
+export const listWallets = ({ signal } = {}) => apiRequest('/wallets', { signal })
 
-export const createWallet = (walletData) => walletApi.createWallet(walletData)
+export const createWallet = (data) =>
+  apiRequest('/wallets', { method: 'POST', body: data })
 
-export const getWalletMembership = (params) =>
-  walletApi.getWalletMembership(params)
+export const updateWallet = (walletId, data) =>
+  apiRequest(`/wallets/${walletId}`, { method: 'PUT', body: data })
 
-export const updateWallet = (params) => walletApi.updateWallet(params)
+export const removeWallet = (walletId) =>
+  apiRequest(`/wallets/${walletId}`, { method: 'DELETE' })
 
-export const removeWallet = (params) => walletApi.removeWallet(params)
+export const listWalletMembers = (walletId, { signal } = {}) =>
+  apiRequest(`/wallets/${walletId}/members`, { signal })
 
-export const listWalletMembersForUser = (params) =>
-  walletApi.listWalletMembersForUser(params)
+export const addWalletMember = (walletId, data) =>
+  apiRequest(`/wallets/${walletId}/members`, { method: 'POST', body: data })
 
-export const addWalletMember = (params) => walletApi.addWalletMember(params)
+export const updateWalletMemberRole = (walletId, memberUserId, role) =>
+  apiRequest(`/wallets/${walletId}/members/${memberUserId}`, {
+    method: 'PATCH',
+    body: { role },
+  })
 
-export const updateWalletMemberRole = (params) =>
-  walletApi.updateWalletMemberRole(params)
-
-export const removeWalletMember = (params) =>
-  walletApi.removeWalletMember(params)
+export const removeWalletMember = (walletId, memberUserId) =>
+  apiRequest(`/wallets/${walletId}/members/${memberUserId}`, {
+    method: 'DELETE',
+  })

@@ -7,7 +7,7 @@ import { PageLoader } from '@/components/feedback/PageLoader'
 import { FormDialog } from '@/components/form-fields/FormDialog'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
-import { useCategoriesPage } from '@/hooks/useCategoriesPage'
+import { useCategoriesPage } from '@/hooks/category/useCategoriesPage'
 
 function CategoriesContent() {
   const {

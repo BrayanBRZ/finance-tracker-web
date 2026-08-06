@@ -8,7 +8,7 @@ import { AuthPasswordField } from '@/components/auth/form/AuthPasswordField'
 import { AuthTextField } from '@/components/auth/form/AuthTextField'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel } from '@/components/ui/field'
-import { useLoginForm } from '@/hooks/useLoginForm'
+import { useLoginForm } from '@/hooks/auth/useLoginForm'
 
 export function LoginForm() {
   const {

@@ -5,7 +5,7 @@ import { AuthFormError } from '@/components/auth/form/AuthFormError'
 import { AuthFormSubmit } from '@/components/auth/form/AuthFormSubmit'
 import { AuthPasswordField } from '@/components/auth/form/AuthPasswordField'
 import { AuthPasswordStrengthIndicator } from '@/components/auth/form/AuthPasswordStrengthIndicator'
-import { useResetPasswordController } from '@/hooks/useResetPasswordForm'
+import { useResetPasswordController } from '@/hooks/auth/useResetPasswordForm'
 
 export function ResetPasswordForm() {
   const {

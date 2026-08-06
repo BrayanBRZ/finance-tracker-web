@@ -1,7 +1,7 @@
 import { FormActions } from '@/components/form-fields/FormActions'
 import { FieldGroup } from '@/components/ui/field'
 import { WalletFormFields } from '@/components/wallets/WalletFormFields'
-import { useCreateWalletForm } from '@/hooks/useCreateWalletForm'
+import { useCreateWalletForm } from '@/hooks/wallet/useCreateWalletForm'
 
 export function CreateWalletForm({ onSuccess, onError }) {
   const {

@@ -1,16 +1,13 @@
-import * as categoryApi from '@/mocks/api/categoryApi.mock'
+import { apiRequest } from '@/services/apiClient'
 
-export const listCategoriesForUser = (params) =>
-  categoryApi.listCategoriesForUser(params)
+export const listCategories = ({ type, signal } = {}) =>
+  apiRequest('/categories', { query: { type }, signal })
 
-export const listCategoryAppearanceOptions = (params) =>
-  categoryApi.listCategoryAppearanceOptions(params)
+export const createCategory = (data) =>
+  apiRequest('/categories', { method: 'POST', body: data })
 
-export const createCategory = (categoryData) =>
-  categoryApi.createCategory(categoryData)
+export const updateCategory = (categoryId, data) =>
+  apiRequest(`/categories/${categoryId}`, { method: 'PUT', body: data })
 
-export const updateCategory = (categoryData) =>
-  categoryApi.updateCategory(categoryData)
-
-export const removeCategory = (categoryData) =>
-  categoryApi.removeCategory(categoryData)
+export const removeCategory = (categoryId) =>
+  apiRequest(`/categories/${categoryId}`, { method: 'DELETE' })

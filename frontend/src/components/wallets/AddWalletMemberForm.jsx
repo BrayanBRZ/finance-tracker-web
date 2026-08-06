@@ -6,7 +6,7 @@ import {
   ASSIGNABLE_WALLET_MEMBER_ROLES,
   WALLET_MEMBER_ROLE_LABELS,
 } from '@/domain/walletRoles'
-import { useAddWalletMemberForm } from '@/hooks/useAddWalletMemberForm'
+import { useAddWalletMemberForm } from '@/hooks/wallet/useAddWalletMemberForm'
 
 const roleOptions = ASSIGNABLE_WALLET_MEMBER_ROLES.map((role) => ({
   value: role,

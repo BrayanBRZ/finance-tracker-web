@@ -4,7 +4,7 @@ import { AuthForm } from '@/components/auth/form/AuthForm'
 import { AuthFormError } from '@/components/auth/form/AuthFormError'
 import { AuthFormSubmit } from '@/components/auth/form/AuthFormSubmit'
 import { AuthTextField } from '@/components/auth/form/AuthTextField'
-import { useForgotPasswordForm } from '@/hooks/useForgotPasswordForm'
+import { useForgotPasswordForm } from '@/hooks/auth/useForgotPasswordForm'
 
 export function ForgotPasswordForm() {
   const { form, onSubmit } = useForgotPasswordForm()

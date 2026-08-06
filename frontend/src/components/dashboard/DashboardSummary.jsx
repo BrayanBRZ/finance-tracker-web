@@ -40,14 +40,14 @@ const summaryItems = [
 
 export function DashboardSummary({
   totalIncome,
-  totalExpenses,
-  currentBalance,
+  totalExpense,
+  balance,
   transactionCount,
 }) {
   const values = {
     income: formatCurrency(totalIncome),
-    expenses: formatCurrency(totalExpenses),
-    balance: formatCurrency(currentBalance),
+    expenses: formatCurrency(totalExpense),
+    balance: formatCurrency(balance),
     count: transactionCount,
   }
 

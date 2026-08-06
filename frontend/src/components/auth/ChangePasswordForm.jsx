@@ -4,7 +4,7 @@ import { AuthFormError } from '@/components/auth/form/AuthFormError'
 import { AuthFormSubmit } from '@/components/auth/form/AuthFormSubmit'
 import { AuthPasswordField } from '@/components/auth/form/AuthPasswordField'
 import { AuthPasswordStrengthIndicator } from '@/components/auth/form/AuthPasswordStrengthIndicator'
-import { useChangePasswordForm } from '@/hooks/useChangePasswordForm'
+import { useChangePasswordForm } from '@/hooks/auth/useChangePasswordForm'
 
 export function ChangePasswordForm() {
   const { form, newPassword, onSubmit } = useChangePasswordForm()

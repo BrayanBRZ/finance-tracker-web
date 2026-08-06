@@ -35,7 +35,7 @@ export function RecentTransactions({ transactions }) {
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
                 {transaction.category?.name ?? 'Sem categoria'} ·{' '}
-                {formatLocalDate(transaction.transactionDate)}
+                {formatLocalDate(transaction.date)}
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">

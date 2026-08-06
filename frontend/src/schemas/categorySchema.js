@@ -6,10 +6,8 @@ export const categorySchema = z.object({
     .string()
     .trim()
     .min(1, 'Nome da categoria é obrigatório')
-    .min(2, 'Nome da categoria deve ter pelo menos 2 caracteres'),
-  type: z
-    .string()
-    .refine(isKnownFinancialType, 'Selecione um tipo de categoria válido'),
-  color: z.string().trim().min(1, 'Selecione uma cor'),
-  icon: z.string().trim().min(1, 'Selecione um ícone'),
+    .max(80, 'Nome da categoria deve ter no máximo 80 caracteres'),
+  type: z.string().refine(isKnownFinancialType, 'Selecione um tipo de categoria válido'),
+  color: z.string().trim().regex(/^#[0-9A-Fa-f]{6}$/, 'Selecione uma cor válida'),
+  icon: z.string().trim().min(1, 'Selecione um ícone').max(120),
 })
