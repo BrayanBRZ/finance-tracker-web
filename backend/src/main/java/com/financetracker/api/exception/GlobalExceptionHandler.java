@@ -13,7 +13,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.validation.BindException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -43,6 +45,14 @@ public class GlobalExceptionHandler {
         return response(
                 HttpStatus.BAD_REQUEST,
                 "Corpo da requisição inválido",
+                null);
+    }
+
+    @ExceptionHandler({ BindException.class, MethodArgumentTypeMismatchException.class })
+    ResponseEntity<ApiError> handleInvalidParameter(Exception exception) {
+        return response(
+                HttpStatus.BAD_REQUEST,
+                "Parâmetro da requisição inválido",
                 null);
     }
 

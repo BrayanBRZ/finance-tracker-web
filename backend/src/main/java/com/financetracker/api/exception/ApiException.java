@@ -17,6 +17,11 @@ public class ApiException extends RuntimeException {
         this.fieldErrors = fieldErrors;
     }
 
-    public HttpStatus getStatus() { return status; }
-    public Map<String, String> getFieldErrors() { return fieldErrors; }
+    public HttpStatus getStatus() {
+        return status;
+    }
+
+    public Map<String, String> getFieldErrors() {
+        return fieldErrors;
+    }
 }

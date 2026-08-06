@@ -22,12 +22,15 @@ import com.financetracker.api.enums.TransactionType;
 import com.financetracker.api.security.AuthenticatedUser;
 import com.financetracker.api.service.CategoryService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(Routes.Categories.BASE)
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Categorias")
 public class CategoryController {
     private final CategoryService categoryService;
 
@@ -36,6 +39,7 @@ public class CategoryController {
     }
 
     @GetMapping
+    @Operation(summary = "Lista as categorias do usuario")
     List<CategoryResponse> list(
             @AuthenticationPrincipal AuthenticatedUser user,
             @RequestParam(required = false) TransactionType type) {
@@ -43,6 +47,7 @@ public class CategoryController {
     }
 
     @PostMapping
+    @Operation(summary = "Cria uma categoria")
     ResponseEntity<CategoryResponse> create(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody CategoryRequest request) {
@@ -50,6 +55,7 @@ public class CategoryController {
     }
 
     @PutMapping(Routes.Categories.BY_ID)
+    @Operation(summary = "Atualiza uma categoria")
     CategoryResponse update(
             @AuthenticationPrincipal AuthenticatedUser user,
             @PathVariable("categoryId") Long categoryId,
@@ -58,6 +64,7 @@ public class CategoryController {
     }
 
     @DeleteMapping(Routes.Categories.BY_ID)
+    @Operation(summary = "Remove uma categoria sem transacoes vinculadas")
     ResponseEntity<Void> delete(
             @AuthenticationPrincipal AuthenticatedUser user,
             @PathVariable("categoryId") Long categoryId) {

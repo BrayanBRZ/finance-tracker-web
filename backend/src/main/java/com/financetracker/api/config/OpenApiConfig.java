@@ -12,7 +12,8 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
     info = @Info(
         title = "Collaborative Wallet API",
         version = "v1",
-        description = ""
+        description = "API REST para gestão financeira pessoal e compartilhada. "
+                + "Use o token retornado no login como Bearer token nas rotas protegidas."
     )
 )
 @SecurityScheme(

@@ -76,6 +76,19 @@ public class Transaction {
         this.transactionDate = transactionDate;
     }
 
+    public void update(
+            Category category,
+            TransactionType type,
+            BigDecimal amount,
+            String description,
+            LocalDate transactionDate) {
+        this.category = category;
+        this.type = type;
+        this.amount = amount;
+        this.description = description;
+        this.transactionDate = transactionDate;
+    }
+
     @PrePersist
     void onCreate() {
         createdAt = LocalDateTime.now();

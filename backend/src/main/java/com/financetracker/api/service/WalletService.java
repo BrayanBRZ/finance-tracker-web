@@ -47,7 +47,7 @@ public class WalletService {
     public WalletResponse create(Long userId, WalletRequest request) {
         User owner = users.findById(userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
-                
+
         Wallet wallet = wallets.save(new Wallet(owner, request.name().trim(), request.description()));
         members.save(new WalletMember(wallet, owner, WalletRole.OWNER));
         return WalletMapper.toResponse(wallet, WalletRole.OWNER);

@@ -21,12 +21,15 @@ import com.financetracker.api.dto.wallet.WalletMemberResponse;
 import com.financetracker.api.security.AuthenticatedUser;
 import com.financetracker.api.service.WalletMemberService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(Routes.Wallets.MEMBERS)
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Membros da carteira")
 public class WalletMemberController {
     private final WalletMemberService walletMemberService;
 
@@ -35,6 +38,7 @@ public class WalletMemberController {
     }
 
     @GetMapping
+    @Operation(summary = "Lista os membros da carteira")
     List<WalletMemberResponse> list(
             @AuthenticationPrincipal AuthenticatedUser user,
             @PathVariable("walletId") Long walletId) {
@@ -42,6 +46,7 @@ public class WalletMemberController {
     }
 
     @PostMapping
+    @Operation(summary = "Adiciona um membro a carteira")
     ResponseEntity<WalletMemberResponse> add(
             @AuthenticationPrincipal AuthenticatedUser user,
             @PathVariable("walletId") Long walletId,
@@ -50,6 +55,7 @@ public class WalletMemberController {
     }
 
     @PatchMapping("/{userId}")
+    @Operation(summary = "Altera o papel de um membro")
     WalletMemberResponse updateRole(
             @AuthenticationPrincipal AuthenticatedUser user,
             @PathVariable("walletId") Long walletId,
@@ -59,6 +65,7 @@ public class WalletMemberController {
     }
 
     @DeleteMapping("/{userId}")
+    @Operation(summary = "Remove um membro da carteira")
     ResponseEntity<Void> remove(
             @AuthenticationPrincipal AuthenticatedUser user,
             @PathVariable("walletId") Long walletId,

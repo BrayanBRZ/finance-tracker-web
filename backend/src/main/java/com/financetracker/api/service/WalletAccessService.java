@@ -38,6 +38,15 @@ public class WalletAccessService {
     }
 
     @Transactional(readOnly = true)
+    public WalletMember requireEditor(Long walletId, Long userId) {
+        WalletMember member = requireMember(walletId, userId);
+        if (member.getRole() == WalletRole.VIEWER) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "Você não possui permissão para alterar esta carteira");
+        }
+        return member;
+    }
+
+    @Transactional(readOnly = true)
     public Wallet requireWallet(Long walletId) {
         return wallets.findById(walletId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Carteira não encontrada"));

@@ -15,12 +15,15 @@ import com.financetracker.api.dto.user.UserResponse;
 import com.financetracker.api.security.AuthenticatedUser;
 import com.financetracker.api.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/users/me")
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Perfil")
 public class UserController {
     private final UserService userService;
 
@@ -29,11 +32,13 @@ public class UserController {
     }
 
     @GetMapping
+    @Operation(summary = "Retorna o perfil do usuario autenticado")
     UserResponse getMe(@AuthenticationPrincipal AuthenticatedUser user) {
         return userService.getMe(user.id());
     }
 
     @PutMapping
+    @Operation(summary = "Atualiza o perfil do usuario autenticado")
     UserResponse updateMe(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody UpdateUserRequest request) {
@@ -41,6 +46,7 @@ public class UserController {
     }
 
     @PatchMapping("/password")
+    @Operation(summary = "Altera a senha do usuario autenticado")
     MessageResponse changePassword(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody ChangePasswordRequest request) {

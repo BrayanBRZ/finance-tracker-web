@@ -20,12 +20,15 @@ import com.financetracker.api.dto.wallet.WalletResponse;
 import com.financetracker.api.security.AuthenticatedUser;
 import com.financetracker.api.service.WalletService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(Routes.Wallets.BASE)
 @SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Carteiras")
 public class WalletController {
     private final WalletService walletService;
 
@@ -34,11 +37,13 @@ public class WalletController {
     }
 
     @GetMapping
+    @Operation(summary = "Lista as carteiras do usuario")
     List<WalletResponse> list(@AuthenticationPrincipal AuthenticatedUser user) {
         return walletService.list(user.id());
     }
 
     @PostMapping
+    @Operation(summary = "Cria uma carteira")
     ResponseEntity<WalletResponse> create(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody WalletRequest request) {
@@ -46,6 +51,7 @@ public class WalletController {
     }
 
     @GetMapping(Routes.Wallets.BY_ID)
+    @Operation(summary = "Detalha uma carteira")
     WalletResponse get(
             @AuthenticationPrincipal AuthenticatedUser user,
             @PathVariable("walletId") Long walletId) {
@@ -53,6 +59,7 @@ public class WalletController {
     }
 
     @PutMapping(Routes.Wallets.BY_ID)
+    @Operation(summary = "Atualiza uma carteira como proprietario")
     WalletResponse update(
             @AuthenticationPrincipal AuthenticatedUser user,
             @PathVariable("walletId") Long walletId,
@@ -61,6 +68,7 @@ public class WalletController {
     }
 
     @DeleteMapping(Routes.Wallets.BY_ID)
+    @Operation(summary = "Remove uma carteira como proprietario")
     ResponseEntity<Void> delete(
             @AuthenticationPrincipal AuthenticatedUser user,
             @PathVariable("walletId") Long walletId) {
