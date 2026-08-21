@@ -15,30 +15,22 @@ import com.financetracker.api.entity.WalletMember;
 import com.financetracker.api.enums.WalletRole;
 import com.financetracker.api.exception.ApiException;
 import com.financetracker.api.mapper.WalletMapper;
-import com.financetracker.api.repository.UserRepository;
 import com.financetracker.api.repository.WalletMemberRepository;
+import com.financetracker.api.util.EmailNormalizer;
 
 @Service
 public class WalletMemberService {
-    private final WalletMemberRepository members;
-    private final UserRepository users;
+    private final WalletMemberRepository walletMemberRepository;
+    private final UserAccessService userAccessService;
     private final WalletAccessService walletAccess;
 
     public WalletMemberService(
-            WalletMemberRepository members,
-            UserRepository users,
+            WalletMemberRepository walletMemberRepository,
+            UserAccessService userAccessService,
             WalletAccessService walletAccess) {
-        this.members = members;
-        this.users = users;
+        this.walletMemberRepository = walletMemberRepository;
+        this.userAccessService = userAccessService;
         this.walletAccess = walletAccess;
-    }
-
-    @Transactional(readOnly = true)
-    public List<WalletMemberResponse> list(Long requesterId, Long walletId) {
-        walletAccess.requireMember(walletId, requesterId);
-        return members.findAllByWalletIdOrderByJoinedAtAsc(walletId).stream()
-                .map(WalletMapper::toMemberResponse)
-                .toList();
     }
 
     @Transactional
@@ -46,14 +38,21 @@ public class WalletMemberService {
         Wallet wallet = walletAccess.requireOwner(walletId, requesterId).getWallet();
         rejectOwnerRole(request.role());
 
-        User user = users.findByEmail(AuthService.normalizeEmail(request.email()))
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
-        if (members.existsByWalletIdAndUserId(walletId, user.getId())) {
+        User user = userAccessService.requireUserByEmail(EmailNormalizer.normalize(request.email()));
+        if (walletMemberRepository.existsByWalletIdAndUserId(walletId, user.getId())) {
             throw new ApiException(HttpStatus.CONFLICT, "Este usuário já é membro da carteira");
         }
 
-        WalletMember member = members.save(new WalletMember(wallet, user, request.role()));
+        WalletMember member = walletMemberRepository.save(new WalletMember(wallet, user, request.role()));
         return WalletMapper.toMemberResponse(member);
+    }
+
+    @Transactional(readOnly = true)
+    public List<WalletMemberResponse> list(Long requesterId, Long walletId) {
+        walletAccess.requireMember(walletId, requesterId);
+        return walletMemberRepository.findAllByWalletIdWithUserOrderByJoinedAtAsc(walletId).stream()
+                .map(WalletMapper::toMemberResponse)
+                .toList();
     }
 
     @Transactional
@@ -75,11 +74,11 @@ public class WalletMemberService {
         walletAccess.requireOwner(walletId, requesterId);
         WalletMember member = requireMember(walletId, memberUserId);
         rejectOwnerMember(member);
-        members.delete(member);
+        walletMemberRepository.delete(member);
     }
 
     private WalletMember requireMember(Long walletId, Long userId) {
-        return members.findByWalletIdAndUserId(walletId, userId)
+        return walletMemberRepository.findByWalletIdAndUserId(walletId, userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Membro da carteira não encontrado"));
     }
 

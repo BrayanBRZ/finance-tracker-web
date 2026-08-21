@@ -1,6 +1,5 @@
 package com.financetracker.api.service;
 
-import java.time.LocalDate;
 import java.util.Locale;
 
 import org.springframework.data.domain.Page;
@@ -22,6 +21,7 @@ import com.financetracker.api.mapper.TransactionMapper;
 import com.financetracker.api.repository.CategoryRepository;
 import com.financetracker.api.repository.TransactionRepository;
 import com.financetracker.api.repository.TransactionSpecifications;
+import com.financetracker.api.validation.DateRangeValidator;
 
 @Service
 public class TransactionService {
@@ -29,25 +29,40 @@ public class TransactionService {
     private static final int DEFAULT_SIZE = 20;
     private static final String DEFAULT_SORT = "date,desc";
 
-    private final TransactionRepository transactions;
-    private final CategoryRepository categories;
+    private final TransactionRepository transactionRepository;
+    private final CategoryRepository categoryRepository;
     private final WalletAccessService walletAccess;
 
     public TransactionService(
-            TransactionRepository transactions,
-            CategoryRepository categories,
+            TransactionRepository transactionRepository,
+            CategoryRepository categoryRepository,
             WalletAccessService walletAccess) {
-        this.transactions = transactions;
-        this.categories = categories;
+        this.transactionRepository = transactionRepository;
+        this.categoryRepository = categoryRepository;
         this.walletAccess = walletAccess;
+    }
+
+    @Transactional
+    public TransactionResponse create(Long userId, Long walletId, TransactionRequest request) {
+        WalletMember member = walletAccess.requireEditor(walletId, userId);
+        Category category = resolveCategory(userId, request);
+        Transaction transaction = transactionRepository.save(new Transaction(
+                member.getWallet(),
+                category,
+                member.getUser(),
+                request.type(),
+                request.amount(),
+                normalizeDescription(request.description()),
+                request.date()));
+        return TransactionMapper.toResponse(transaction);
     }
 
     @Transactional(readOnly = true)
     public PageResponse<TransactionResponse> list(Long userId, Long walletId, TransactionFilter filter) {
         walletAccess.requireMember(walletId, userId);
-        validateDateRange(filter.startDate(), filter.endDate());
+        DateRangeValidator.validate(filter.startDate(), filter.endDate());
 
-        Page<Transaction> page = transactions.findAll(
+        Page<Transaction> page = transactionRepository.findAll(
                 TransactionSpecifications.byWalletAndFilter(walletId, filter),
                 PageRequest.of(page(filter), size(filter), sort(filter)));
 
@@ -57,21 +72,6 @@ public class TransactionService {
                 page.getSize(),
                 page.getTotalElements(),
                 page.getTotalPages());
-    }
-
-    @Transactional
-    public TransactionResponse create(Long userId, Long walletId, TransactionRequest request) {
-        WalletMember member = walletAccess.requireEditor(walletId, userId);
-        Category category = resolveCategory(userId, request);
-        Transaction transaction = transactions.save(new Transaction(
-                member.getWallet(),
-                category,
-                member.getUser(),
-                request.type(),
-                request.amount(),
-                normalizeDescription(request.description()),
-                request.date()));
-        return TransactionMapper.toResponse(transaction);
     }
 
     @Transactional(readOnly = true)
@@ -97,11 +97,11 @@ public class TransactionService {
     @Transactional
     public void delete(Long userId, Long walletId, Long transactionId) {
         walletAccess.requireEditor(walletId, userId);
-        transactions.delete(requireTransaction(walletId, transactionId));
+        transactionRepository.delete(requireTransaction(walletId, transactionId));
     }
 
     private Transaction requireTransaction(Long walletId, Long transactionId) {
-        return transactions.findByIdAndWalletId(transactionId, walletId)
+        return transactionRepository.findByIdAndWalletId(transactionId, walletId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Transação não encontrada"));
     }
 
@@ -110,7 +110,7 @@ public class TransactionService {
             return null;
         }
 
-        Category category = categories.findByIdAndUserId(request.categoryId(), userId)
+        Category category = categoryRepository.findByIdAndUserId(request.categoryId(), userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Categoria não encontrada"));
         if (category.getType() != request.type()) {
             throw new ApiException(
@@ -147,12 +147,6 @@ public class TransactionService {
             return Sort.by(direction, property);
         } catch (IllegalArgumentException exception) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Direção de ordenação inválida");
-        }
-    }
-
-    public static void validateDateRange(LocalDate startDate, LocalDate endDate) {
-        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "A data inicial deve ser anterior ou igual à data final");
         }
     }
 

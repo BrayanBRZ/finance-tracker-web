@@ -8,6 +8,7 @@ import com.financetracker.api.entity.User;
 import com.financetracker.api.exception.ApiException;
 import com.financetracker.api.mapper.UserMapper;
 import com.financetracker.api.repository.UserRepository;
+import com.financetracker.api.util.EmailNormalizer;
 
 import java.util.Map;
 
@@ -18,24 +19,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
-    private final UserRepository users;
+    private final UserRepository userRepository;
+    private final UserAccessService userAccessService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository users, PasswordEncoder passwordEncoder) {
-        this.users = users;
+    public UserService(
+            UserRepository userRepository,
+            UserAccessService userAccessService,
+            PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.userAccessService = userAccessService;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
     public UserResponse getMe(Long userId) {
-        return UserMapper.toResponse(requireUser(userId));
+        return UserMapper.toResponse(userAccessService.requireUser(userId));
     }
 
     @Transactional
     public UserResponse updateMe(Long userId, UpdateUserRequest request) {
-        User user = requireUser(userId);
-        String email = AuthService.normalizeEmail(request.email());
-        if (users.existsByEmailAndIdNot(email, userId)) {
+        User user = userAccessService.requireUser(userId);
+        String email = EmailNormalizer.normalize(request.email());
+        if (userRepository.existsByEmailAndIdNot(email, userId)) {
             throw new ApiException(HttpStatus.CONFLICT, "Este e-mail já está cadastrado");
         }
         user.setName(request.name().trim());
@@ -45,7 +51,7 @@ public class UserService {
 
     @Transactional
     public MessageResponse changePassword(Long userId, ChangePasswordRequest request) {
-        User user = requireUser(userId);
+        User user = userAccessService.requireUser(userId);
         if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
             throw new ApiException(
                     HttpStatus.UNPROCESSABLE_ENTITY,
@@ -54,10 +60,5 @@ public class UserService {
         }
         user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
         return new MessageResponse("Senha alterada com sucesso.");
-    }
-
-    private User requireUser(Long userId) {
-        return users.findById(userId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
     }
 }

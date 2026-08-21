@@ -38,20 +38,20 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping
-    @Operation(summary = "Lista as categorias do usuario")
-    List<CategoryResponse> list(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @RequestParam(required = false) TransactionType type) {
-        return categoryService.list(user.id(), type);
-    }
-
     @PostMapping
     @Operation(summary = "Cria uma categoria")
     ResponseEntity<CategoryResponse> create(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody CategoryRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(user.id(), request));
+    }
+
+    @GetMapping
+    @Operation(summary = "Lista as categorias do usuario")
+    List<CategoryResponse> list(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @RequestParam(required = false) TransactionType type) {
+        return categoryService.list(user.id(), type);
     }
 
     @PutMapping(Routes.Categories.BY_ID)

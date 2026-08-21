@@ -13,18 +13,20 @@ import com.financetracker.api.repository.WalletRepository;
 
 @Service
 public class WalletAccessService {
-    private final WalletRepository wallets;
-    private final WalletMemberRepository members;
+    private final WalletRepository walletRepository;
+    private final WalletMemberRepository walletMemberRepository;
 
-    public WalletAccessService(WalletRepository wallets, WalletMemberRepository members) {
-        this.wallets = wallets;
-        this.members = members;
+    public WalletAccessService(
+            WalletRepository walletRepository,
+            WalletMemberRepository walletMemberRepository) {
+        this.walletRepository = walletRepository;
+        this.walletMemberRepository = walletMemberRepository;
     }
 
     @Transactional(readOnly = true)
     public WalletMember requireMember(Long walletId, Long userId) {
         requireWallet(walletId);
-        return members.findByWalletIdAndUserId(walletId, userId)
+        return walletMemberRepository.findByWalletIdAndUserId(walletId, userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.FORBIDDEN, "Você não possui acesso a esta carteira"));
     }
 
@@ -48,7 +50,7 @@ public class WalletAccessService {
 
     @Transactional(readOnly = true)
     public Wallet requireWallet(Long walletId) {
-        return wallets.findById(walletId)
+        return walletRepository.findById(walletId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Carteira não encontrada"));
     }
 }

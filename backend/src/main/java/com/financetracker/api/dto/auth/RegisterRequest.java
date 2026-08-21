@@ -1,6 +1,7 @@
 package com.financetracker.api.dto.auth;
 
 import com.financetracker.api.validation.StrongPassword;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

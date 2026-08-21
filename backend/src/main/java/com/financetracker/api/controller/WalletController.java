@@ -36,18 +36,18 @@ public class WalletController {
         this.walletService = walletService;
     }
 
-    @GetMapping
-    @Operation(summary = "Lista as carteiras do usuario")
-    List<WalletResponse> list(@AuthenticationPrincipal AuthenticatedUser user) {
-        return walletService.list(user.id());
-    }
-
     @PostMapping
     @Operation(summary = "Cria uma carteira")
     ResponseEntity<WalletResponse> create(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody WalletRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(walletService.create(user.id(), request));
+    }
+
+    @GetMapping
+    @Operation(summary = "Lista as carteiras do usuario")
+    List<WalletResponse> list(@AuthenticationPrincipal AuthenticatedUser user) {
+        return walletService.list(user.id());
     }
 
     @GetMapping(Routes.Wallets.BY_ID)

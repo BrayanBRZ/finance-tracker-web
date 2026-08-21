@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.financetracker.api.Routes;
 import com.financetracker.api.dto.common.MessageResponse;
 import com.financetracker.api.dto.user.ChangePasswordRequest;
 import com.financetracker.api.dto.user.UpdateUserRequest;
@@ -21,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/users/me")
+@RequestMapping(Routes.Users.BASE)
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Perfil")
 public class UserController {
@@ -31,13 +32,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
+    @GetMapping(Routes.Users.ME)
     @Operation(summary = "Retorna o perfil do usuario autenticado")
     UserResponse getMe(@AuthenticationPrincipal AuthenticatedUser user) {
         return userService.getMe(user.id());
     }
 
-    @PutMapping
+    @PutMapping(Routes.Users.ME)
     @Operation(summary = "Atualiza o perfil do usuario autenticado")
     UserResponse updateMe(
             @AuthenticationPrincipal AuthenticatedUser user,
@@ -45,7 +46,7 @@ public class UserController {
         return userService.updateMe(user.id(), request);
     }
 
-    @PatchMapping("/password")
+    @PatchMapping(Routes.Users.PASSWORD)
     @Operation(summary = "Altera a senha do usuario autenticado")
     MessageResponse changePassword(
             @AuthenticationPrincipal AuthenticatedUser user,

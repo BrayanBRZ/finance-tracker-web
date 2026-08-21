@@ -37,14 +37,6 @@ public class WalletMemberController {
         this.walletMemberService = walletMemberService;
     }
 
-    @GetMapping
-    @Operation(summary = "Lista os membros da carteira")
-    List<WalletMemberResponse> list(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId) {
-        return walletMemberService.list(user.id(), walletId);
-    }
-
     @PostMapping
     @Operation(summary = "Adiciona um membro a carteira")
     ResponseEntity<WalletMemberResponse> add(
@@ -52,6 +44,14 @@ public class WalletMemberController {
             @PathVariable("walletId") Long walletId,
             @Valid @RequestBody WalletMemberRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(walletMemberService.add(user.id(), walletId, request));
+    }
+
+    @GetMapping
+    @Operation(summary = "Lista os membros da carteira")
+    List<WalletMemberResponse> list(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @PathVariable("walletId") Long walletId) {
+        return walletMemberService.list(user.id(), walletId);
     }
 
     @PatchMapping("/{userId}")

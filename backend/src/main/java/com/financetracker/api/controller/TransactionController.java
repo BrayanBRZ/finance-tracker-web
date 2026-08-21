@@ -37,15 +37,6 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @GetMapping
-    @Operation(summary = "Lista transações da carteira com filtros e paginação")
-    PageResponse<TransactionResponse> list(
-            @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
-            @Valid @ModelAttribute TransactionFilter filter) {
-        return transactionService.list(user.id(), walletId, filter);
-    }
-
     @PostMapping
     @Operation(summary = "Cria uma transação na carteira")
     ResponseEntity<TransactionResponse> create(
@@ -53,6 +44,15 @@ public class TransactionController {
             @PathVariable("walletId") Long walletId,
             @Valid @RequestBody TransactionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.create(user.id(), walletId, request));
+    }
+
+    @GetMapping
+    @Operation(summary = "Lista transações da carteira com filtros e paginação")
+    PageResponse<TransactionResponse> list(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @PathVariable("walletId") Long walletId,
+            @Valid @ModelAttribute TransactionFilter filter) {
+        return transactionService.list(user.id(), walletId, filter);
     }
 
     @GetMapping("/{transactionId}")

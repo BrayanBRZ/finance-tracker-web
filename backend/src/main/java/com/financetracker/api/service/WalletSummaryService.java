@@ -18,23 +18,24 @@ import com.financetracker.api.entity.Transaction;
 import com.financetracker.api.enums.TransactionType;
 import com.financetracker.api.repository.TransactionRepository;
 import com.financetracker.api.repository.TransactionSpecifications;
+import com.financetracker.api.validation.DateRangeValidator;
 
 @Service
 public class WalletSummaryService {
-    private final TransactionRepository transactions;
+    private final TransactionRepository transactionRepository;
     private final WalletAccessService walletAccess;
 
-    public WalletSummaryService(TransactionRepository transactions, WalletAccessService walletAccess) {
-        this.transactions = transactions;
+    public WalletSummaryService(TransactionRepository transactionRepository, WalletAccessService walletAccess) {
+        this.transactionRepository = transactionRepository;
         this.walletAccess = walletAccess;
     }
 
     @Transactional(readOnly = true)
     public WalletSummaryResponse get(Long userId, Long walletId, LocalDate startDate, LocalDate endDate) {
         walletAccess.requireMember(walletId, userId);
-        TransactionService.validateDateRange(startDate, endDate);
+        DateRangeValidator.validate(startDate, endDate);
 
-        List<Transaction> entries = transactions.findAll(
+        List<Transaction> entries = transactionRepository.findAll(
                 TransactionSpecifications.byWalletAndPeriod(walletId, startDate, endDate));
         BigDecimal totalIncome = totalByType(entries, TransactionType.INCOME);
         BigDecimal totalExpense = totalByType(entries, TransactionType.EXPENSE);
