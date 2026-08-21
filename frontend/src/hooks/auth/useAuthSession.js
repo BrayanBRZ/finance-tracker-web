@@ -9,9 +9,8 @@ import {
 import { login as loginRequest } from '@/services/authService'
 import { getCurrentUser } from '@/services/userService'
 
-const toSession = (token, user) => ({
+const withExpiration = (token) => ({
   ...token,
-  user,
   expiresAt: new Date(Date.now() + token.expiresIn * 1000).toISOString(),
 })
 
@@ -44,11 +43,12 @@ export function useAuthSession() {
 
   const login = useCallback(async (credentials) => {
     const token = await loginRequest(credentials)
-    writeApiSession(token, credentials.rememberMe)
+    const pendingSession = withExpiration(token)
+    writeApiSession(pendingSession, credentials.rememberMe)
 
     try {
       const user = await getCurrentUser()
-      const authSession = toSession(token, user)
+      const authSession = { ...pendingSession, user }
       writeApiSession(authSession, credentials.rememberMe)
       setSession(authSession)
       return authSession

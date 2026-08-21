@@ -45,11 +45,11 @@ public final class Routes {
     public static final class Wallets {
         public static final String BASE = API_V1 + "/wallets";
         public static final String BY_ID = "/{walletId}";
-        public static final String MEMBERS = BY_ID + "/members";
+        public static final String MEMBERS = BASE + BY_ID + "/members";
         public static final String MEMBER_BY_USER_ID = MEMBERS + "/{userId}";
-        public static final String TRANSACTIONS = BY_ID + "/transactions";
+        public static final String TRANSACTIONS = BASE + BY_ID + "/transactions";
         public static final String TRANSACTION_BY_ID = TRANSACTIONS + "/{transactionId}";
-        public static final String SUMMARY = BY_ID + "/summary";
+        public static final String SUMMARY = BASE + BY_ID + "/summary";
 
         private Wallets() {
         }
