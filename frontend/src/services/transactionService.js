@@ -1,13 +1,13 @@
-import { apiRequest } from '@/services/apiClient'
-
-export const listTransactions = ({ walletId, signal, ...query }) =>
-  apiRequest(`/wallets/${walletId}/transactions`, { query, signal })
+import { apiRequest } from '@/services/api/client'
 
 export const createTransaction = (walletId, data) =>
   apiRequest(`/wallets/${walletId}/transactions`, {
     method: 'POST',
     body: data,
   })
+
+export const listTransactions = ({ walletId, signal, ...query }) =>
+  apiRequest(`/wallets/${walletId}/transactions`, { query, signal })
 
 export const updateTransaction = (walletId, transactionId, data) =>
   apiRequest(`/wallets/${walletId}/transactions/${transactionId}`, {

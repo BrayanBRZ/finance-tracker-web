@@ -23,7 +23,8 @@ export function WalletProvider({ children }) {
         ...wallets,
         listWalletMembers: ({ signal } = {}) =>
           listWalletMembers(requireCurrentWallet(), { signal }),
-        addWalletMember: (data) => addWalletMember(requireCurrentWallet(), data),
+        addWalletMember: (data) =>
+          addWalletMember(requireCurrentWallet(), data),
         updateWalletMemberRole: (memberUserId, role) =>
           updateWalletMemberRole(requireCurrentWallet(), memberUserId, role),
         removeWalletMember: (memberUserId) =>

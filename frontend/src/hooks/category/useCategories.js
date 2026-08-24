@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { categoryAppearanceOptions } from '@/lib/categoryAppearance'
 import { FINANCIAL_TYPES } from '@/domain/financialTypes'
 import { useAsyncScopeGuard } from '@/hooks/shared/useAsyncScopeGuard'
-import { isAbortError } from '@/services/apiClient'
+import { isAbortError } from '@/services/api/client'
 import {
   createCategory as createCategoryRequest,
   listCategories,

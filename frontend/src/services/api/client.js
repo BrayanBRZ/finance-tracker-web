@@ -1,28 +1,13 @@
-import {
-  clearApiSession,
-  readApiSession,
-} from '@/storage/authTokenStorage'
-
-const API_URL =
-  import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api/v1'
-
-export class ApiError extends Error {
-  constructor(message, { status = null, fieldErrors = {} } = {}) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-    this.fieldErrors = fieldErrors
-  }
-}
+import { clearApiSession, readApiSession } from '@/storage/authTokenStorage'
+import { ApiError } from './error'
 
 const buildUrl = (path, query) => {
-  const baseUrl = API_URL.replace(/\/+$/, '')
+  const baseUrl = import.meta.env.VITE_API_URL
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
   const url = new URL(`${baseUrl}${normalizedPath}`)
 
   Object.entries(query ?? {}).forEach(([key, value]) => {
-    if (value === null || value === undefined || value === '') return
-    url.searchParams.set(key, String(value))
+    if (value === null || value === '') url.searchParams.set(key, String(value))
   })
 
   return url.toString()
@@ -52,6 +37,7 @@ export async function apiRequest(
     headers.set('Authorization', `Bearer ${session.accessToken}`)
   }
 
+  
   let response
   try {
     response = await fetch(buildUrl(path, query), {

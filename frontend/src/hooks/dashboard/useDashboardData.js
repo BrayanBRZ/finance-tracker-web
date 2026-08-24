@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useWallet } from '@/context/walletContext'
-import { isAbortError } from '@/services/apiClient'
+import { isAbortError } from '@/services/api/client'
 import { getWalletSummary } from '@/services/summaryService'
 import { listTransactions } from '@/services/transactionService'
 

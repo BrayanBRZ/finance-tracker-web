@@ -1,4 +1,4 @@
-import { apiRequest } from '@/services/apiClient'
+import { apiRequest } from '@/services/api/client'
 
 export const getCurrentUser = ({ signal } = {}) =>
   apiRequest('/users/me', { signal })

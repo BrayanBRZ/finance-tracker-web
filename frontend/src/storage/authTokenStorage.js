@@ -3,6 +3,13 @@ export const AUTH_SESSION_CHANGED_EVENT = 'finance-tracker:auth-session-changed'
 
 const storages = () => [window.localStorage, window.sessionStorage]
 
+export function writeApiSession(session, rememberMe) {
+  clearApiSession(false)
+  const storage = rememberMe ? window.localStorage : window.sessionStorage
+  storage.setItem(API_SESSION_STORAGE_KEY, JSON.stringify(session))
+  notifySessionChange()
+}
+
 export function readApiSession() {
   for (const storage of storages()) {
     try {
@@ -14,14 +21,6 @@ export function readApiSession() {
   }
   return null
 }
-
-export function writeApiSession(session, rememberMe) {
-  clearApiSession(false)
-  const storage = rememberMe ? window.localStorage : window.sessionStorage
-  storage.setItem(API_SESSION_STORAGE_KEY, JSON.stringify(session))
-  notifySessionChange()
-}
-
 export function clearApiSession(notify = true) {
   for (const storage of storages()) {
     try {

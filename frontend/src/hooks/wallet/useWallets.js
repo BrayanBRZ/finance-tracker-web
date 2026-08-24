@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from '@/context/sessionContext'
 import { useAsyncScopeGuard } from '@/hooks/shared/useAsyncScopeGuard'
-import { isAbortError } from '@/services/apiClient'
+import { isAbortError } from '@/services/api/client'
 import {
   createWallet,
   listWallets,

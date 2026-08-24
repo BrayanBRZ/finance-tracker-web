@@ -3,6 +3,38 @@ const WALLET_PREFERENCES_STORAGE_KEY = '@project:wallet_preferences'
 const canUseLocalStorage = () =>
   typeof window !== 'undefined' && window.localStorage
 
+export function writeSelectedWalletId({ userId, walletId }) {
+  if (!userId || !walletId) {
+    return
+  }
+
+  writeWalletPreferences({
+    ...readWalletPreferences(),
+    [userId]: walletId,
+  })
+}
+
+export function readSelectedWalletId(userId) {
+  if (!userId) {
+    return null
+  }
+
+  return readWalletPreferences()[userId] ?? null
+}
+
+export function clearSelectedWalletId(userId) {
+  if (!userId) {
+    return
+  }
+
+  const walletPreferences = readWalletPreferences()
+  const nextWalletPreferences = { ...walletPreferences }
+
+  delete nextWalletPreferences[userId]
+
+  writeWalletPreferences(nextWalletPreferences)
+}
+
 const readWalletPreferences = () => {
   if (!canUseLocalStorage()) {
     return {}
@@ -33,36 +65,4 @@ const writeWalletPreferences = (walletPreferences) => {
     WALLET_PREFERENCES_STORAGE_KEY,
     JSON.stringify(walletPreferences),
   )
-}
-
-export function readSelectedWalletId(userId) {
-  if (!userId) {
-    return null
-  }
-
-  return readWalletPreferences()[userId] ?? null
-}
-
-export function writeSelectedWalletId({ userId, walletId }) {
-  if (!userId || !walletId) {
-    return
-  }
-
-  writeWalletPreferences({
-    ...readWalletPreferences(),
-    [userId]: walletId,
-  })
-}
-
-export function clearSelectedWalletId(userId) {
-  if (!userId) {
-    return
-  }
-
-  const walletPreferences = readWalletPreferences()
-  const nextWalletPreferences = { ...walletPreferences }
-
-  delete nextWalletPreferences[userId]
-
-  writeWalletPreferences(nextWalletPreferences)
 }

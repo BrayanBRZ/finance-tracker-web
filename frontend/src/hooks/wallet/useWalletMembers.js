@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useWallet } from '@/context/walletContext'
 import { useAsyncScopeGuard } from '@/hooks/shared/useAsyncScopeGuard'
-import { isAbortError } from '@/services/apiClient'
+import { isAbortError } from '@/services/api/client'
 
 const getErrorMessage = (error) =>
   error instanceof Error ? error.message : 'Não foi possível carregar os membros da carteira.'
