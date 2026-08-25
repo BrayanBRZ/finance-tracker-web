@@ -33,11 +33,16 @@ export function useTransactionsPage() {
   const setFilter = (key, value) => {
     setFilters((current) => ({ ...current, [key]: value || null, page: 0 }))
   }
-  const changePage = (page) => setFilters((current) => ({ ...current, page: page - 1 }))
+  const changePage = (page) =>
+    setFilters((current) => ({ ...current, page: page - 1 }))
   const resetFilters = () => setFilters(defaultFilters)
 
   const filterError = useMemo(() => {
-    if (filters.startDate && filters.endDate && filters.startDate > filters.endDate) {
+    if (
+      filters.startDate &&
+      filters.endDate &&
+      filters.startDate > filters.endDate
+    ) {
       return 'A data inicial deve ser anterior ou igual à data final.'
     }
     return null
@@ -46,13 +51,22 @@ export function useTransactionsPage() {
   const saveTransaction = async (transactionData) => {
     try {
       if (editingTransaction) {
-        await transactionsState.updateTransaction(editingTransaction.id, transactionData)
-        toast({ message: 'Transação atualizada com sucesso.', variant: 'success' })
+        await transactionsState.updateTransaction(
+          editingTransaction.id,
+          transactionData,
+        )
+        toast({
+          message: 'Transação atualizada com sucesso.',
+          variant: 'success',
+        })
         setEditingTransaction(null)
       } else {
         await transactionsState.createTransaction(transactionData)
         setFilters((current) => ({ ...current, page: 0 }))
-        toast({ message: 'Transação registrada com sucesso.', variant: 'success' })
+        toast({
+          message: 'Transação registrada com sucesso.',
+          variant: 'success',
+        })
       }
       setIsFormOpen(false)
     } catch (error) {
@@ -65,7 +79,9 @@ export function useTransactionsPage() {
     if (!deletingTransaction) return
     setIsDeletePending(true)
     try {
-      const nextPage = await transactionsState.removeTransaction(deletingTransaction.id)
+      const nextPage = await transactionsState.removeTransaction(
+        deletingTransaction.id,
+      )
       setFilters((current) => ({ ...current, page: nextPage }))
       toast({ message: 'Transação excluída com sucesso.', variant: 'success' })
     } catch (error) {
@@ -78,7 +94,10 @@ export function useTransactionsPage() {
 
   const retryPageData = () => {
     if (filterError) return
-    void Promise.all([transactionsState.refreshTransactions(), categoriesState.refreshCategories()])
+    void Promise.all([
+      transactionsState.refreshTransactions(),
+      categoriesState.refreshCategories(),
+    ])
   }
 
   return {
@@ -86,7 +105,8 @@ export function useTransactionsPage() {
     filters,
     filterError,
     isLoading: transactionsState.isLoading || categoriesState.isLoading,
-    loadErrorMessage: filterError ?? transactionsState.errorMessage ?? categoriesState.errorMessage,
+    loadErrorMessage:
+      transactionsState.errorMessage ?? categoriesState.errorMessage,
     canManageTransactions,
     pageTransactions: transactionsState.transactions,
     currentPage: transactionsState.pageData.page + 1,

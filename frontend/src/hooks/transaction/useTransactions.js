@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useWallet } from '@/context/walletContext'
-import { useAsyncScopeGuard } from '@/hooks/shared/useAsyncScopeGuard'
 import { isAbortError } from '@/services/api/client'
 import {
   createTransaction as createTransactionRequest,
@@ -9,30 +8,37 @@ import {
   updateTransaction as updateTransactionRequest,
 } from '@/services/transactionService'
 
-const emptyPage = { content: [], page: 0, size: 10, totalElements: 0, totalPages: 0 }
+const emptyPage = {
+  content: [],
+  page: 0,
+  size: 10,
+  totalElements: 0,
+  totalPages: 0,
+}
 
 const getErrorMessage = (error) =>
-  error instanceof Error ? error.message : 'Não foi possível carregar as transações.'
+  error instanceof Error
+    ? error.message
+    : 'Não foi possível carregar as transações.'
 
 export function useTransactions(filters) {
   const { currentWallet } = useWallet()
   const walletId = currentWallet?.id
+  const hasInvalidDateRange =
+    filters.startDate && filters.endDate && filters.startDate > filters.endDate
   const [pageData, setPageData] = useState(emptyPage)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
-  const scopeKey = JSON.stringify([walletId ?? null, filters])
-  const { beginRequest, captureScope, invalidateRequests, isRequestCurrent, isScopeCurrent } =
-    useAsyncScopeGuard(scopeKey)
-
   const refreshTransactions = useCallback(
     async ({ signal, page: requestedPage } = {}) => {
-      const request = beginRequest()
       if (!walletId) {
         setPageData(emptyPage)
         setErrorMessage(null)
         setIsLoading(false)
         return emptyPage
       }
+
+      if (hasInvalidDateRange) return emptyPage
 
       setIsLoading(true)
       setErrorMessage(null)
@@ -43,19 +49,18 @@ export function useTransactions(filters) {
           page: requestedPage ?? filters.page,
           signal,
         })
-        if (!isRequestCurrent(request)) return emptyPage
         setPageData(nextPage)
         return nextPage
       } catch (error) {
-        if (isAbortError(error) || !isRequestCurrent(request)) return emptyPage
+        if (isAbortError(error)) return emptyPage
         setPageData(emptyPage)
         setErrorMessage(getErrorMessage(error))
         return emptyPage
       } finally {
-        if (isRequestCurrent(request)) setIsLoading(false)
+        if (!signal?.aborted) setIsLoading(false)
       }
     },
-    [beginRequest, filters, isRequestCurrent, walletId],
+    [filters, hasInvalidDateRange, walletId],
   )
 
   useEffect(() => {
@@ -69,38 +74,35 @@ export function useTransactions(filters) {
   }, [refreshTransactions])
 
   const createTransaction = async (data) => {
-    if (!walletId) throw new Error('Selecione uma carteira antes de criar transações.')
-    const scope = captureScope()
+    if (!walletId)
+      throw new Error('Selecione uma carteira antes de criar transações.')
     const transaction = await createTransactionRequest(walletId, data)
-    if (isScopeCurrent(scope)) {
-      invalidateRequests()
-      await refreshTransactions({ page: 0 })
-    }
+    await refreshTransactions({ page: 0 })
     return transaction
   }
 
   const updateTransaction = async (transactionId, data) => {
-    if (!walletId) throw new Error('Selecione uma carteira antes de editar transações.')
-    const scope = captureScope()
-    const transaction = await updateTransactionRequest(walletId, transactionId, data)
-    if (isScopeCurrent(scope)) {
-      invalidateRequests()
-      await refreshTransactions()
-    }
+    if (!walletId)
+      throw new Error('Selecione uma carteira antes de editar transações.')
+    const transaction = await updateTransactionRequest(
+      walletId,
+      transactionId,
+      data,
+    )
+    await refreshTransactions()
     return transaction
   }
 
   const removeTransaction = async (transactionId) => {
-    if (!walletId) throw new Error('Selecione uma carteira antes de excluir transações.')
-    const scope = captureScope()
+    if (!walletId)
+      throw new Error('Selecione uma carteira antes de excluir transações.')
     await removeTransactionRequest(walletId, transactionId)
-    if (isScopeCurrent(scope)) {
-      invalidateRequests()
-      const nextPage = pageData.content.length === 1 && filters.page > 0 ? filters.page - 1 : filters.page
-      await refreshTransactions({ page: nextPage })
-      return nextPage
-    }
-    return filters.page
+    const nextPage =
+      pageData.content.length === 1 && filters.page > 0
+        ? filters.page - 1
+        : filters.page
+    await refreshTransactions({ page: nextPage })
+    return nextPage
   }
 
   return {

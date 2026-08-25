@@ -8,6 +8,7 @@ import { FormDialog } from '@/components/form-fields/FormDialog'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import { useCategoriesPage } from '@/hooks/category/useCategoriesPage'
+import { WalletScope } from '@/components/wallets/WalletScope'
 
 function CategoriesContent() {
   const {
@@ -83,5 +84,9 @@ function CategoriesContent() {
 }
 
 export function CategoriesPage() {
-  return <CategoriesContent />
+  return (
+    <WalletScope>
+      <CategoriesContent />
+    </WalletScope>
+  )
 }

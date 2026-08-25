@@ -28,8 +28,7 @@ export const PASSWORD_REQUIREMENTS = Object.freeze([
   },
 ])
 
-export const STRONG_PASSWORD_MESSAGE =
-  'Use pelo menos 8 caracteres, incluindo maiúscula, minúscula, número e símbolo'
+export const PASSWORD_MIN_MESSAGE = 'Use pelo menos 8 caracteres'
 
 export function evaluatePasswordRequirements(password = '') {
   return PASSWORD_REQUIREMENTS.map((requirement) => ({
@@ -39,8 +38,6 @@ export function evaluatePasswordRequirements(password = '') {
   }))
 }
 
-export function isStrongPassword(password = '') {
-  return evaluatePasswordRequirements(password).every(
-    (requirement) => requirement.passed,
-  )
+export function isValidPassword(password = '') {
+  return password.length >= PASSWORD_MIN_LENGTH
 }

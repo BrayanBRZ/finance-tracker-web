@@ -14,29 +14,55 @@ import { useTransactionsPage } from '@/hooks/transaction/useTransactionsPage'
 
 function TransactionFilters({ categories, filters, onChange, onReset }) {
   return (
-    <div className="grid gap-3 rounded-(--radius) border border-border bg-card p-4 md:grid-cols-4">
+    <div className="border-border bg-card grid gap-3 rounded-(--radius) border p-4 md:grid-cols-4">
       <select
-        className="h-10 rounded-(--radius) border border-input bg-background px-3 text-sm"
+        className="border-input bg-background h-10 rounded-(--radius) border px-3 text-sm"
         value={filters.type ?? ''}
         onChange={(event) => onChange('type', event.target.value)}
         aria-label="Filtrar por tipo"
       >
         <option value="">Todos os tipos</option>
-        {FINANCIAL_TYPE_OPTIONS.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
+        {FINANCIAL_TYPE_OPTIONS.map((type) => (
+          <option key={type.value} value={type.value}>
+            {type.label}
+          </option>
+        ))}
       </select>
       <select
-        className="h-10 rounded-(--radius) border border-input bg-background px-3 text-sm"
+        className="border-input bg-background h-10 rounded-(--radius) border px-3 text-sm"
         value={filters.categoryId ?? ''}
-        onChange={(event) => onChange('categoryId', event.target.value ? Number(event.target.value) : null)}
+        onChange={(event) =>
+          onChange(
+            'categoryId',
+            event.target.value ? Number(event.target.value) : null,
+          )
+        }
         aria-label="Filtrar por categoria"
       >
         <option value="">Todas as categorias</option>
-        {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+        {categories.map((category) => (
+          <option key={category.id} value={category.id}>
+            {category.name}
+          </option>
+        ))}
       </select>
-      <Input type="date" value={filters.startDate ?? ''} onChange={(event) => onChange('startDate', event.target.value)} aria-label="Data inicial" />
+      <Input
+        type="date"
+        value={filters.startDate ?? ''}
+        onChange={(event) => onChange('startDate', event.target.value)}
+        aria-label="Data inicial"
+      />
       <div className="flex gap-2">
-        <Input className="min-w-0" type="date" value={filters.endDate ?? ''} onChange={(event) => onChange('endDate', event.target.value)} aria-label="Data final" />
-        <Button type="button" variant="outline" onClick={onReset}>Limpar</Button>
+        <Input
+          className="min-w-0"
+          type="date"
+          value={filters.endDate ?? ''}
+          onChange={(event) => onChange('endDate', event.target.value)}
+          aria-label="Data final"
+        />
+        <Button type="button" variant="outline" onClick={onReset}>
+          Limpar
+        </Button>
       </div>
     </div>
   )
@@ -46,6 +72,7 @@ function TransactionsContent() {
   const {
     categories,
     filters,
+    filterError,
     isLoading,
     loadErrorMessage,
     canManageTransactions,
@@ -72,15 +99,36 @@ function TransactionsContent() {
   return isLoading ? (
     <PageLoader />
   ) : loadErrorMessage ? (
-    <PageErrorState eyebrow="Não foi possível carregar transações" description={loadErrorMessage} onRetry={retryPageData} />
+    <PageErrorState
+      eyebrow="Não foi possível carregar transações"
+      description={loadErrorMessage}
+      onRetry={retryPageData}
+    />
   ) : (
     <div className="flex h-full min-h-0 flex-col gap-6">
       <PageHeader
         title="Transações"
         description="Gerencie receitas e despesas da carteira selecionada."
-        actions={canManageTransactions ? <Button type="button" onClick={openCreateForm}><Plus aria-hidden="true" />Nova transação</Button> : null}
+        actions={
+          canManageTransactions ? (
+            <Button type="button" onClick={openCreateForm}>
+              <Plus aria-hidden="true" />
+              Nova transação
+            </Button>
+          ) : null
+        }
       />
-      <TransactionFilters categories={categories} filters={filters} onChange={setFilter} onReset={resetFilters} />
+      <TransactionFilters
+        categories={categories}
+        filters={filters}
+        onChange={setFilter}
+        onReset={resetFilters}
+      />
+      {filterError ? (
+        <p className="text-destructive text-sm" role="alert">
+          {filterError}
+        </p>
+      ) : null}
       <TransactionList
         transactions={pageTransactions}
         page={currentPage}
@@ -91,8 +139,18 @@ function TransactionsContent() {
         onEdit={openEditForm}
         onDelete={setDeletingTransaction}
       />
-      <FormDialog open={isFormOpen} onOpenChange={handleFormOpenChange} title={editingTransaction ? 'Editar transação' : 'Nova transação'} description="Escolha o tipo da transação. A categoria pessoal é opcional.">
-        <TransactionForm categories={categories} transaction={editingTransaction} onSubmit={saveTransaction} onCancel={() => handleFormOpenChange(false)} />
+      <FormDialog
+        open={isFormOpen}
+        onOpenChange={handleFormOpenChange}
+        title={editingTransaction ? 'Editar transação' : 'Nova transação'}
+        description="Escolha o tipo da transação. A categoria pessoal é opcional."
+      >
+        <TransactionForm
+          categories={categories}
+          transaction={editingTransaction}
+          onSubmit={saveTransaction}
+          onCancel={() => handleFormOpenChange(false)}
+        />
       </FormDialog>
       <ConfirmDialog
         open={Boolean(deletingTransaction)}
@@ -108,5 +166,9 @@ function TransactionsContent() {
 }
 
 export function TransactionsPage() {
-  return <WalletScope><TransactionsContent /></WalletScope>
+  return (
+    <WalletScope>
+      <TransactionsContent />
+    </WalletScope>
+  )
 }

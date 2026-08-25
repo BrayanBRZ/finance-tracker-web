@@ -7,7 +7,9 @@ const buildUrl = (path, query) => {
   const url = new URL(`${baseUrl}${normalizedPath}`)
 
   Object.entries(query ?? {}).forEach(([key, value]) => {
-    if (value === null || value === '') url.searchParams.set(key, String(value))
+    if (value !== null && value !== undefined && value !== '') {
+      url.searchParams.set(key, String(value))
+    }
   })
 
   return url.toString()
@@ -37,7 +39,6 @@ export async function apiRequest(
     headers.set('Authorization', `Bearer ${session.accessToken}`)
   }
 
-  
   let response
   try {
     response = await fetch(buildUrl(path, query), {

@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from '@/context/sessionContext'
-import { useAsyncScopeGuard } from '@/hooks/shared/useAsyncScopeGuard'
 import { isAbortError } from '@/services/api/client'
 import {
+  addWalletMember,
   createWallet,
+  listWalletMembers,
   listWallets,
   removeWallet,
+  removeWalletMember,
   updateWallet,
+  updateWalletMemberRole,
 } from '@/services/walletService'
 import {
   clearSelectedWalletId,
@@ -15,7 +18,9 @@ import {
 } from '@/storage/walletPreferenceStorage'
 
 const getErrorMessage = (error) =>
-  error instanceof Error ? error.message : 'Não foi possível carregar as carteiras.'
+  error instanceof Error
+    ? error.message
+    : 'Não foi possível carregar as carteiras.'
 
 const sameId = (left, right) => Number(left) === Number(right)
 
@@ -26,32 +31,45 @@ const resolveCurrentWallet = (userId, wallets) => {
   }
 
   const preferredId = readSelectedWalletId(userId)
-  const wallet = wallets.find((item) => sameId(item.id, preferredId)) ?? wallets[0]
-  writeSelectedWalletId({ userId, walletId: wallet.id })
+
+  const wallet =
+    wallets.find((item) => sameId(item.id, preferredId)) ?? wallets[0]
+
+  writeSelectedWalletId({
+    userId,
+    walletId: wallet.id,
+  })
+
   return wallet
 }
 
 export function useWallets() {
   const { session, isLoading: isSessionLoading } = useSession()
+
   const userId = session?.user.id
+
   const [wallets, setWallets] = useState([])
   const [currentWallet, setCurrentWallet] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
-  const { beginRequest, captureScope, invalidateRequests, isRequestCurrent, isScopeCurrent } =
-    useAsyncScopeGuard(JSON.stringify([userId ?? null]))
+
+  const requireCurrentWallet = useCallback(() => {
+    if (!currentWallet) {
+      throw new Error('Selecione uma carteira antes de continuar.')
+    }
+
+    return currentWallet.id
+  }, [currentWallet])
 
   const reset = useCallback(() => {
-    invalidateRequests()
     setWallets([])
     setCurrentWallet(null)
     setIsLoading(false)
     setErrorMessage(null)
-  }, [invalidateRequests])
+  }, [])
 
   const refreshWallets = useCallback(
     async ({ signal } = {}) => {
-      const request = beginRequest()
       if (!userId) {
         reset()
         return []
@@ -59,89 +77,143 @@ export function useWallets() {
 
       setIsLoading(true)
       setErrorMessage(null)
+
       try {
         const nextWallets = await listWallets({ signal })
-        if (!isRequestCurrent(request)) return []
 
         setWallets(nextWallets)
+
         setCurrentWallet(resolveCurrentWallet(userId, nextWallets))
+
         return nextWallets
       } catch (error) {
-        if (isAbortError(error) || !isRequestCurrent(request)) return []
+        if (isAbortError(error)) {
+          return []
+        }
+
         setWallets([])
         setCurrentWallet(null)
         setErrorMessage(getErrorMessage(error))
+
         return []
       } finally {
-        if (isRequestCurrent(request)) setIsLoading(false)
+        if (!signal?.aborted) {
+          setIsLoading(false)
+        }
       }
     },
-    [beginRequest, isRequestCurrent, reset, userId],
+    [reset, userId],
   )
 
   useEffect(() => {
-    if (isSessionLoading) return undefined
+    if (isSessionLoading) {
+      return undefined
+    }
+
     const controller = new AbortController()
+
     const load = async () => {
       await Promise.resolve()
-      await refreshWallets({ signal: controller.signal })
+
+      await refreshWallets({
+        signal: controller.signal,
+      })
     }
+
     void load()
-    return () => controller.abort()
+
+    return () => {
+      controller.abort()
+    }
   }, [isSessionLoading, refreshWallets])
 
   const selectWallet = useCallback(
     (walletId) => {
       const wallet = wallets.find((item) => sameId(item.id, walletId))
-      if (!wallet || !userId) return null
-      invalidateRequests()
+
+      if (!wallet || !userId) {
+        return null
+      }
+
       setCurrentWallet(wallet)
-      writeSelectedWalletId({ userId, walletId: wallet.id })
+
+      writeSelectedWalletId({
+        userId,
+        walletId: wallet.id,
+      })
+
       return wallet
     },
-    [invalidateRequests, userId, wallets],
+    [userId, wallets],
   )
 
   const createCurrentWallet = useCallback(
     async (data) => {
-      const scope = captureScope()
       const wallet = await createWallet(data)
-      if (isScopeCurrent(scope)) {
-        invalidateRequests()
-        setWallets((current) => [...current, wallet])
-        setCurrentWallet(wallet)
-        writeSelectedWalletId({ userId, walletId: wallet.id })
-      }
+
+      setWallets((current) => [...current, wallet])
+
+      setCurrentWallet(wallet)
+
+      writeSelectedWalletId({
+        userId,
+        walletId: wallet.id,
+      })
+
       return wallet
     },
-    [captureScope, invalidateRequests, isScopeCurrent, userId],
+    [userId],
   )
 
   const updateCurrentWallet = useCallback(
     async (data) => {
-      if (!currentWallet) throw new Error('Selecione uma carteira antes de continuar.')
-      const scope = captureScope()
-      const wallet = await updateWallet(currentWallet.id, data)
-      if (isScopeCurrent(scope)) {
-        setWallets((current) => current.map((item) => (sameId(item.id, wallet.id) ? wallet : item)))
-        setCurrentWallet(wallet)
-      }
+      const walletId = requireCurrentWallet()
+
+      const wallet = await updateWallet(walletId, data)
+
+      setWallets((current) =>
+        current.map((item) => (sameId(item.id, wallet.id) ? wallet : item)),
+      )
+
+      setCurrentWallet(wallet)
+
       return wallet
     },
-    [captureScope, currentWallet, isScopeCurrent],
+    [requireCurrentWallet],
   )
 
   const removeCurrentWallet = useCallback(async () => {
-    if (!currentWallet) throw new Error('Selecione uma carteira antes de continuar.')
-    const scope = captureScope()
-    const walletId = currentWallet.id
+    const walletId = requireCurrentWallet()
+
     await removeWallet(walletId)
-    if (!isScopeCurrent(scope)) return
 
     const nextWallets = wallets.filter((item) => !sameId(item.id, walletId))
+
     setWallets(nextWallets)
+
     setCurrentWallet(resolveCurrentWallet(userId, nextWallets))
-  }, [captureScope, currentWallet, isScopeCurrent, userId, wallets])
+  }, [requireCurrentWallet, userId, wallets])
+
+  const listCurrentWalletMembers = useCallback(
+    ({ signal } = {}) => listWalletMembers(requireCurrentWallet(), { signal }),
+    [requireCurrentWallet],
+  )
+
+  const addCurrentWalletMember = useCallback(
+    (data) => addWalletMember(requireCurrentWallet(), data),
+    [requireCurrentWallet],
+  )
+
+  const updateCurrentWalletMemberRole = useCallback(
+    (memberUserId, role) =>
+      updateWalletMemberRole(requireCurrentWallet(), memberUserId, role),
+    [requireCurrentWallet],
+  )
+
+  const removeCurrentWalletMember = useCallback(
+    (memberUserId) => removeWalletMember(requireCurrentWallet(), memberUserId),
+    [requireCurrentWallet],
+  )
 
   return {
     wallets,
@@ -154,5 +226,9 @@ export function useWallets() {
     createWallet: createCurrentWallet,
     updateWallet: updateCurrentWallet,
     removeWallet: removeCurrentWallet,
+    listWalletMembers: listCurrentWalletMembers,
+    addWalletMember: addCurrentWalletMember,
+    updateWalletMemberRole: updateCurrentWalletMemberRole,
+    removeWalletMember: removeCurrentWalletMember,
   }
 }
