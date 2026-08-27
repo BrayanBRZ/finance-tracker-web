@@ -8,44 +8,61 @@ import { TransactionForm } from '@/components/transactions/TransactionForm'
 import { TransactionList } from '@/components/transactions/TransactionList'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { WalletScope } from '@/components/wallets/WalletScope'
 import { FINANCIAL_TYPE_OPTIONS } from '@/domain/financialTypes'
 import { useTransactionsPage } from '@/hooks/transaction/useTransactionsPage'
 
+const ALL_TYPES_VALUE = '__all_types__'
+const ALL_CATEGORIES_VALUE = '__all_categories__'
+
 function TransactionFilters({ categories, filters, onChange, onReset }) {
   return (
     <div className="border-border bg-card grid gap-3 rounded-(--radius) border p-4 md:grid-cols-4">
-      <select
-        className="border-input bg-background h-10 rounded-(--radius) border px-3 text-sm"
-        value={filters.type ?? ''}
-        onChange={(event) => onChange('type', event.target.value)}
-        aria-label="Filtrar por tipo"
-      >
-        <option value="">Todos os tipos</option>
-        {FINANCIAL_TYPE_OPTIONS.map((type) => (
-          <option key={type.value} value={type.value}>
-            {type.label}
-          </option>
-        ))}
-      </select>
-      <select
-        className="border-input bg-background h-10 rounded-(--radius) border px-3 text-sm"
-        value={filters.categoryId ?? ''}
-        onChange={(event) =>
-          onChange(
-            'categoryId',
-            event.target.value ? Number(event.target.value) : null,
-          )
+      <Select
+        value={filters.type ?? ALL_TYPES_VALUE}
+        onValueChange={(value) =>
+          onChange('type', value === ALL_TYPES_VALUE ? null : value)
         }
-        aria-label="Filtrar por categoria"
       >
-        <option value="">Todas as categorias</option>
-        {categories.map((category) => (
-          <option key={category.id} value={category.id}>
-            {category.name}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger aria-label="Filtrar por tipo">
+          <SelectValue placeholder="Todos os tipos" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ALL_TYPES_VALUE}>Todos os tipos</SelectItem>
+          {FINANCIAL_TYPE_OPTIONS.map((type) => (
+            <SelectItem key={type.value} value={type.value}>
+              {type.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Select
+        value={filters.categoryId ?? ALL_CATEGORIES_VALUE}
+        onValueChange={(value) =>
+          onChange('categoryId', value === ALL_CATEGORIES_VALUE ? null : value)
+        }
+      >
+        <SelectTrigger aria-label="Filtrar por categoria">
+          <SelectValue placeholder="Todas as categorias" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ALL_CATEGORIES_VALUE}>
+            Todas as categorias
+          </SelectItem>
+          {categories.map((category) => (
+            <SelectItem key={category.id} value={category.id}>
+              {category.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <Input
         type="date"
         value={filters.startDate ?? ''}

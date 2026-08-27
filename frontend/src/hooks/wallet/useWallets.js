@@ -22,7 +22,7 @@ const getErrorMessage = (error) =>
     ? error.message
     : 'Não foi possível carregar as carteiras.'
 
-const sameId = (left, right) => Number(left) === Number(right)
+const sameId = (left, right) => left === right
 
 const resolveCurrentWallet = (userId, wallets) => {
   if (wallets.length === 0) {

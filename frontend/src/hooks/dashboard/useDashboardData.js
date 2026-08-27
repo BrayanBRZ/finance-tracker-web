@@ -36,7 +36,13 @@ export function useDashboardData() {
       try {
         const [nextSummary, recentPage] = await Promise.all([
           getWalletSummary({ walletId, signal }),
-          listTransactions({ walletId, page: 0, size: 5, sort: 'date,desc', signal }),
+          listTransactions({
+            walletId,
+            page: 0,
+            size: 5,
+            sort: 'date,desc',
+            signal,
+          }),
         ])
         setSummary(nextSummary)
         setRecentTransactions(recentPage.content)
@@ -44,7 +50,11 @@ export function useDashboardData() {
         if (isAbortError(error)) return
         setSummary(emptySummary)
         setRecentTransactions([])
-        setErrorMessage(error instanceof Error ? error.message : 'Não foi possível carregar o dashboard.')
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível carregar o dashboard.',
+        )
       } finally {
         if (!signal?.aborted) setIsLoading(false)
       }
@@ -62,5 +72,11 @@ export function useDashboardData() {
     return () => controller.abort()
   }, [refreshDashboard])
 
-  return { ...summary, recentTransactions, isLoading, errorMessage, refreshDashboard }
+  return {
+    ...summary,
+    recentTransactions,
+    isLoading,
+    errorMessage,
+    refreshDashboard,
+  }
 }

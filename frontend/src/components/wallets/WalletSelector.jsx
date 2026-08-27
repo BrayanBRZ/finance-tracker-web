@@ -44,7 +44,7 @@ export function WalletSelector() {
       </Select>
 
       {errorMessage ? (
-        <p id="wallet-selector-error" className="mt-1 text-xs text-destructive">
+        <p id="wallet-selector-error" className="text-destructive mt-1 text-xs">
           {errorMessage}
         </p>
       ) : null}

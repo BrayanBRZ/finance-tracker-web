@@ -1,4 +1,5 @@
 import { Pencil, Trash2 } from 'lucide-react'
+import { CategoryTypeBadge } from '@/components/categories/CategoryTypeBadge'
 import { Button } from '@/components/ui/button'
 import { CategoryIndicator } from '@/components/categories/CategoryIndicator'
 import { CollectionCard } from '@/components/collections/CollectionCard'
@@ -22,10 +23,16 @@ export function TransactionList({
       header: 'Descrição',
       cellClassName: 'min-w-48',
       render: (transaction) => (
-        <span className="font-medium text-foreground">
+        <span className="text-foreground font-medium">
           {transaction.description}
         </span>
       ),
+    },
+    {
+      key: 'type',
+      header: 'Tipo',
+      cellClassName: 'whitespace-nowrap',
+      render: (transaction) => <CategoryTypeBadge type={transaction.type} />,
     },
     {
       key: 'category',
@@ -96,7 +103,7 @@ export function TransactionList({
         getItemKey={(transaction) => transaction.id}
         emptyMessage="Ainda não há transações nesta carteira."
         className="min-w-0"
-        tableClassName="min-w-180"
+        tableClassName="min-w-200"
       />
       <Pagination
         page={page}

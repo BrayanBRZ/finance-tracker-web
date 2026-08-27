@@ -15,7 +15,10 @@ export function useCategoriesPage() {
     try {
       if (editingCategory) {
         await categoriesState.updateCategory(editingCategory.id, categoryData)
-        toast({ message: 'Categoria atualizada com sucesso.', variant: 'success' })
+        toast({
+          message: 'Categoria atualizada com sucesso.',
+          variant: 'success',
+        })
         setEditingCategory(null)
         setIsFormOpen(false)
         return

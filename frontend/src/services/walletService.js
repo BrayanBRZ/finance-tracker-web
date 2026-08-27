@@ -3,7 +3,8 @@ import { apiRequest } from '@/services/api/client'
 export const createWallet = (data) =>
   apiRequest('/wallets', { method: 'POST', body: data })
 
-export const listWallets = ({ signal } = {}) => apiRequest('/wallets', { signal })
+export const listWallets = ({ signal } = {}) =>
+  apiRequest('/wallets', { signal })
 
 export const updateWallet = (walletId, data) =>
   apiRequest(`/wallets/${walletId}`, { method: 'PUT', body: data })

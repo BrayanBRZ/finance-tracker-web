@@ -24,22 +24,22 @@ export function RecentTransactions({ transactions }) {
                 <span
                   className={
                     transaction.type === 'INCOME'
-                      ? 'size-1.5 rounded-full bg-primary'
-                      : 'size-1.5 rounded-full bg-destructive'
+                      ? 'bg-primary size-1.5 rounded-full'
+                      : 'bg-destructive size-1.5 rounded-full'
                   }
                   aria-hidden="true"
                 />
-                <p className="truncate text-sm font-medium text-foreground">
+                <p className="text-foreground truncate text-sm font-medium">
                   {transaction.description}
                 </p>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-xs">
                 {transaction.category?.name ?? 'Sem categoria'} ·{' '}
                 {formatLocalDate(transaction.date)}
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <span className="text-sm font-medium text-foreground">
+              <span className="text-foreground text-sm font-medium">
                 {formatCurrency(transaction.amount)}
               </span>
               <CategoryTypeBadge type={transaction.type} />

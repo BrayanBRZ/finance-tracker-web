@@ -61,7 +61,11 @@ function CategoriesContent() {
         open={isFormOpen}
         onOpenChange={handleFormOpenChange}
         title={editingCategory ? 'Editar categoria' : 'Nova categoria'}
-        description="Categorias são pessoais e podem classificar lançamentos das suas carteiras."
+        description={
+          editingCategory
+            ? 'Ao mudar o tipo, as transações vinculadas ficarão sem categoria.'
+            : 'Categorias são pessoais e podem classificar lançamentos das suas carteiras.'
+        }
       >
         <CategoryForm
           appearanceOptions={appearanceOptions}
@@ -74,7 +78,7 @@ function CategoriesContent() {
         open={Boolean(deletingCategory)}
         onOpenChange={handleDeleteOpenChange}
         title="Excluir categoria"
-        description={`A categoria “${deletingCategory?.name ?? ''}” será removida permanentemente.`}
+        description={`A categoria “${deletingCategory?.name ?? ''}” será removida permanentemente. As transações vinculadas permanecerão sem categoria.`}
         confirmLabel="Excluir categoria"
         isPending={isDeletePending}
         onConfirm={confirmDeleteCategory}

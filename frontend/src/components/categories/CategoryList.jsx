@@ -26,7 +26,7 @@ function CategoryItem({ category, canManage, onEdit, onRemove }) {
     <div className="flex min-w-0 items-center justify-between gap-3 px-1">
       <CategoryIndicator
         category={category}
-        className="min-w-0 font-medium text-card-foreground"
+        className="text-card-foreground min-w-0 font-medium"
       />
       <div className="flex shrink-0 items-center gap-2">
         {canManage ? (
@@ -78,7 +78,7 @@ function CategorySection({ section, categories, canManage, onEdit, onRemove }) {
         emptyMessage={section.emptyMessage}
         compact
         scrollable
-        className="h-full px-2 ring-1 ring-border"
+        className="ring-border h-full px-2 ring-1"
       />
     </CollectionCard>
   )

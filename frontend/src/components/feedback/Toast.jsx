@@ -52,7 +52,7 @@ export function Toast({
       role={selectedVariant.role}
       aria-live={variant === 'error' ? 'assertive' : 'polite'}
       className={cn(
-        'fixed right-6 bottom-6 z-50 flex max-w-sm items-center gap-3 rounded-(--radius) border border-border bg-card px-4 py-3 shadow-lg transition-all duration-350 ease-in-out',
+        'border-border bg-card fixed right-6 bottom-6 z-50 flex max-w-sm items-center gap-3 rounded-(--radius) border px-4 py-3 shadow-lg transition-all duration-350 ease-in-out',
         visible ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0',
       )}
     >
@@ -60,14 +60,14 @@ export function Toast({
         size={20}
         className={cn('shrink-0', selectedVariant.iconClassName)}
       />
-      <p className="flex-1 text-sm font-medium text-card-foreground">
+      <p className="text-card-foreground flex-1 text-sm font-medium">
         {message}
       </p>
       <button
         type="button"
         onClick={dismiss}
         aria-label="Fechar notificação"
-        className="ml-1 shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+        className="text-muted-foreground hover:text-foreground ml-1 shrink-0 cursor-pointer transition-colors"
       >
         <X size={15} />
       </button>

@@ -16,7 +16,8 @@ const formContent = {
   },
   create: {
     title: 'Nova carteira',
-    description: 'Carteiras separam seus dados financeiros e definem permissões.',
+    description:
+      'Carteiras separam seus dados financeiros e definem permissões.',
   },
 }
 

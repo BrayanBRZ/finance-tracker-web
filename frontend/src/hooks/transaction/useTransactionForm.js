@@ -14,7 +14,9 @@ export function useTransactionForm({ categories, transaction, onSubmit }) {
     resolver: zodResolver(transactionSchema),
     mode: 'onTouched',
     values: {
-      categoryId: transaction?.category?.id ? String(transaction.category.id) : NO_CATEGORY_VALUE,
+      categoryId: transaction?.category?.id
+        ? transaction.category.id
+        : NO_CATEGORY_VALUE,
       type: transaction?.type ?? FINANCIAL_TYPES.EXPENSE,
       description: transaction?.description ?? '',
       amount: transaction?.amount ?? '',
@@ -27,7 +29,7 @@ export function useTransactionForm({ categories, transaction, onSubmit }) {
       { value: NO_CATEGORY_VALUE, label: 'Sem categoria' },
       ...categories
         .filter((category) => category.type === selectedType)
-        .map((category) => ({ value: String(category.id), label: category.name })),
+        .map((category) => ({ value: category.id, label: category.name })),
     ],
     [categories, selectedType],
   )
@@ -35,10 +37,13 @@ export function useTransactionForm({ categories, transaction, onSubmit }) {
   const onTypeChange = (field, nextType) => {
     field.onChange(nextType)
     const selectedCategory = categories.find(
-      (category) => String(category.id) === form.getValues('categoryId'),
+      (category) => category.id === form.getValues('categoryId'),
     )
     if (selectedCategory && selectedCategory.type !== nextType) {
-      form.setValue('categoryId', NO_CATEGORY_VALUE, { shouldDirty: true, shouldValidate: true })
+      form.setValue('categoryId', NO_CATEGORY_VALUE, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
     }
   }
 
@@ -48,7 +53,8 @@ export function useTransactionForm({ categories, transaction, onSubmit }) {
       await onSubmit({
         ...data,
         description: data.description || null,
-        categoryId: data.categoryId === NO_CATEGORY_VALUE ? null : Number(data.categoryId),
+        categoryId:
+          data.categoryId === NO_CATEGORY_VALUE ? null : data.categoryId,
       })
       if (!isEditing) form.reset()
     } catch (error) {

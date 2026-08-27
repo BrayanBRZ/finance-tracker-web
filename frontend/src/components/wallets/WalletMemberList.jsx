@@ -27,10 +27,10 @@ export function WalletMemberList({
       cellClassName: 'min-w-56',
       render: (member) => (
         <div>
-          <p className="font-medium text-foreground">
+          <p className="text-foreground font-medium">
             {member.user?.name ?? 'Usuário indisponível'}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             {member.user?.email ?? 'E-mail indisponível'}
           </p>
         </div>
@@ -63,7 +63,7 @@ export function WalletMemberList({
             </SelectContent>
           </Select>
         ) : (
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="text-muted-foreground text-sm font-medium">
             {WALLET_MEMBER_ROLE_LABELS[member.role]}
           </span>
         )
