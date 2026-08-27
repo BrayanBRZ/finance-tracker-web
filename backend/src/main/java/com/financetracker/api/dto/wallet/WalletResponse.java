@@ -2,14 +2,15 @@ package com.financetracker.api.dto.wallet;
 
 import com.financetracker.api.dto.user.UserSummaryResponse;
 import com.financetracker.api.enums.WalletRole;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.UUID;
 
 public record WalletResponse(
-    Long id,
+    UUID id,
     String name,
     String description,
     UserSummaryResponse owner,
     WalletRole currentUserRole,
-    LocalDateTime createdAt
+    Instant createdAt
 ) {
 }

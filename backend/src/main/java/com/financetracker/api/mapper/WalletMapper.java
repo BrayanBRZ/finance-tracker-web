@@ -12,7 +12,7 @@ public final class WalletMapper {
 
     public static WalletResponse toResponse(Wallet wallet, WalletRole currentUserRole) {
         return new WalletResponse(
-                wallet.getId(),
+                wallet.getUuid(),
                 wallet.getName(),
                 wallet.getDescription(),
                 UserMapper.toSummary(wallet.getOwner()),
@@ -22,9 +22,9 @@ public final class WalletMapper {
 
     public static WalletMemberResponse toMemberResponse(WalletMember member) {
         return new WalletMemberResponse(
-                member.getId(),
+                member.getUuid(),
                 UserMapper.toSummary(member.getUser()),
                 member.getRole(),
-                member.getJoinedAt());
+                member.getCreatedAt());
     }
 }

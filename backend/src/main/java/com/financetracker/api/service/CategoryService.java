@@ -1,6 +1,7 @@
 package com.financetracker.api.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.financetracker.api.dto.category.CategoryRequest;
 import com.financetracker.api.dto.category.CategoryResponse;
 import com.financetracker.api.entity.Category;
+import com.financetracker.api.entity.Transaction;
 import com.financetracker.api.enums.TransactionType;
 import com.financetracker.api.exception.ApiException;
 import com.financetracker.api.mapper.CategoryMapper;
@@ -51,25 +53,30 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryResponse update(Long userId, Long categoryId, CategoryRequest request) {
+    public CategoryResponse update(Long userId, UUID categoryId, CategoryRequest request) {
         Category category = requireCategory(categoryId, userId);
+        if (category.getType() != request.type()) {
+            clearCategoryFromTransactions(category.getId());
+        }
         category.update(request.name().trim(), request.type(), request.color(), request.icon());
         return CategoryMapper.toResponse(category);
     }
 
     @Transactional
-    public void delete(Long userId, Long categoryId) {
+    public void delete(Long userId, UUID categoryId) {
         Category category = requireCategory(categoryId, userId);
-        if (transactionRepository.existsByCategoryId(categoryId)) {
-            throw new ApiException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    "Não é possível excluir uma categoria com transações vinculadas");
-        }
+        clearCategoryFromTransactions(category.getId());
         categoryRepository.delete(category);
     }
 
-    private Category requireCategory(Long categoryId, Long userId) {
-        return categoryRepository.findByIdAndUserId(categoryId, userId)
+    private void clearCategoryFromTransactions(Long categoryId) {
+        List<Transaction> transactions = transactionRepository.findAllByCategoryId(categoryId);
+        transactions.forEach(Transaction::clearCategory);
+        transactionRepository.flush();
+    }
+
+    private Category requireCategory(UUID categoryId, Long userId) {
+        return categoryRepository.findByUuidAndUserId(categoryId, userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Categoria não encontrada"));
     }
 }

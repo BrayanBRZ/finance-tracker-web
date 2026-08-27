@@ -1,6 +1,7 @@
 package com.financetracker.api.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,13 +51,13 @@ public class WalletService {
     }
 
     @Transactional(readOnly = true)
-    public WalletResponse get(Long userId, Long walletId) {
+    public WalletResponse get(Long userId, UUID walletId) {
         WalletMember member = walletAccess.requireMember(walletId, userId);
         return WalletMapper.toResponse(member.getWallet(), member.getRole());
     }
 
     @Transactional
-    public WalletResponse update(Long userId, Long walletId, WalletRequest request) {
+    public WalletResponse update(Long userId, UUID walletId, WalletRequest request) {
         WalletMember owner = walletAccess.requireOwner(walletId, userId);
         Wallet wallet = owner.getWallet();
         wallet.update(request.name().trim(), request.description());
@@ -64,7 +65,7 @@ public class WalletService {
     }
 
     @Transactional
-    public void delete(Long userId, Long walletId) {
+    public void delete(Long userId, UUID walletId) {
         WalletMember owner = walletAccess.requireOwner(walletId, userId);
         walletRepository.delete(owner.getWallet());
     }

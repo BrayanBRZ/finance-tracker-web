@@ -1,6 +1,7 @@
 package com.financetracker.api.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,16 +59,16 @@ public class CategoryController {
     @Operation(summary = "Atualiza uma categoria")
     CategoryResponse update(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("categoryId") Long categoryId,
+            @PathVariable("categoryId") UUID categoryId,
             @Valid @RequestBody CategoryRequest request) {
         return categoryService.update(user.id(), categoryId, request);
     }
 
     @DeleteMapping(Routes.Categories.BY_ID)
-    @Operation(summary = "Remove uma categoria sem transacoes vinculadas")
+    @Operation(summary = "Remove uma categoria e desvincula suas transacoes")
     ResponseEntity<Void> delete(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("categoryId") Long categoryId) {
+            @PathVariable("categoryId") UUID categoryId) {
         categoryService.delete(user.id(), categoryId);
         return ResponseEntity.noContent().build();
     }

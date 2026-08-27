@@ -1,6 +1,7 @@
 package com.financetracker.api.service;
 
 import java.util.Locale;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,7 +44,7 @@ public class TransactionService {
     }
 
     @Transactional
-    public TransactionResponse create(Long userId, Long walletId, TransactionRequest request) {
+    public TransactionResponse create(Long userId, UUID walletId, TransactionRequest request) {
         WalletMember member = walletAccess.requireEditor(walletId, userId);
         Category category = resolveCategory(userId, request);
         Transaction transaction = transactionRepository.save(new Transaction(
@@ -58,12 +59,12 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<TransactionResponse> list(Long userId, Long walletId, TransactionFilter filter) {
-        walletAccess.requireMember(walletId, userId);
+    public PageResponse<TransactionResponse> list(Long userId, UUID walletId, TransactionFilter filter) {
+        WalletMember member = walletAccess.requireMember(walletId, userId);
         DateRangeValidator.validate(filter.startDate(), filter.endDate());
 
         Page<Transaction> page = transactionRepository.findAll(
-                TransactionSpecifications.byWalletAndFilter(walletId, filter),
+                TransactionSpecifications.byWalletAndFilter(member.getWallet().getId(), filter),
                 PageRequest.of(page(filter), size(filter), sort(filter)));
 
         return new PageResponse<>(
@@ -75,15 +76,15 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = true)
-    public TransactionResponse get(Long userId, Long walletId, Long transactionId) {
-        walletAccess.requireMember(walletId, userId);
-        return TransactionMapper.toResponse(requireTransaction(walletId, transactionId));
+    public TransactionResponse get(Long userId, UUID walletId, UUID transactionId) {
+        WalletMember member = walletAccess.requireMember(walletId, userId);
+        return TransactionMapper.toResponse(requireTransaction(member.getWallet().getId(), transactionId));
     }
 
     @Transactional
-    public TransactionResponse update(Long userId, Long walletId, Long transactionId, TransactionRequest request) {
-        walletAccess.requireEditor(walletId, userId);
-        Transaction transaction = requireTransaction(walletId, transactionId);
+    public TransactionResponse update(Long userId, UUID walletId, UUID transactionId, TransactionRequest request) {
+        WalletMember member = walletAccess.requireEditor(walletId, userId);
+        Transaction transaction = requireTransaction(member.getWallet().getId(), transactionId);
         Category category = resolveCategory(userId, request);
         transaction.update(
                 category,
@@ -95,13 +96,13 @@ public class TransactionService {
     }
 
     @Transactional
-    public void delete(Long userId, Long walletId, Long transactionId) {
-        walletAccess.requireEditor(walletId, userId);
-        transactionRepository.delete(requireTransaction(walletId, transactionId));
+    public void delete(Long userId, UUID walletId, UUID transactionId) {
+        WalletMember member = walletAccess.requireEditor(walletId, userId);
+        transactionRepository.delete(requireTransaction(member.getWallet().getId(), transactionId));
     }
 
-    private Transaction requireTransaction(Long walletId, Long transactionId) {
-        return transactionRepository.findByIdAndWalletId(transactionId, walletId)
+    private Transaction requireTransaction(Long internalWalletId, UUID transactionId) {
+        return transactionRepository.findByUuidAndWalletId(transactionId, internalWalletId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Transação não encontrada"));
     }
 
@@ -110,7 +111,7 @@ public class TransactionService {
             return null;
         }
 
-        Category category = categoryRepository.findByIdAndUserId(request.categoryId(), userId)
+        Category category = categoryRepository.findByUuidAndUserId(request.categoryId(), userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Categoria não encontrada"));
         if (category.getType() != request.type()) {
             throw new ApiException(

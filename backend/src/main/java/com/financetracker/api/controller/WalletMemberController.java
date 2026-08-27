@@ -1,6 +1,7 @@
 package com.financetracker.api.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class WalletMemberController {
     @Operation(summary = "Adiciona um membro a carteira")
     ResponseEntity<WalletMemberResponse> add(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
+            @PathVariable("walletId") UUID walletId,
             @Valid @RequestBody WalletMemberRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(walletMemberService.add(user.id(), walletId, request));
     }
@@ -50,7 +51,7 @@ public class WalletMemberController {
     @Operation(summary = "Lista os membros da carteira")
     List<WalletMemberResponse> list(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId) {
+            @PathVariable("walletId") UUID walletId) {
         return walletMemberService.list(user.id(), walletId);
     }
 
@@ -58,8 +59,8 @@ public class WalletMemberController {
     @Operation(summary = "Altera o papel de um membro")
     WalletMemberResponse updateRole(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
-            @PathVariable("userId") Long memberUserId,
+            @PathVariable("walletId") UUID walletId,
+            @PathVariable("userId") UUID memberUserId,
             @Valid @RequestBody UpdateWalletMemberRoleRequest request) {
         return walletMemberService.updateRole(user.id(), walletId, memberUserId, request);
     }
@@ -68,8 +69,8 @@ public class WalletMemberController {
     @Operation(summary = "Remove um membro da carteira")
     ResponseEntity<Void> remove(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
-            @PathVariable("userId") Long memberUserId) {
+            @PathVariable("walletId") UUID walletId,
+            @PathVariable("userId") UUID memberUserId) {
         walletMemberService.remove(user.id(), walletId, memberUserId);
         return ResponseEntity.noContent().build();
     }

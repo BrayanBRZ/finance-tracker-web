@@ -9,8 +9,8 @@ public final class TransactionMapper {
 
     public static TransactionResponse toResponse(Transaction transaction) {
         return new TransactionResponse(
-                transaction.getId(),
-                transaction.getWallet().getId(),
+                transaction.getUuid(),
+                transaction.getWallet().getUuid(),
                 transaction.getCategory() == null ? null : CategoryMapper.toResponse(transaction.getCategory()),
                 UserMapper.toSummary(transaction.getCreatedBy()),
                 transaction.getType(),

@@ -23,7 +23,7 @@ public final class TransactionSpecifications {
                         predicates.add(builder.equal(root.get("type"), filter.type()));
                     }
                     if (filter.categoryId() != null) {
-                        predicates.add(builder.equal(root.get("category").get("id"), filter.categoryId()));
+                        predicates.add(builder.equal(root.get("category").get("uuid"), filter.categoryId()));
                     }
                     return builder.and(predicates.toArray(Predicate[]::new));
                 });

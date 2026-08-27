@@ -1,12 +1,13 @@
 package com.financetracker.api.dto.user;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.UUID;
 
 public record UserResponse(
-    Long id,
+    UUID id,
     String name,
     String email,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    Instant createdAt,
+    Instant updatedAt
 ) {
 }

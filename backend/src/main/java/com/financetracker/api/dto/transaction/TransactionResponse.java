@@ -4,18 +4,19 @@ import com.financetracker.api.dto.category.CategoryResponse;
 import com.financetracker.api.dto.user.UserSummaryResponse;
 import com.financetracker.api.enums.TransactionType;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record TransactionResponse(
-    Long id,
-    Long walletId,
+    UUID id,
+    UUID walletId,
     CategoryResponse category,
     UserSummaryResponse createdBy,
     TransactionType type,
     BigDecimal amount,
     String description,
     LocalDate date,
-    LocalDateTime createdAt
+    Instant createdAt
 ) {
 }

@@ -1,6 +1,7 @@
 package com.financetracker.api.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +55,7 @@ public class WalletController {
     @Operation(summary = "Detalha uma carteira")
     WalletResponse get(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId) {
+            @PathVariable("walletId") UUID walletId) {
         return walletService.get(user.id(), walletId);
     }
 
@@ -62,7 +63,7 @@ public class WalletController {
     @Operation(summary = "Atualiza uma carteira como proprietario")
     WalletResponse update(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
+            @PathVariable("walletId") UUID walletId,
             @Valid @RequestBody WalletRequest request) {
         return walletService.update(user.id(), walletId, request);
     }
@@ -71,7 +72,7 @@ public class WalletController {
     @Operation(summary = "Remove uma carteira como proprietario")
     ResponseEntity<Void> delete(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId) {
+            @PathVariable("walletId") UUID walletId) {
         walletService.delete(user.id(), walletId);
         return ResponseEntity.noContent().build();
     }

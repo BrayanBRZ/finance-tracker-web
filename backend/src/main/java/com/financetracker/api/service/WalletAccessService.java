@@ -1,5 +1,7 @@
 package com.financetracker.api.service;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,14 +26,14 @@ public class WalletAccessService {
     }
 
     @Transactional(readOnly = true)
-    public WalletMember requireMember(Long walletId, Long userId) {
-        requireWallet(walletId);
-        return walletMemberRepository.findByWalletIdAndUserId(walletId, userId)
+    public WalletMember requireMember(UUID walletId, Long userId) {
+        Wallet wallet = requireWallet(walletId);
+        return walletMemberRepository.findByWalletIdAndUserId(wallet.getId(), userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.FORBIDDEN, "Você não possui acesso a esta carteira"));
     }
 
     @Transactional(readOnly = true)
-    public WalletMember requireOwner(Long walletId, Long userId) {
+    public WalletMember requireOwner(UUID walletId, Long userId) {
         WalletMember member = requireMember(walletId, userId);
         if (member.getRole() != WalletRole.OWNER) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Apenas o proprietário pode alterar esta carteira");
@@ -40,7 +42,7 @@ public class WalletAccessService {
     }
 
     @Transactional(readOnly = true)
-    public WalletMember requireEditor(Long walletId, Long userId) {
+    public WalletMember requireEditor(UUID walletId, Long userId) {
         WalletMember member = requireMember(walletId, userId);
         if (member.getRole() == WalletRole.VIEWER) {
             throw new ApiException(HttpStatus.FORBIDDEN, "Você não possui permissão para alterar esta carteira");
@@ -49,8 +51,8 @@ public class WalletAccessService {
     }
 
     @Transactional(readOnly = true)
-    public Wallet requireWallet(Long walletId) {
-        return walletRepository.findById(walletId)
+    public Wallet requireWallet(UUID walletId) {
+        return walletRepository.findByUuid(walletId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Carteira não encontrada"));
     }
 }

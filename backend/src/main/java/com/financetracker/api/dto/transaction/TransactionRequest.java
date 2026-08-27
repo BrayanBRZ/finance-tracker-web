@@ -7,12 +7,13 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record TransactionRequest(
     @NotNull(message = "Tipo é obrigatório") TransactionType type,
     @NotNull(message = "Valor é obrigatório") @DecimalMin(value = "0.01", message = "Valor deve ser maior que zero") BigDecimal amount,
     @Size(max = 500, message = "Descrição deve ter no máximo 500 caracteres") String description,
     @NotNull(message = "Data é obrigatória") @PastOrPresent(message = "Data não pode estar no futuro") LocalDate date,
-    Long categoryId
+    UUID categoryId
 ) {
 }

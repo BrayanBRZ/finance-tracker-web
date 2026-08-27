@@ -2,7 +2,6 @@ package com.financetracker.api.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import com.financetracker.api.enums.TransactionType;
 
@@ -11,23 +10,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 
 @Entity
 @Table(name = "transactions")
 @Getter
-public class Transaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class Transaction extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
@@ -52,9 +43,6 @@ public class Transaction {
 
     @Column(name = "transaction_date", nullable = false)
     private LocalDate transactionDate;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 
     protected Transaction() {
     }
@@ -89,8 +77,7 @@ public class Transaction {
         this.transactionDate = transactionDate;
     }
 
-    @PrePersist
-    void onCreate() {
-        createdAt = LocalDateTime.now();
+    public void clearCategory() {
+        this.category = null;
     }
 }

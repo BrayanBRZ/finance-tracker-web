@@ -9,7 +9,7 @@ public final class CategoryMapper {
 
     public static CategoryResponse toResponse(Category category) {
         return new CategoryResponse(
-                category.getId(),
+                category.getUuid(),
                 category.getName(),
                 category.getType(),
                 category.getColor(),

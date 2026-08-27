@@ -1,6 +1,7 @@
 package com.financetracker.api.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,12 +35,12 @@ public class WalletMemberService {
     }
 
     @Transactional
-    public WalletMemberResponse add(Long requesterId, Long walletId, WalletMemberRequest request) {
+    public WalletMemberResponse add(Long requesterId, UUID walletId, WalletMemberRequest request) {
         Wallet wallet = walletAccess.requireOwner(walletId, requesterId).getWallet();
         rejectOwnerRole(request.role());
 
         User user = userAccessService.requireUserByEmail(EmailNormalizer.normalize(request.email()));
-        if (walletMemberRepository.existsByWalletIdAndUserId(walletId, user.getId())) {
+        if (walletMemberRepository.existsByWalletIdAndUserId(wallet.getId(), user.getId())) {
             throw new ApiException(HttpStatus.CONFLICT, "Este usuário já é membro da carteira");
         }
 
@@ -48,9 +49,9 @@ public class WalletMemberService {
     }
 
     @Transactional(readOnly = true)
-    public List<WalletMemberResponse> list(Long requesterId, Long walletId) {
-        walletAccess.requireMember(walletId, requesterId);
-        return walletMemberRepository.findAllByWalletIdWithUserOrderByJoinedAtAsc(walletId).stream()
+    public List<WalletMemberResponse> list(Long requesterId, UUID walletId) {
+        Wallet wallet = walletAccess.requireMember(walletId, requesterId).getWallet();
+        return walletMemberRepository.findAllByWalletIdWithUserOrderByCreatedAtAsc(wallet.getId()).stream()
                 .map(WalletMapper::toMemberResponse)
                 .toList();
     }
@@ -58,27 +59,27 @@ public class WalletMemberService {
     @Transactional
     public WalletMemberResponse updateRole(
             Long requesterId,
-            Long walletId,
-            Long memberUserId,
+            UUID walletId,
+            UUID memberUserId,
             UpdateWalletMemberRoleRequest request) {
-        walletAccess.requireOwner(walletId, requesterId);
+        Wallet wallet = walletAccess.requireOwner(walletId, requesterId).getWallet();
         rejectOwnerRole(request.role());
-        WalletMember member = requireMember(walletId, memberUserId);
+        WalletMember member = requireMember(wallet.getId(), memberUserId);
         rejectOwnerMember(member);
         member.changeRole(request.role());
         return WalletMapper.toMemberResponse(member);
     }
 
     @Transactional
-    public void remove(Long requesterId, Long walletId, Long memberUserId) {
-        walletAccess.requireOwner(walletId, requesterId);
-        WalletMember member = requireMember(walletId, memberUserId);
+    public void remove(Long requesterId, UUID walletId, UUID memberUserId) {
+        Wallet wallet = walletAccess.requireOwner(walletId, requesterId).getWallet();
+        WalletMember member = requireMember(wallet.getId(), memberUserId);
         rejectOwnerMember(member);
         walletMemberRepository.delete(member);
     }
 
-    private WalletMember requireMember(Long walletId, Long userId) {
-        return walletMemberRepository.findByWalletIdAndUserId(walletId, userId)
+    private WalletMember requireMember(Long internalWalletId, UUID userId) {
+        return walletMemberRepository.findByWalletIdAndUserUuid(internalWalletId, userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Membro da carteira não encontrado"));
     }
 

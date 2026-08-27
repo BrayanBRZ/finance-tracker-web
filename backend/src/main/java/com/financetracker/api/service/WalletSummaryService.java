@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,12 +32,12 @@ public class WalletSummaryService {
     }
 
     @Transactional(readOnly = true)
-    public WalletSummaryResponse get(Long userId, Long walletId, LocalDate startDate, LocalDate endDate) {
-        walletAccess.requireMember(walletId, userId);
+    public WalletSummaryResponse get(Long userId, UUID walletId, LocalDate startDate, LocalDate endDate) {
+        Long internalWalletId = walletAccess.requireMember(walletId, userId).getWallet().getId();
         DateRangeValidator.validate(startDate, endDate);
 
         List<Transaction> entries = transactionRepository.findAll(
-                TransactionSpecifications.byWalletAndPeriod(walletId, startDate, endDate));
+                TransactionSpecifications.byWalletAndPeriod(internalWalletId, startDate, endDate));
         BigDecimal totalIncome = totalByType(entries, TransactionType.INCOME);
         BigDecimal totalExpense = totalByType(entries, TransactionType.EXPENSE);
 
@@ -57,12 +58,12 @@ public class WalletSummaryService {
     }
 
     private List<CategoryTotalResponse> byCategory(List<Transaction> entries) {
-        Map<Long, CategoryAmounts> totals = new LinkedHashMap<>();
+        Map<UUID, CategoryAmounts> totals = new LinkedHashMap<>();
         for (Transaction entry : entries) {
             if (entry.getCategory() == null) {
                 continue;
             }
-            totals.compute(entry.getCategory().getId(), (id, current) -> current == null
+            totals.compute(entry.getCategory().getUuid(), (id, current) -> current == null
                     ? new CategoryAmounts(entry.getCategory().getName(), entry.getAmount())
                     : current.add(entry.getAmount()));
         }

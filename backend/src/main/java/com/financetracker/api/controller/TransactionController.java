@@ -1,5 +1,7 @@
 package com.financetracker.api.controller;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,7 +43,7 @@ public class TransactionController {
     @Operation(summary = "Cria uma transação na carteira")
     ResponseEntity<TransactionResponse> create(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
+            @PathVariable("walletId") UUID walletId,
             @Valid @RequestBody TransactionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.create(user.id(), walletId, request));
     }
@@ -50,7 +52,7 @@ public class TransactionController {
     @Operation(summary = "Lista transações da carteira com filtros e paginação")
     PageResponse<TransactionResponse> list(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
+            @PathVariable("walletId") UUID walletId,
             @Valid @ModelAttribute TransactionFilter filter) {
         return transactionService.list(user.id(), walletId, filter);
     }
@@ -59,8 +61,8 @@ public class TransactionController {
     @Operation(summary = "Detalha uma transação")
     TransactionResponse get(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
-            @PathVariable("transactionId") Long transactionId) {
+            @PathVariable("walletId") UUID walletId,
+            @PathVariable("transactionId") UUID transactionId) {
         return transactionService.get(user.id(), walletId, transactionId);
     }
 
@@ -68,8 +70,8 @@ public class TransactionController {
     @Operation(summary = "Atualiza uma transação")
     TransactionResponse update(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
-            @PathVariable("transactionId") Long transactionId,
+            @PathVariable("walletId") UUID walletId,
+            @PathVariable("transactionId") UUID transactionId,
             @Valid @RequestBody TransactionRequest request) {
         return transactionService.update(user.id(), walletId, transactionId, request);
     }
@@ -78,8 +80,8 @@ public class TransactionController {
     @Operation(summary = "Remove uma transação")
     ResponseEntity<Void> delete(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
-            @PathVariable("transactionId") Long transactionId) {
+            @PathVariable("walletId") UUID walletId,
+            @PathVariable("transactionId") UUID transactionId) {
         transactionService.delete(user.id(), walletId, transactionId);
         return ResponseEntity.noContent().build();
     }

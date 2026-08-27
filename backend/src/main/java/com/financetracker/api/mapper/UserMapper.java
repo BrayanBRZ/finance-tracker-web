@@ -10,7 +10,7 @@ public final class UserMapper {
 
     public static UserResponse toResponse(User user) {
         return new UserResponse(
-                user.getId(),
+                user.getUuid(),
                 user.getName(),
                 user.getEmail(),
                 user.getCreatedAt(),
@@ -18,6 +18,6 @@ public final class UserMapper {
     }
 
     public static UserSummaryResponse toSummary(User user) {
-        return new UserSummaryResponse(user.getId(), user.getName(), user.getEmail());
+        return new UserSummaryResponse(user.getUuid(), user.getName(), user.getEmail());
     }
 }

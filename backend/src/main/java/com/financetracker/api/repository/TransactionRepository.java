@@ -2,17 +2,17 @@ package com.financetracker.api.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.financetracker.api.entity.Transaction;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction> {
+public interface TransactionRepository extends BaseRepository<Transaction>, JpaSpecificationExecutor<Transaction> {
     @Override
     @EntityGraph(attributePaths = { "wallet", "category", "createdBy" })
     Page<Transaction> findAll(Specification<Transaction> specification, Pageable pageable);
@@ -21,7 +21,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @EntityGraph(attributePaths = "category")
     List<Transaction> findAll(Specification<Transaction> specification);
 
-    boolean existsByCategoryId(Long categoryId);
+    List<Transaction> findAllByCategoryId(Long categoryId);
 
-    Optional<Transaction> findByIdAndWalletId(Long id, Long walletId);
+    Optional<Transaction> findByUuidAndWalletId(UUID transactionId, Long walletId);
 }

@@ -2,12 +2,13 @@ package com.financetracker.api.dto.wallet;
 
 import com.financetracker.api.dto.user.UserSummaryResponse;
 import com.financetracker.api.enums.WalletRole;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.UUID;
 
 public record WalletMemberResponse(
-    Long id,
+    UUID id,
     UserSummaryResponse user,
     WalletRole role,
-    LocalDateTime joinedAt
+    Instant joinedAt
 ) {
 }

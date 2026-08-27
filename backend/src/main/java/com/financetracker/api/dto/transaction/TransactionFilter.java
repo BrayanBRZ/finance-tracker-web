@@ -4,10 +4,11 @@ import com.financetracker.api.enums.TransactionType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record TransactionFilter(
     TransactionType type,
-    Long categoryId,
+    UUID categoryId,
     LocalDate startDate,
     LocalDate endDate,
     @Min(value = 0, message = "Página deve ser maior ou igual a zero") Integer page,

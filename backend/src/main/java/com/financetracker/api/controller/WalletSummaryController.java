@@ -1,6 +1,7 @@
 package com.financetracker.api.controller;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,7 +35,7 @@ public class WalletSummaryController {
     @Operation(summary = "Retorna o resumo financeiro da carteira")
     WalletSummaryResponse get(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable("walletId") Long walletId,
+            @PathVariable("walletId") UUID walletId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return walletSummaryService.get(user.id(), walletId, startDate, endDate);
