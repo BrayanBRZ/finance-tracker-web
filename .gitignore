@@ -26,7 +26,6 @@ AGENTS.md
 graphify-out
 
 # Credentials
-application.properties
 application-secrets.properties
 
 # Editor directories and files

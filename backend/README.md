@@ -19,12 +19,20 @@ CREATE DATABASE finance;
 
 O Hibernate cria e atualiza as tabelas automaticamente em desenvolvimento por meio de `spring.jpa.hibernate.ddl-auto=update`.
 
+As entidades de negócio usam um `Long` apenas como chave técnica interna e expõem UUIDs na API. Como esta versão não inclui migração ou backfill para registros anteriores, recrie o schema ao atualizar uma instalação existente:
+
+```sql
+DROP DATABASE finance;
+CREATE DATABASE finance;
+```
+
+Essa operação remove todos os dados locais. Execute-a manualmente somente em um ambiente de desenvolvimento descartável. Depois da atualização, tokens JWT emitidos por versões anteriores deixam de ser válidos e os usuários precisam autenticar novamente.
+
 ## Configuração
 
-Copie os arquivos de exemplo para os nomes locais abaixo. Eles são ignorados pelo Git:
+Copie apenas o arquivo de segredos para o nome local abaixo. Ele é ignorado pelo Git:
 
 ```powershell
-Copy-Item .\src\main\resources\application-example.properties .\src\main\resources\application.properties
 Copy-Item .\src\main\resources\application-secrets-example.properties .\src\main\resources\application-secrets.properties
 ```
 
@@ -67,6 +75,8 @@ Authorization: Bearer <accessToken>
 ## Decisões de projeto
 
 - Controllers recebem e devolvem DTOs; regras e autorização por recurso ficam nos services.
+- IDs numéricos permanecem privados na persistência; rotas, DTOs e o `sub` do JWT usam UUIDs.
+- Identidade e timestamps UTC são compartilhados pelas entidades de negócio por meio de uma classe base mapeada pelo JPA.
 - Toda carteira possui um proprietário e uma associação de membro `OWNER`.
 - `OWNER` administra a carteira e os membros; `EDITOR` altera transações; `VIEWER` apenas consulta.
 - A recuperação de senha grava um token de uso único, válido por uma hora, e envia o link por e-mail.
