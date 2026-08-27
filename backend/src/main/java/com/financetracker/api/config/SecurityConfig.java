@@ -1,5 +1,6 @@
 package com.financetracker.api.config;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +23,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.financetracker.api.exception.ApiError;
 import com.financetracker.api.security.JwtAuthenticationFilter;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 public class SecurityConfig {
@@ -51,8 +55,7 @@ public class SecurityConfig {
                         ObjectMapper objectMapper) throws Exception {
                 return http
                                 .csrf(csrf -> csrf.disable())
-                                .cors(cors -> {
-                                })
+                                .cors(Customizer.withDefaults())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth.requestMatchers(
@@ -64,25 +67,25 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(errors -> errors
-                                                .authenticationEntryPoint((request, response, exception) -> {
-                                                        HttpStatus status = HttpStatus.UNAUTHORIZED;
-                                                        response.setStatus(status.value());
-                                                        response.setContentType("application/json");
-                                                        objectMapper.writeValue(response.getOutputStream(),
-                                                                        new ApiError(Instant.now(), status.value(),
-                                                                                        status.getReasonPhrase(),
-                                                                                        "Autenticação necessária",
-                                                                                        null));
-                                                }).accessDeniedHandler((request, response, exception) -> {
-                                                        HttpStatus status = HttpStatus.FORBIDDEN;
-                                                        response.setStatus(status.value());
-                                                        response.setContentType("application/json");
-                                                        objectMapper.writeValue(response.getOutputStream(),
-                                                                        new ApiError(Instant.now(), status.value(),
-                                                                                        status.getReasonPhrase(),
-                                                                                        "Acesso negado", null));
-                                                }))
+                                                .authenticationEntryPoint((request, response, exception) -> writeError(
+                                                                response, objectMapper, HttpStatus.UNAUTHORIZED,
+                                                                "Autenticação necessária"))
+                                                .accessDeniedHandler((request, response, exception) -> writeError(
+                                                                response, objectMapper, HttpStatus.FORBIDDEN,
+                                                                "Acesso negado")))
                                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                                 .build();
+        }
+
+        private void writeError(
+                        HttpServletResponse response,
+                        ObjectMapper objectMapper,
+                        HttpStatus status,
+                        String message) throws IOException {
+                response.setStatus(status.value());
+                response.setContentType("application/json");
+                objectMapper.writeValue(
+                                response.getOutputStream(),
+                                new ApiError(Instant.now(), status.value(), status.getReasonPhrase(), message, null));
         }
 }
