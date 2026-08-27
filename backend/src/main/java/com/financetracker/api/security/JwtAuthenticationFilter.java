@@ -1,6 +1,7 @@
 package com.financetracker.api.security;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.financetracker.api.repository.UserRepository;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,15 +41,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(7);
 
             try {
-                userRepository.findById(jwtService.extractUserId(token))
-                        .filter(user -> jwtService.isValid(token, user))
+                Claims claims = jwtService.parse(token);
+
+                userRepository.findByUuid(jwtService.extractUserUuid(claims))
+                        .filter(user -> jwtService.isValid(claims, user))
                         .ifPresent(user -> {
-                            AuthenticatedUser principal = AuthenticatedUser.from(user);
                             SecurityContextHolder.getContext().setAuthentication(
                                     new UsernamePasswordAuthenticationToken(
-                                            principal,
+                                            new AuthenticatedUser(user.getId()),
                                             null,
-                                            principal.getAuthorities()));
+                                            List.of()));
                         });
             } catch (JwtException | IllegalArgumentException ignored) {
                 SecurityContextHolder.clearContext();
