@@ -2,7 +2,7 @@ import { Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CategoryIndicator } from '@/components/categories/CategoryIndicator'
 import { CollectionCard } from '@/components/collections/CollectionCard'
-import { DataList } from '@/components/collections/DataList'
+import { DataTable } from '@/components/collections/DataTable'
 import { FINANCIAL_TYPES } from '@/domain/financialTypes'
 import { cn } from '@/lib/utils'
 
@@ -21,16 +21,26 @@ const categorySections = [
   },
 ]
 
-function CategoryItem({ category, canManage, onEdit, onRemove }) {
-  return (
-    <div className="flex min-w-0 items-center justify-between gap-3 px-1">
-      <CategoryIndicator
-        category={category}
-        className="text-card-foreground min-w-0 font-medium"
-      />
-      <div className="flex shrink-0 items-center gap-2">
-        {canManage ? (
-          <>
+function CategorySection({ section, categories, canManage, onEdit, onRemove }) {
+  const columns = [
+    {
+      key: 'category',
+      header: 'Categoria',
+      render: (category) => (
+        <CategoryIndicator
+          category={category}
+          className="text-card-foreground min-w-0 font-medium"
+        />
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Ações',
+      headerClassName: 'w-40 text-right',
+      cellClassName: 'w-40 whitespace-nowrap text-right',
+      render: (category) =>
+        canManage ? (
+          <div className="flex justify-end gap-2">
             <Button
               type="button"
               variant="outline"
@@ -49,14 +59,11 @@ function CategoryItem({ category, canManage, onEdit, onRemove }) {
               <Trash2 aria-hidden="true" />
               Excluir
             </Button>
-          </>
-        ) : null}
-      </div>
-    </div>
-  )
-}
+          </div>
+        ) : null,
+    },
+  ]
 
-function CategorySection({ section, categories, canManage, onEdit, onRemove }) {
   return (
     <CollectionCard
       className="h-full"
@@ -64,21 +71,12 @@ function CategorySection({ section, categories, canManage, onEdit, onRemove }) {
       title={section.title}
       description={section.description}
     >
-      <DataList
+      <DataTable
         items={categories}
+        columns={columns}
         getItemKey={(category) => category.id}
-        renderItem={(category) => (
-          <CategoryItem
-            category={category}
-            canManage={canManage}
-            onEdit={onEdit}
-            onRemove={onRemove}
-          />
-        )}
         emptyMessage={section.emptyMessage}
-        compact
-        scrollable
-        className="ring-border h-full px-2 ring-1"
+        className="h-full flex-1"
       />
     </CollectionCard>
   )

@@ -22,13 +22,15 @@ const formContent = {
 }
 
 export function useWalletSettingsPage() {
-  const { currentWallet, removeWallet } = useWallet()
+  const { currentWallet, leaveWallet, removeWallet } = useWallet()
   const { toast } = useToast()
   const [activeForm, setActiveForm] = useState(null)
   const [removingMember, setRemovingMember] = useState(null)
   const [isRemovePending, setIsRemovePending] = useState(false)
   const [isDeleteWalletPending, setIsDeleteWalletPending] = useState(false)
   const [isDeleteWalletOpen, setIsDeleteWalletOpen] = useState(false)
+  const [isLeaveWalletPending, setIsLeaveWalletPending] = useState(false)
+  const [isLeaveWalletOpen, setIsLeaveWalletOpen] = useState(false)
   const membersState = useWalletMembers()
   const isOwner = currentWallet?.currentUserRole === WALLET_MEMBER_ROLES.OWNER
 
@@ -82,11 +84,27 @@ export function useWalletSettingsPage() {
       setIsDeleteWalletPending(false)
     }
   }
+  const confirmLeaveWallet = async () => {
+    setIsLeaveWalletPending(true)
+    try {
+      await leaveWallet()
+      toast({ message: 'Você saiu da carteira.', variant: 'success' })
+      setIsLeaveWalletOpen(false)
+    } catch (error) {
+      toast({ message: getErrorMessage(error), variant: 'error' })
+      setIsLeaveWalletOpen(false)
+    } finally {
+      setIsLeaveWalletPending(false)
+    }
+  }
   const handleRemoveMemberOpenChange = (isOpen) => {
     if (!isOpen && !isRemovePending) setRemovingMember(null)
   }
   const handleDeleteWalletOpenChange = (isOpen) => {
     if (!isOpen && !isDeleteWalletPending) setIsDeleteWalletOpen(false)
+  }
+  const handleLeaveWalletOpenChange = (isOpen) => {
+    if (!isOpen && !isLeaveWalletPending) setIsLeaveWalletOpen(false)
   }
 
   return {
@@ -99,9 +117,12 @@ export function useWalletSettingsPage() {
     isRemovePending,
     isDeleteWalletOpen,
     isDeleteWalletPending,
+    isLeaveWalletOpen,
+    isLeaveWalletPending,
     setActiveForm,
     setRemovingMember,
     setIsDeleteWalletOpen,
+    setIsLeaveWalletOpen,
     closeForm,
     handleRoleChange,
     confirmRemoveMember,
@@ -110,7 +131,9 @@ export function useWalletSettingsPage() {
     handleAddMemberSuccess,
     handleCreateWalletSuccess,
     confirmDeleteWallet,
+    confirmLeaveWallet,
     handleRemoveMemberOpenChange,
     handleDeleteWalletOpenChange,
+    handleLeaveWalletOpenChange,
   }
 }

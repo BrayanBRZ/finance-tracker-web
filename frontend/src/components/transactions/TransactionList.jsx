@@ -24,7 +24,7 @@ export function TransactionList({
       cellClassName: 'min-w-48',
       render: (transaction) => (
         <span className="text-foreground font-medium">
-          {transaction.description}
+          {transaction.description?.trim() || 'Sem descrição'}
         </span>
       ),
     },
@@ -51,13 +51,12 @@ export function TransactionList({
     {
       key: 'amount',
       header: 'Valor',
-      headerClassName: 'text-right',
-      cellClassName: 'whitespace-nowrap text-right font-medium tabular-nums',
+      cellClassName: 'whitespace-nowrap font-medium tabular-nums',
       render: (transaction) => formatCurrency(transaction.amount),
     },
     {
       key: 'actions',
-      header: <span className="sr-only">Ações</span>,
+      header: 'Ações',
       headerClassName: 'text-right',
       cellClassName: 'whitespace-nowrap text-right',
       render: (transaction) =>

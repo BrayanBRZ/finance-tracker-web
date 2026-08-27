@@ -17,8 +17,8 @@ import { cn } from '@/lib/utils'
 const navigationItems = [
   { to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/app/transacoes', label: 'Transações', icon: ArrowLeftRight },
-  { to: '/app/categorias', label: 'Categorias', icon: Tags },
   { to: '/app/carteira', label: 'Carteira', icon: WalletCards },
+  { to: '/app/categorias', label: 'Categorias', icon: Tags },
 ]
 
 const pageNames = {

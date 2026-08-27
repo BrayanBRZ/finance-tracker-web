@@ -1,43 +1,59 @@
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, WalletCards } from 'lucide-react'
 import { PageErrorState } from '@/components/feedback/PageErrorState'
 import { PageLoader } from '@/components/feedback/PageLoader'
-import { StateCard } from '@/components/feedback/StateCard'
 import { FormDialog } from '@/components/form-fields/FormDialog'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { CreateWalletForm } from '@/components/wallets/CreateWalletForm'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { useWallet } from '@/context/walletContext'
 
 export function WalletScope({ children }) {
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false)
   const { currentWallet, errorMessage, isLoading, refreshWallets } = useWallet()
 
-  return isLoading ? (
-    <PageLoader />
-  ) : errorMessage ? (
-    <PageErrorState
-      eyebrow="Não foi possível carregar as carteiras"
-      description={errorMessage}
-      onRetry={() => void refreshWallets()}
-    />
-  ) : !currentWallet ? (
-    <div className="flex h-full min-h-0 flex-col gap-6">
-      <PageHeader
-        title="Carteira"
-        description="Crie uma carteira para começar a organizar suas finanças."
-        actions={
+  if (isLoading) return <PageLoader />
+
+  if (errorMessage) {
+    return (
+      <PageErrorState
+        eyebrow="Não foi possível carregar as carteiras"
+        description={errorMessage}
+        onRetry={() => void refreshWallets()}
+      />
+    )
+  }
+
+  if (currentWallet) return children
+
+  return (
+    <>
+      <Card
+        size="sm"
+        role="status"
+        aria-live="polite"
+        className="mx-auto w-full max-w-2xl"
+      >
+        <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-(--radius)">
+              <WalletCards className="size-4" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="font-heading font-medium">
+                Crie uma carteira para continuar
+              </h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Esta funcionalidade precisa de uma carteira selecionada.
+              </p>
+            </div>
+          </div>
           <Button type="button" onClick={() => setIsCreateFormOpen(true)}>
             <Plus aria-hidden="true" />
             Criar carteira
           </Button>
-        }
-      />
-      <StateCard
-        eyebrow="Nenhuma carteira encontrada"
-        title="Crie uma carteira para começar"
-        description="Carteiras separam seus dados financeiros e definem o contexto de dashboard, categorias, transações e membros."
-      />
+        </CardContent>
+      </Card>
 
       <FormDialog
         open={isCreateFormOpen}
@@ -47,8 +63,6 @@ export function WalletScope({ children }) {
       >
         <CreateWalletForm onSuccess={() => setIsCreateFormOpen(false)} />
       </FormDialog>
-    </div>
-  ) : (
-    children
+    </>
   )
 }

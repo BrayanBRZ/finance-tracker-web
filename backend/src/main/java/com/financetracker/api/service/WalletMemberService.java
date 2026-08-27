@@ -78,6 +78,13 @@ public class WalletMemberService {
         walletMemberRepository.delete(member);
     }
 
+    @Transactional
+    public void leave(Long requesterId, UUID walletId) {
+        WalletMember member = walletAccess.requireMember(walletId, requesterId);
+        rejectOwnerMember(member);
+        walletMemberRepository.delete(member);
+    }
+
     private WalletMember requireMember(Long internalWalletId, UUID userId) {
         return walletMemberRepository.findByWalletIdAndUserUuid(internalWalletId, userId)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Membro da carteira não encontrado"));

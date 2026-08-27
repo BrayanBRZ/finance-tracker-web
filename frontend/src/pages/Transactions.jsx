@@ -113,15 +113,7 @@ function TransactionsContent() {
     retryPageData,
   } = useTransactionsPage()
 
-  return isLoading ? (
-    <PageLoader />
-  ) : loadErrorMessage ? (
-    <PageErrorState
-      eyebrow="Não foi possível carregar transações"
-      description={loadErrorMessage}
-      onRetry={retryPageData}
-    />
-  ) : (
+  return (
     <div className="flex h-full min-h-0 flex-col gap-6">
       <PageHeader
         title="Transações"
@@ -135,57 +127,67 @@ function TransactionsContent() {
           ) : null
         }
       />
-      <TransactionFilters
-        categories={categories}
-        filters={filters}
-        onChange={setFilter}
-        onReset={resetFilters}
-      />
-      {filterError ? (
-        <p className="text-destructive text-sm" role="alert">
-          {filterError}
-        </p>
-      ) : null}
-      <TransactionList
-        transactions={pageTransactions}
-        page={currentPage}
-        totalPages={totalPages}
-        canEditTransaction={() => canManageTransactions}
-        canDelete={canManageTransactions}
-        onPageChange={changePage}
-        onEdit={openEditForm}
-        onDelete={setDeletingTransaction}
-      />
-      <FormDialog
-        open={isFormOpen}
-        onOpenChange={handleFormOpenChange}
-        title={editingTransaction ? 'Editar transação' : 'Nova transação'}
-        description="Escolha o tipo da transação. A categoria pessoal é opcional."
-      >
-        <TransactionForm
-          categories={categories}
-          transaction={editingTransaction}
-          onSubmit={saveTransaction}
-          onCancel={() => handleFormOpenChange(false)}
-        />
-      </FormDialog>
-      <ConfirmDialog
-        open={Boolean(deletingTransaction)}
-        onOpenChange={handleDeleteOpenChange}
-        title="Excluir transação"
-        description={`A transação “${deletingTransaction?.description ?? 'Sem descrição'}” será removida permanentemente.`}
-        confirmLabel="Excluir transação"
-        isPending={isDeletePending}
-        onConfirm={confirmDeleteTransaction}
-      />
+      <WalletScope>
+        {isLoading ? (
+          <PageLoader />
+        ) : loadErrorMessage ? (
+          <PageErrorState
+            eyebrow="Não foi possível carregar transações"
+            description={loadErrorMessage}
+            onRetry={retryPageData}
+          />
+        ) : (
+          <>
+            <TransactionFilters
+              categories={categories}
+              filters={filters}
+              onChange={setFilter}
+              onReset={resetFilters}
+            />
+            {filterError ? (
+              <p className="text-destructive text-sm" role="alert">
+                {filterError}
+              </p>
+            ) : null}
+            <TransactionList
+              transactions={pageTransactions}
+              page={currentPage}
+              totalPages={totalPages}
+              canEditTransaction={() => canManageTransactions}
+              canDelete={canManageTransactions}
+              onPageChange={changePage}
+              onEdit={openEditForm}
+              onDelete={setDeletingTransaction}
+            />
+            <FormDialog
+              open={isFormOpen}
+              onOpenChange={handleFormOpenChange}
+              title={editingTransaction ? 'Editar transação' : 'Nova transação'}
+              description="Escolha o tipo da transação. A categoria pessoal é opcional."
+            >
+              <TransactionForm
+                categories={categories}
+                transaction={editingTransaction}
+                onSubmit={saveTransaction}
+                onCancel={() => handleFormOpenChange(false)}
+              />
+            </FormDialog>
+            <ConfirmDialog
+              open={Boolean(deletingTransaction)}
+              onOpenChange={handleDeleteOpenChange}
+              title="Excluir transação"
+              description={`A transação “${deletingTransaction?.description ?? 'Sem descrição'}” será removida permanentemente.`}
+              confirmLabel="Excluir transação"
+              isPending={isDeletePending}
+              onConfirm={confirmDeleteTransaction}
+            />
+          </>
+        )}
+      </WalletScope>
     </div>
   )
 }
 
 export function TransactionsPage() {
-  return (
-    <WalletScope>
-      <TransactionsContent />
-    </WalletScope>
-  )
+  return <TransactionsContent />
 }

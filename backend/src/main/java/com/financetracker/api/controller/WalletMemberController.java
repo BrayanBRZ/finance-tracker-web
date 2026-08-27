@@ -74,4 +74,13 @@ public class WalletMemberController {
         walletMemberService.remove(user.id(), walletId, memberUserId);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/me")
+    @Operation(summary = "Sai da carteira atual")
+    ResponseEntity<Void> leave(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @PathVariable("walletId") UUID walletId) {
+        walletMemberService.leave(user.id(), walletId);
+        return ResponseEntity.noContent().build();
+    }
 }

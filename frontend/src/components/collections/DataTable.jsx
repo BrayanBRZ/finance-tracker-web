@@ -1,4 +1,12 @@
 import { CollectionEmptyState } from '@/components/collections/CollectionEmptyState'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 
 export function DataTable({
@@ -14,44 +22,43 @@ export function DataTable({
   }
 
   return (
-    <div
-      className={cn(
+    <Table
+      containerClassName={cn(
         'scrollbar-minimal min-h-0 overflow-auto ring-1 ring-border',
         className,
       )}
+      className={tableClassName}
     >
-      <table className={cn('w-full border-collapse text-sm', tableClassName)}>
-        <thead className="sticky top-0 z-10 bg-muted/95 text-left text-xs text-muted-foreground backdrop-blur-sm">
-          <tr>
-            {columns.map((column) => (
-              <th
-                key={column.key}
-                scope="col"
-                className={cn(
-                  'h-9 px-3 font-medium whitespace-nowrap',
-                  column.headerClassName,
-                )}
-              >
-                {column.header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {items.map((item) => (
-            <tr key={getItemKey(item)} className="hover:bg-muted/35">
-              {columns.map((column) => (
-                <td
-                  key={column.key}
-                  className={cn('px-3 py-2.5 align-middle', column.cellClassName)}
-                >
-                  {column.render(item)}
-                </td>
-              ))}
-            </tr>
+      <TableHeader className="bg-muted/95 text-muted-foreground sticky top-0 z-10 text-xs backdrop-blur-sm">
+        <TableRow className="hover:bg-transparent">
+          {columns.map((column) => (
+            <TableHead
+              key={column.key}
+              scope="col"
+              className={cn(
+                'text-muted-foreground h-9 px-3 text-xs',
+                column.headerClassName,
+              )}
+            >
+              {column.header}
+            </TableHead>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {items.map((item) => (
+          <TableRow key={getItemKey(item)} className="hover:bg-muted/35">
+            {columns.map((column) => (
+              <TableCell
+                key={column.key}
+                className={cn('px-3 py-2.5', column.cellClassName)}
+              >
+                {column.render(item)}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   )
 }

@@ -33,7 +33,6 @@ function DashboardContent() {
     />
   ) : (
     <div className="space-y-6">
-      <PageHeader title="Dashboard" description="Visão geral da carteira selecionada" />
       <DashboardSummary
         totalIncome={totalIncome}
         totalExpense={totalExpense}
@@ -54,8 +53,14 @@ function DashboardContent() {
 
 export function DashboardPage() {
   return (
-    <WalletScope>
-      <DashboardContent />
-    </WalletScope>
+    <div className="space-y-6">
+      <PageHeader
+        title="Dashboard"
+        description="Visão geral da carteira selecionada"
+      />
+      <WalletScope>
+        <DashboardContent />
+      </WalletScope>
+    </div>
   )
 }

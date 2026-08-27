@@ -4,6 +4,7 @@ import { isAbortError } from '@/services/api/client'
 import {
   addWalletMember,
   createWallet,
+  leaveWallet,
   listWalletMembers,
   listWallets,
   removeWallet,
@@ -194,6 +195,18 @@ export function useWallets() {
     setCurrentWallet(resolveCurrentWallet(userId, nextWallets))
   }, [requireCurrentWallet, userId, wallets])
 
+  const leaveCurrentWallet = useCallback(async () => {
+    const walletId = requireCurrentWallet()
+
+    await leaveWallet(walletId)
+
+    const nextWallets = wallets.filter((item) => !sameId(item.id, walletId))
+
+    setWallets(nextWallets)
+
+    setCurrentWallet(resolveCurrentWallet(userId, nextWallets))
+  }, [requireCurrentWallet, userId, wallets])
+
   const listCurrentWalletMembers = useCallback(
     ({ signal } = {}) => listWalletMembers(requireCurrentWallet(), { signal }),
     [requireCurrentWallet],
@@ -226,6 +239,7 @@ export function useWallets() {
     createWallet: createCurrentWallet,
     updateWallet: updateCurrentWallet,
     removeWallet: removeCurrentWallet,
+    leaveWallet: leaveCurrentWallet,
     listWalletMembers: listCurrentWalletMembers,
     addWalletMember: addCurrentWalletMember,
     updateWalletMemberRole: updateCurrentWalletMemberRole,

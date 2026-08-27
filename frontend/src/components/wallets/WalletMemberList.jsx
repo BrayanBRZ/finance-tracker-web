@@ -71,22 +71,24 @@ export function WalletMemberList({
     },
     {
       key: 'actions',
-      header: <span className="sr-only">Ações</span>,
-      headerClassName: 'text-right',
+      header: 'Ações',
+      headerClassName: 'w-32 text-right',
       cellClassName: 'w-32 text-right',
       render: (member) => {
         const isOwner = member.role === WALLET_MEMBER_ROLES.OWNER
 
         return canManage && !isOwner ? (
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            onClick={() => onRemove(member)}
-          >
-            <Trash2 aria-hidden="true" />
-            Remover
-          </Button>
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={() => onRemove(member)}
+            >
+              <Trash2 aria-hidden="true" />
+              Remover
+            </Button>
+          </div>
         ) : null
       },
     },

@@ -28,3 +28,8 @@ export const removeWalletMember = (walletId, memberUserId) =>
   apiRequest(`/wallets/${walletId}/members/${memberUserId}`, {
     method: 'DELETE',
   })
+
+export const leaveWallet = (walletId) =>
+  apiRequest(`/wallets/${walletId}/members/me`, {
+    method: 'DELETE',
+  })
