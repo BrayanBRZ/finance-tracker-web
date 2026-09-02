@@ -23,6 +23,8 @@ import com.financetracker.api.validation.DateRangeValidator;
 
 @Service
 public class WalletSummaryService {
+    private static final String UNCATEGORIZED_CATEGORY_NAME = "Sem categoria";
+
     private final TransactionRepository transactionRepository;
     private final WalletAccessService walletAccess;
 
@@ -60,11 +62,12 @@ public class WalletSummaryService {
     private List<CategoryTotalResponse> byCategory(List<Transaction> entries) {
         Map<UUID, CategoryAmounts> totals = new LinkedHashMap<>();
         for (Transaction entry : entries) {
-            if (entry.getCategory() == null) {
-                continue;
-            }
-            totals.compute(entry.getCategory().getUuid(), (id, current) -> current == null
-                    ? new CategoryAmounts(entry.getCategory().getName(), entry.getAmount())
+            UUID categoryId = entry.getCategory() == null ? null : entry.getCategory().getUuid();
+            String categoryName = entry.getCategory() == null
+                    ? UNCATEGORIZED_CATEGORY_NAME
+                    : entry.getCategory().getName();
+            totals.compute(categoryId, (id, current) -> current == null
+                    ? new CategoryAmounts(categoryName, entry.getAmount())
                     : current.add(entry.getAmount()));
         }
 

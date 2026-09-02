@@ -42,12 +42,12 @@ export function ExpenseBreakdownChart({ categoryTotals }) {
     <Card className="h-full lg:col-span-2">
       <CardHeader>
         <CardTitle className="text-base">Movimentação por categoria</CardTitle>
-        <CardDescription>Totais de receitas e despesas com categoria.</CardDescription>
+        <CardDescription>Totais de receitas e despesas por categoria.</CardDescription>
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (
           <p className="rounded-(--radius) border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
-            Registre lançamentos categorizados para visualizar a distribuição.
+            Registre lançamentos para visualizar a distribuição.
           </p>
         ) : (
           <ChartContainer config={chartConfig} className="h-72 w-full" aria-label="Gráfico de movimentação por categoria">
