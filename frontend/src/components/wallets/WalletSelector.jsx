@@ -1,3 +1,4 @@
+import { WalletMinimal } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -30,6 +31,7 @@ export function WalletSelector() {
           aria-invalid={errorMessage ? true : undefined}
         >
           <SelectValue
+            className="flex-1"
             placeholder={isLoading ? 'Carregando...' : 'Nenhuma carteira'}
           />
         </SelectTrigger>
@@ -37,6 +39,7 @@ export function WalletSelector() {
         <SelectContent>
           {wallets.map((wallet) => (
             <SelectItem key={wallet.id} value={wallet.id}>
+              <WalletMinimal aria-hidden="true" />
               {wallet.name}
             </SelectItem>
           ))}
