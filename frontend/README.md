@@ -1,16 +1,50 @@
-# React + Vite
+# Finance Tracker Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend React do Finance Tracker. Ele consome a API Spring Boot do diretório `../backend` para autenticação, carteiras, categorias, transações e resumo financeiro.
 
-Currently, two official plugins are available:
+## Pré-requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20 ou superior;
+- npm;
+- API do Finance Tracker em execução, normalmente em `http://localhost:8080`.
 
-## React Compiler
+## Configuração
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Copie o arquivo de exemplo e ajuste a URL da API se necessário:
 
-## Expanding the ESLint configuration
+```powershell
+Copy-Item .env.example .env
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```dotenv
+VITE_API_URL=http://localhost:8080/api/v1
+```
+
+`VITE_API_URL` é obrigatória porque define a base usada pelos serviços HTTP do frontend. Não versione o arquivo `.env` com configurações locais.
+
+## Execução
+
+```powershell
+npm install
+npm run dev
+```
+
+O Vite exibirá a URL local, normalmente `http://localhost:5173`.
+
+## Scripts
+
+| Comando | Finalidade |
+| --- | --- |
+| `npm run dev` | Inicia o servidor de desenvolvimento |
+| `npm run lint` | Executa o ESLint |
+| `npm run build` | Gera o build de produção |
+| `npm run preview` | Serve localmente o build de produção |
+
+## Decisões de projeto
+
+- As páginas ficam em `src/pages`, componentes reutilizáveis em `src/components` e chamadas HTTP em `src/services`.
+- A sessão autenticada é enviada em `Authorization: Bearer <token>`.
+- Requisições de leitura podem ser canceladas ao desmontar uma tela para evitar atualizar estados antigos.
+- O estado da carteira selecionada é persistido por usuário no navegador.
+
+Veja o [README da raiz](../README.md) para a configuração completa do backend e do banco de dados.
