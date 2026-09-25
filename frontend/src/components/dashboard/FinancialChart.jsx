@@ -30,7 +30,7 @@ export function FinancialChart({ totalIncome, totalExpense }) {
   const hasData = totalIncome > 0 || totalExpense > 0
   const data = [
     {
-      period: 'Carteira atual',
+      period: 'Período selecionado',
       income: totalIncome,
       expenses: totalExpense,
     },

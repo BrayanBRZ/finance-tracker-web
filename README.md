@@ -100,6 +100,14 @@ As rotas privadas exigem o cabeçalho abaixo:
 Authorization: Bearer <accessToken>
 ```
 
+## Relatório financeiro
+
+O Dashboard inicia com o mês atual e permite selecionar um intervalo inclusivo de datas. Os cards, gráficos e lançamentos recentes usam o mesmo período. Para intervalos dentro de um mês, a evolução financeira é exibida por dia; para intervalos maiores, por mês.
+
+Com uma carteira selecionada, as datas do Dashboard atualizam o período automaticamente quando válidas. **Baixar relatório** gera um PDF A4 para o período exibido, com os totais de receitas e despesas, resultado do período, quantidade de lançamentos, movimentação por categoria e totais por mês. O arquivo é gerado a partir dos dados atuais do banco e pode ser baixado por qualquer membro da carteira, inclusive quem possui papel `VIEWER`.
+
+A rota documentada no Swagger é `GET /api/v1/wallets/{walletId}/reports/summary.pdf?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`. Ela exige JWT Bearer e retorna `application/pdf`. As duas datas são obrigatórias; a data inicial deve ser anterior ou igual à final. Os valores por categoria representam a soma das movimentações de receitas e despesas daquela categoria. O PDF usa a fonte Duru Sans, distribuída sob a SIL Open Font License no diretório `backend/src/main/resources/fonts/`.
+
 ## Decisões de projeto
 
 - Controllers recebem e retornam DTOs; regras de negócio e autorização por recurso ficam nos services.

@@ -10,8 +10,8 @@ import { formatCurrency } from '@/utils/formatters'
 const summaryItems = [
   {
     key: 'balance',
-    label: 'Saldo atual',
-    description: 'Disponível na carteira',
+    label: 'Resultado do período',
+    description: 'Receitas menos despesas',
     icon: Landmark,
     tone: 'text-foreground',
   },

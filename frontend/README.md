@@ -31,6 +31,8 @@ npm run dev
 
 O Vite exibirá a URL local, normalmente `http://localhost:5173`.
 
+No Dashboard, o mês atual é selecionado inicialmente. Ao escolher uma data inicial ou final válida, o período é atualizado automaticamente. É possível baixar o relatório financeiro em PDF para a carteira e o período exibidos.
+
 ## Scripts
 
 | Comando | Finalidade |

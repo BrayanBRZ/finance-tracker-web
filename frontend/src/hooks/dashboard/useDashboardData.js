@@ -11,15 +11,18 @@ const emptySummary = {
   transactionCount: 0,
   byCategory: [],
   byMonth: [],
+  byDay: [],
 }
 
-export function useDashboardData() {
+export function useDashboardData({ startDate, endDate }) {
   const { currentWallet } = useWallet()
   const walletId = currentWallet?.id
   const [summary, setSummary] = useState(emptySummary)
   const [recentTransactions, setRecentTransactions] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
+  const [loadedKey, setLoadedKey] = useState(null)
+  const requestKey = `${walletId}:${startDate}:${endDate}`
 
   const refreshDashboard = useCallback(
     async ({ signal } = {}) => {
@@ -27,17 +30,21 @@ export function useDashboardData() {
         setSummary(emptySummary)
         setRecentTransactions([])
         setErrorMessage(null)
+        setLoadedKey(null)
         setIsLoading(false)
         return
       }
 
       setIsLoading(true)
       setErrorMessage(null)
+      setLoadedKey(null)
       try {
         const [nextSummary, recentPage] = await Promise.all([
-          getWalletSummary({ walletId, signal }),
+          getWalletSummary({ walletId, startDate, endDate, signal }),
           listTransactions({
             walletId,
+            startDate,
+            endDate,
             page: 0,
             size: 5,
             sort: 'date,desc',
@@ -46,10 +53,12 @@ export function useDashboardData() {
         ])
         setSummary(nextSummary)
         setRecentTransactions(recentPage.content)
+        setLoadedKey(requestKey)
       } catch (error) {
         if (isAbortError(error)) return
         setSummary(emptySummary)
         setRecentTransactions([])
+        setLoadedKey(null)
         setErrorMessage(
           error instanceof Error
             ? error.message
@@ -59,7 +68,7 @@ export function useDashboardData() {
         if (!signal?.aborted) setIsLoading(false)
       }
     },
-    [walletId],
+    [walletId, startDate, endDate, requestKey],
   )
 
   useEffect(() => {
@@ -77,6 +86,7 @@ export function useDashboardData() {
     recentTransactions,
     isLoading,
     errorMessage,
+    isReady: loadedKey === requestKey && !isLoading && !errorMessage,
     refreshDashboard,
   }
 }

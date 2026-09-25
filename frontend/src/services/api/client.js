@@ -26,11 +26,17 @@ export async function apiRequest(
     headers: customHeaders,
     signal,
     auth = true,
+    responseType = 'json',
   } = {},
 ) {
   const session = auth ? readApiSession() : null
   const headers = new Headers(customHeaders)
-  headers.set('Accept', 'application/json')
+  headers.set(
+    'Accept',
+    responseType === 'blob'
+      ? 'application/pdf, application/json'
+      : 'application/json',
+  )
 
   if (body !== undefined) {
     headers.set('Content-Type', 'application/json')
@@ -55,8 +61,8 @@ export async function apiRequest(
   if (response.status === 401) clearApiSession()
   if (response.status === 204) return null
 
-  const responseBody = await response.json().catch(() => null)
   if (!response.ok) {
+    const responseBody = await response.json().catch(() => null)
     throw new ApiError(
       responseBody?.message ?? 'Não foi possível concluir a operação.',
       {
@@ -66,5 +72,7 @@ export async function apiRequest(
     )
   }
 
-  return responseBody
+  return responseType === 'blob'
+    ? response.blob()
+    : response.json().catch(() => null)
 }

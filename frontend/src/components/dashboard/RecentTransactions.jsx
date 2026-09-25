@@ -10,7 +10,7 @@ export function RecentTransactions({ transactions }) {
     <CollectionCard
       className="h-full"
       title="Atividades recentes"
-      description="Últimos lançamentos da carteira selecionada."
+      description="Últimos lançamentos do período selecionado."
     >
       <DataList
         items={recentTransactions}
