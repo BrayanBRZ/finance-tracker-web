@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.financetracker.api.dto.summary.CategoryTotalResponse;
+import com.financetracker.api.dto.summary.DailyTotalResponse;
 import com.financetracker.api.dto.summary.WalletSummaryResponse;
 import com.financetracker.api.entity.Category;
 import com.financetracker.api.entity.Transaction;
@@ -62,12 +63,45 @@ class WalletSummaryServiceTest {
                 new CategoryTotalResponse(categoryId, "Alimentação", new BigDecimal("80.00"))), response.byCategory());
     }
 
+    @Test
+    void getIncludesBothEndsOfDailyRangeAndFillsDaysWithoutTransactions() {
+        Long userId = 42L;
+        UUID walletId = UUID.randomUUID();
+        Wallet wallet = mock(Wallet.class);
+        WalletMember member = mock(WalletMember.class);
+        when(member.getWallet()).thenReturn(wallet);
+        when(wallet.getId()).thenReturn(7L);
+        when(walletAccess.requireMember(walletId, userId)).thenReturn(member);
+        Transaction first = transaction(null, new BigDecimal("10.00"), TransactionType.INCOME,
+                LocalDate.of(2026, 9, 1));
+        Transaction last = transaction(null, new BigDecimal("4.00"), TransactionType.EXPENSE,
+                LocalDate.of(2026, 9, 3));
+        when(transactionRepository.findAll(org.mockito.ArgumentMatchers.<Specification<Transaction>>any()))
+                .thenReturn(List.of(first, last));
+
+        WalletSummaryResponse response = walletSummaryService.get(
+                userId, walletId, LocalDate.of(2026, 9, 1), LocalDate.of(2026, 9, 3));
+
+        assertEquals(new BigDecimal("10.00"), response.totalIncome());
+        assertEquals(new BigDecimal("4.00"), response.totalExpense());
+        assertEquals(new BigDecimal("6.00"), response.balance());
+        assertEquals(List.of(
+                new DailyTotalResponse(LocalDate.of(2026, 9, 1), new BigDecimal("10.00"), BigDecimal.ZERO),
+                new DailyTotalResponse(LocalDate.of(2026, 9, 2), BigDecimal.ZERO, BigDecimal.ZERO),
+                new DailyTotalResponse(LocalDate.of(2026, 9, 3), BigDecimal.ZERO, new BigDecimal("4.00"))),
+                response.byDay());
+    }
+
     private Transaction transaction(Category category, BigDecimal amount) {
+        return transaction(category, amount, TransactionType.EXPENSE, LocalDate.of(2026, 9, 1));
+    }
+
+    private Transaction transaction(Category category, BigDecimal amount, TransactionType type, LocalDate date) {
         Transaction transaction = mock(Transaction.class);
         when(transaction.getCategory()).thenReturn(category);
         when(transaction.getAmount()).thenReturn(amount);
-        when(transaction.getType()).thenReturn(TransactionType.EXPENSE);
-        when(transaction.getTransactionDate()).thenReturn(LocalDate.of(2026, 9, 1));
+        when(transaction.getType()).thenReturn(type);
+        when(transaction.getTransactionDate()).thenReturn(date);
         return transaction;
     }
 }

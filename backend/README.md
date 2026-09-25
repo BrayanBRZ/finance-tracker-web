@@ -72,6 +72,8 @@ As rotas protegidas exigem o header:
 Authorization: Bearer <accessToken>
 ```
 
+O relatório financeiro está disponível em `GET /api/v1/wallets/{walletId}/reports/summary.pdf?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`. As datas são inclusivas e obrigatórias; qualquer membro da carteira pode baixar o PDF. A resposta usa `application/pdf`, e o endpoint está descrito no Swagger. O resumo JSON da carteira também retorna `byDay` quando o intervalo está contido em um único mês.
+
 ## Decisões de projeto
 
 - Controllers recebem e devolvem DTOs; regras e autorização por recurso ficam nos services.

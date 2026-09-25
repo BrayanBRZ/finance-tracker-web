@@ -9,6 +9,7 @@ public record WalletSummaryResponse(
     BigDecimal balance,
     long transactionCount,
     List<CategoryTotalResponse> byCategory,
-    List<MonthlyTotalResponse> byMonth
+    List<MonthlyTotalResponse> byMonth,
+    List<DailyTotalResponse> byDay
 ) {
 }

@@ -3,6 +3,7 @@ package com.financetracker.api.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.financetracker.api.dto.summary.CategoryTotalResponse;
+import com.financetracker.api.dto.summary.DailyTotalResponse;
 import com.financetracker.api.dto.summary.MonthlyTotalResponse;
 import com.financetracker.api.dto.summary.WalletSummaryResponse;
 import com.financetracker.api.entity.Transaction;
@@ -49,7 +51,8 @@ public class WalletSummaryService {
                 totalIncome.subtract(totalExpense),
                 entries.size(),
                 byCategory(entries),
-                byMonth(entries));
+                byMonth(entries),
+                byDay(entries, startDate, endDate));
     }
 
     private BigDecimal totalByType(List<Transaction> entries, TransactionType type) {
@@ -93,6 +96,27 @@ public class WalletSummaryService {
                         entry.getValue().income,
                         entry.getValue().expense))
                 .toList();
+    }
+
+    private List<DailyTotalResponse> byDay(List<Transaction> entries, LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null || !YearMonth.from(startDate).equals(YearMonth.from(endDate))) {
+            return List.of();
+        }
+
+        Map<LocalDate, MonthlyAmounts> totals = new LinkedHashMap<>();
+        for (Transaction entry : entries) {
+            totals.computeIfAbsent(entry.getTransactionDate(), ignored -> new MonthlyAmounts()).add(entry);
+        }
+
+        List<DailyTotalResponse> days = new ArrayList<>();
+        for (LocalDate day = startDate; !day.isAfter(endDate); day = day.plusDays(1)) {
+            MonthlyAmounts amount = totals.getOrDefault(day, new MonthlyAmounts());
+            days.add(new DailyTotalResponse(day, amount.income, amount.expense));
+            if (day.equals(endDate)) {
+                break;
+            }
+        }
+        return days;
     }
 
     private record CategoryAmounts(String name, BigDecimal total) {
