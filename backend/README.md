@@ -72,7 +72,13 @@ As rotas protegidas exigem o header:
 Authorization: Bearer <accessToken>
 ```
 
-O relatório financeiro está disponível em `GET /api/v1/wallets/{walletId}/reports/summary.pdf?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`. As datas são inclusivas e obrigatórias; qualquer membro da carteira pode baixar o PDF. A resposta usa `application/pdf`, e o endpoint está descrito no Swagger. O resumo JSON da carteira também retorna `byDay` quando o intervalo está contido em um único mês.
+## Análise financeira por IA
+
+`POST /api/v1/wallets/{walletId}/insights` recebe `startDate` e `endDate` no corpo JSON, exige JWT e associação à carteira. O período é inclusivo, com até 366 dias. Totais são calculados a partir do banco e as despesas são separadas das receitas por categoria, sem alterar o contrato do resumo/PDF.
+
+Configure `AI_ENABLED=true`, `GEMINI_API_KEY` e `AI_MODEL` somente no servidor. O modelo deve suportar `generateContent` e respostas estruturadas. Sem configuração, a rota retorna `503` e as demais funcionalidades continuam disponíveis. As variáveis de timeout, limites, privacidade, formato da resposta e roteiro de validação estão detalhados na seção **Análise financeira por IA** do [README principal](../README.md#análise-financeira-por-ia).
+
+`WalletInsightContextService` monta os dados dentro de uma transação de leitura; `WalletInsightService` chama `FinancialInsightProvider` após essa transação. `GeminiInsightProvider` usa HTTP com timeout e valida o JSON retornado. O cache limitado e os limites por usuário/carteira são em memória e por instância. Não há persistência de prompts nem alterações no schema.
 
 ## Decisões de projeto
 
