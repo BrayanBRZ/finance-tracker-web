@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Download } from 'lucide-react'
+import { Download, Sparkles } from 'lucide-react'
+import { FinancialInsightDialog } from '@/components/dashboard/FinancialInsightDialog'
 import { DashboardSummary } from '@/components/dashboard/DashboardSummary'
 import { CashFlowChart } from '@/components/dashboard/CashFlowChart'
 import { ExpenseBreakdownChart } from '@/components/dashboard/ExpenseBreakdownChart'
@@ -84,6 +85,7 @@ export function DashboardPage() {
   const { toast } = useToast()
   const [period, setPeriod] = useState(currentMonthPeriod)
   const [isDownloading, setIsDownloading] = useState(false)
+  const [isInsightOpen, setIsInsightOpen] = useState(false)
   const data = useDashboardData(period)
 
   const changePeriodDate = (field, value) => {
@@ -142,6 +144,16 @@ export function DashboardPage() {
               className="self-end"
               type="button"
               variant="outline"
+              disabled={!currentWallet || !data.isReady}
+              onClick={() => setIsInsightOpen(true)}
+            >
+              <Sparkles aria-hidden="true" />
+              Análise financeira
+            </Button>
+            <Button
+              className="self-end"
+              type="button"
+              variant="outline"
               disabled={!currentWallet || !data.isReady || isDownloading}
               onClick={() => void downloadReport()}
             >
@@ -154,6 +166,12 @@ export function DashboardPage() {
       <WalletScope>
         <DashboardContent data={data} period={period} />
       </WalletScope>
+      <FinancialInsightDialog
+        open={isInsightOpen}
+        onOpenChange={setIsInsightOpen}
+        period={period}
+        isReady={data.isReady}
+      />
     </div>
   )
 }
