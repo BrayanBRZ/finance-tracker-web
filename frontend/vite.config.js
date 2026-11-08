@@ -1,13 +1,27 @@
 import { fileURLToPath, URL } from 'node:url'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { securityPolicyPlugin } from './security.config.js'
 
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+export default defineConfig(({ mode, command, isPreview }) => {
+  const env = loadEnv(
+    mode,
+    fileURLToPath(new URL('.', import.meta.url)),
+    'VITE_',
+  )
+  return {
+    plugins: [
+      react(),
+      tailwindcss(),
+      ...(command === 'build' || isPreview
+        ? [securityPolicyPlugin(env.VITE_API_URL)]
+        : []),
+    ],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
     },
-  },
+  }
 })
