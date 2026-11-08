@@ -84,7 +84,7 @@ export function CashFlowChart({ dailyTotals, monthlyTotals, isDaily }) {
               <ChartLegend content={<ChartLegendContent />} />
               <Area
                 dataKey="income"
-                type="natural"
+                type="linear"
                 fill="var(--color-income)"
                 fillOpacity={0.2}
                 stroke="var(--color-income)"
@@ -92,7 +92,7 @@ export function CashFlowChart({ dailyTotals, monthlyTotals, isDaily }) {
               />
               <Area
                 dataKey="expenses"
-                type="natural"
+                type="linear"
                 fill="var(--color-expenses)"
                 fillOpacity={0.16}
                 stroke="var(--color-expenses)"
