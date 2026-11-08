@@ -37,6 +37,7 @@ O Vite exibirá a URL local, normalmente `http://localhost:5173`.
 | --- | --- |
 | `npm run dev` | Inicia o servidor de desenvolvimento |
 | `npm run lint` | Executa o ESLint |
+| `npm run test:security` | Valida a política de segurança e o limite UTF-8 de senhas |
 | `npm run build` | Gera o build de produção |
 | `npm run preview` | Serve localmente o build de produção |
 
@@ -46,5 +47,6 @@ O Vite exibirá a URL local, normalmente `http://localhost:5173`.
 - A sessão autenticada é enviada em `Authorization: Bearer <token>`.
 - Requisições de leitura podem ser canceladas ao desmontar uma tela para evitar atualizar estados antigos.
 - O estado da carteira selecionada é persistido por usuário no navegador.
+- O build de produção inclui CSP com scripts locais e conexões restritas à origem de `VITE_API_URL`. O arquivo `dist/_headers` configura os cabeçalhos em hosts compatíveis; nos demais, replique esses cabeçalhos na configuração do servidor/CDN. `npm run preview` aplica os mesmos cabeçalhos. Veja [SECURITY.md](../SECURITY.md).
 
 Veja o [README da raiz](../README.md) para a configuração completa do backend e do banco de dados.

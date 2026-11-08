@@ -42,11 +42,14 @@ Configure as variáveis abaixo no ambiente ou em `application-secrets.properties
 | --- | --- | --- |
 | `DB_URL` | URL JDBC do MySQL | `jdbc:mysql://localhost:3306/finance` |
 | `DB_USERNAME` / `DB_PASSWORD` | Credenciais do banco | `root` / vazio |
-| `JWT_SECRET` | Chave de assinatura JWT, com pelo menos 32 caracteres | — |
+| `JWT_SECRET` | Chave aleatória de assinatura JWT, com pelo menos 32 bytes; obrigatória | — |
 | `JWT_EXPIRATION` | Validade do token em milissegundos | `86400000` |
 | `MAIL_USERNAME` / `MAIL_PASSWORD` | Conta Gmail e senha de app para recuperação de senha | — |
 | `FRONTEND_BASE_URL` | URL usada nos links enviados por e-mail | `http://localhost:5173` |
 | `CORS_ALLOWED_ORIGINS` | Origens liberadas pelo CORS, separadas por vírgula | `http://localhost:3000,http://localhost:5173` |
+| `EXPOSE_RESET_TOKEN` | Depuração do token de recuperação; exige também perfil `local` | `false` |
+| `AUTH_RATE_LIMIT_MAX_REQUESTS` | Limite por IP/operação sensível em cada janela | `10` |
+| `AUTH_RATE_LIMIT_WINDOW_SECONDS` | Duração da janela de autenticação em segundos | `60` |
 
 Inicie a API:
 
@@ -84,6 +87,7 @@ O frontend ficará disponível em `http://localhost:5173` e a API em `http://loc
 | Diretório | Comando | Finalidade |
 | --- | --- | --- |
 | `frontend` | `npm run lint` | Verifica regras de qualidade do código |
+| `frontend` | `npm run test:security` | Verifica políticas de segurança e limite UTF-8 de senhas |
 | `frontend` | `npm run build` | Gera o build de produção |
 | `backend` | `.\mvnw.cmd test` | Executa os testes do backend |
 | `backend` | `.\mvnw.cmd spring-boot:run` | Inicia a API localmente |
@@ -99,6 +103,10 @@ As rotas privadas exigem o cabeçalho abaixo:
 ```http
 Authorization: Bearer <accessToken>
 ```
+
+## Segurança
+
+O requisito 1.6 está documentado em [SECURITY.md](./SECURITY.md), com os riscos relevantes, as proteções contra injeção/XSS/CSRF, autorização por recurso, limites de autenticação, cabeçalhos HTTP e configuração de segredos. A recuperação de senha não expõe o token por padrão; a API recusa chaves JWT de exemplo. O build do frontend inclui CSP e gera `_headers`, que deve ser aplicado pelo host no deploy.
 
 ## Decisões de projeto
 

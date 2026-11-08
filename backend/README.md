@@ -42,15 +42,20 @@ Configure principalmente estas variáveis, por environment variables ou no arqui
 | ----------------------------- | ---------------------------------------------------------- |
 | `DB_URL`                      | URL JDBC, por padrão `jdbc:mysql://localhost:3306/finance` |
 | `DB_USERNAME` / `DB_PASSWORD` | Credenciais do MySQL                                       |
-| `JWT_SECRET`                  | Chave com pelo menos 32 caracteres                         |
+| `JWT_SECRET`                  | Chave aleatória obrigatória com pelo menos 32 bytes, sem fallback |
 | `JWT_EXPIRATION`              | Validade do JWT em milissegundos; padrão de 24 horas       |
-| `MAIL_USERNAME`               | Remetente Gmail; padrão `brayanbarrosdm@gmail.com`         |
+| `MAIL_USERNAME`               | Remetente Gmail, sem conta pré-configurada                 |
 | `MAIL_PASSWORD`               | Senha de app do Gmail                                      |
 | `FRONTEND_BASE_URL`           | Origem do frontend; padrão `http://localhost:5173`         |
 | `CORS_ALLOWED_ORIGINS`        | Origens separadas por vírgula                              |
-| `EXPOSE_RESET_TOKEN`          | Expõe `debugToken` no ambiente local                       |
+| `EXPOSE_RESET_TOKEN`          | Padrão `false`; `true` exige `SPRING_PROFILES_ACTIVE=local` |
+| `AUTH_RATE_LIMIT_MAX_REQUESTS` | Limite por IP/operação sensível; padrão `10`              |
+| `AUTH_RATE_LIMIT_WINDOW_SECONDS` | Janela em segundos; padrão `60`                       |
+| `AUTH_RATE_LIMIT_MAX_ENTRIES` | Limite de pares IP/operação em memória; padrão `10000`     |
 
 Para obter `MAIL_PASSWORD`, gere uma senha de app na conta Gmail. Não use a senha normal da conta e não versione esse valor.
+
+Os mapeamentos de variáveis estão em `application.properties`: o arquivo local é opcional quando o ambiente já fornece os segredos. Ele é lido do filesystem durante a execução local (a partir da raiz do projeto ou de `backend`), e o Maven exclui os arquivos de segredos do JAR. A API não inicia sem chave JWT válida. As decisões do requisito 1.6, os limites do rate limiting por instância/proxy e a configuração dos cabeçalhos em produção estão em [SECURITY.md](../SECURITY.md).
 
 ## Execução
 
