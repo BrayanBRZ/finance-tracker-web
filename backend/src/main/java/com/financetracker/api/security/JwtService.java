@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
+import java.util.Locale;
 
 import javax.crypto.SecretKey;
 
@@ -24,8 +25,13 @@ public class JwtService {
     public JwtService(
             @Value("${app.jwt.secret}") String secret,
             @Value("${app.jwt.expiration}") long expirationMs) {
-        if (secret.getBytes(StandardCharsets.UTF_8).length < 32) {
-            throw new IllegalArgumentException("JWT_SECRET deve ter pelo menos 256 bits");
+        if (secret == null || secret.isBlank() || secret.getBytes(StandardCharsets.UTF_8).length < 32
+                || secret.strip().toLowerCase(Locale.ROOT).startsWith("substitua")
+                || secret.strip().toLowerCase(Locale.ROOT).startsWith("change-me")) {
+            throw new IllegalArgumentException("Configure JWT_SECRET com uma chave aleatória de pelo menos 256 bits, sem usar exemplos");
+        }
+        if (expirationMs < 1000) {
+            throw new IllegalArgumentException("JWT_EXPIRATION deve ser de pelo menos 1000 milissegundos");
         }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMs;

@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,11 @@ public class AuthService {
             JwtService jwtService,
             SendEmailService sendEmailService,
             @Value("${app.password-reset.expiration}") long resetExpirationMs,
-            @Value("${app.auth.expose-reset-token}") boolean exposeResetToken) {
+            @Value("${app.auth.expose-reset-token:false}") boolean exposeResetToken,
+            Environment environment) {
+        if (exposeResetToken && !environment.matchesProfiles("local")) {
+            throw new IllegalArgumentException("EXPOSE_RESET_TOKEN só pode ser habilitado com o perfil local");
+        }
         this.userRepository = userRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.passwordEncoder = passwordEncoder;
