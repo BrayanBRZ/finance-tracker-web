@@ -1,4 +1,10 @@
 export const PASSWORD_MIN_LENGTH = 8
+export const PASSWORD_MAX_BYTES = 72
+export const PASSWORD_MAX_MESSAGE = 'Use no máximo 72 bytes em UTF-8 na senha'
+
+export function hasValidPasswordByteLength(password = '') {
+  return new TextEncoder().encode(password).length <= PASSWORD_MAX_BYTES
+}
 
 export const PASSWORD_REQUIREMENTS = Object.freeze([
   {

@@ -14,6 +14,7 @@ import jakarta.validation.constraints.Size;
 @Documented
 @Constraint(validatedBy = {})
 @Size(min = 8)
+@PasswordByteLength
 @ReportAsSingleViolation
 @Target({
         ElementType.FIELD,
@@ -24,7 +25,7 @@ import jakarta.validation.constraints.Size;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface StrongPassword {
 
-    String message() default "A senha deve conter pelo menos 8 caracteres.";
+    String message() default "A senha deve conter pelo menos 8 caracteres e no máximo 72 bytes em UTF-8.";
 
     Class<?>[] groups() default {};
 
