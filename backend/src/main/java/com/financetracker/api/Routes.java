@@ -48,6 +48,7 @@ public final class Routes {
         public static final String MEMBERS = BASE + BY_ID + "/members";
         public static final String MEMBER_BY_USER_ID = MEMBERS + "/{userId}";
         public static final String TRANSACTIONS = BASE + BY_ID + "/transactions";
+        public static final String EVENTS = BASE + BY_ID + "/events";
         public static final String TRANSACTION_BY_ID = TRANSACTIONS + "/{transactionId}";
         public static final String SUMMARY = BASE + BY_ID + "/summary";
         public static final String SUMMARY_REPORT = BASE + BY_ID + "/reports/summary.pdf";

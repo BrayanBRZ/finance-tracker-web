@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,14 +34,17 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
     private final WalletAccessService walletAccess;
+    private final ApplicationEventPublisher events;
 
     public TransactionService(
             TransactionRepository transactionRepository,
             CategoryRepository categoryRepository,
-            WalletAccessService walletAccess) {
+            WalletAccessService walletAccess,
+            ApplicationEventPublisher events) {
         this.transactionRepository = transactionRepository;
         this.categoryRepository = categoryRepository;
         this.walletAccess = walletAccess;
+        this.events = events;
     }
 
     @Transactional
@@ -55,6 +59,7 @@ public class TransactionService {
                 request.amount(),
                 normalizeDescription(request.description()),
                 request.date()));
+        events.publishEvent(new WalletTransactionChanged(member.getWallet().getId()));
         return TransactionMapper.toResponse(transaction);
     }
 
@@ -92,6 +97,7 @@ public class TransactionService {
                 request.amount(),
                 normalizeDescription(request.description()),
                 request.date());
+        events.publishEvent(new WalletTransactionChanged(member.getWallet().getId()));
         return TransactionMapper.toResponse(transaction);
     }
 
@@ -99,6 +105,7 @@ public class TransactionService {
     public void delete(Long userId, UUID walletId, UUID transactionId) {
         WalletMember member = walletAccess.requireEditor(walletId, userId);
         transactionRepository.delete(requireTransaction(member.getWallet().getId(), transactionId));
+        events.publishEvent(new WalletTransactionChanged(member.getWallet().getId()));
     }
 
     private Transaction requireTransaction(Long internalWalletId, UUID transactionId) {

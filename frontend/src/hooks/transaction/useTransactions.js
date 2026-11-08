@@ -22,7 +22,7 @@ const getErrorMessage = (error) =>
     : 'Não foi possível carregar as transações.'
 
 export function useTransactions(filters) {
-  const { currentWallet } = useWallet()
+  const { currentWallet, transactionRevision } = useWallet()
   const walletId = currentWallet?.id
   const hasInvalidDateRange =
     filters.startDate && filters.endDate && filters.startDate > filters.endDate
@@ -71,7 +71,7 @@ export function useTransactions(filters) {
     }
     void load()
     return () => controller.abort()
-  }, [refreshTransactions])
+  }, [refreshTransactions, transactionRevision])
 
   const createTransaction = async (data) => {
     if (!walletId)

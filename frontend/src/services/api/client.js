@@ -1,7 +1,7 @@
 import { clearApiSession, readApiSession } from '@/storage/authTokenStorage'
 import { ApiError } from './error'
 
-const buildUrl = (path, query) => {
+export const buildApiUrl = (path, query) => {
   const baseUrl = import.meta.env.VITE_API_URL
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
   const url = new URL(`${baseUrl}${normalizedPath}`)
@@ -47,7 +47,7 @@ export async function apiRequest(
 
   let response
   try {
-    response = await fetch(buildUrl(path, query), {
+    response = await fetch(buildApiUrl(path, query), {
       method,
       headers,
       signal,

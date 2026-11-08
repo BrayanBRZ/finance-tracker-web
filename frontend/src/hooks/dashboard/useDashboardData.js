@@ -15,7 +15,7 @@ const emptySummary = {
 }
 
 export function useDashboardData({ startDate, endDate }) {
-  const { currentWallet } = useWallet()
+  const { currentWallet, transactionRevision } = useWallet()
   const walletId = currentWallet?.id
   const [summary, setSummary] = useState(emptySummary)
   const [recentTransactions, setRecentTransactions] = useState([])
@@ -79,7 +79,7 @@ export function useDashboardData({ startDate, endDate }) {
     }
     void load()
     return () => controller.abort()
-  }, [refreshDashboard])
+  }, [refreshDashboard, transactionRevision])
 
   return {
     ...summary,
