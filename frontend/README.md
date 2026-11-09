@@ -1,12 +1,11 @@
 # Finance Tracker Web
 
-Frontend React do Finance Tracker. Ele consome a API Spring Boot do diretório `../backend` para autenticação, carteiras, categorias, transações e resumo financeiro.
+Interface web do Finance Tracker, desenvolvida em React e integrada à API do projeto.
 
 ## Pré-requisitos
 
-- Node.js 20 ou superior;
-- npm;
-- API do Finance Tracker em execução, normalmente em `http://localhost:8080`.
+- Node.js 20 ou superior e npm
+- API do Finance Tracker em execução, normalmente em `http://localhost:8080`
 
 ## Configuração
 
@@ -20,7 +19,7 @@ Copy-Item .env.example .env
 VITE_API_URL=http://localhost:8080/api/v1
 ```
 
-`VITE_API_URL` é obrigatória porque define a base usada pelos serviços HTTP do frontend. Não versione o arquivo `.env` com configurações locais.
+`VITE_API_URL` é obrigatória e define o endereço base da API. Configure o valor para o ambiente de destino antes de executar `npm run build`.
 
 ## Execução
 
@@ -37,16 +36,13 @@ O Vite exibirá a URL local, normalmente `http://localhost:5173`.
 | --- | --- |
 | `npm run dev` | Inicia o servidor de desenvolvimento |
 | `npm run lint` | Executa o ESLint |
-| `npm run test:security` | Valida a política de segurança e o limite UTF-8 de senhas |
 | `npm run build` | Gera o build de produção |
 | `npm run preview` | Serve localmente o build de produção |
 
-## Decisões de projeto
+## Instalação e modo offline
 
-- As páginas ficam em `src/pages`, componentes reutilizáveis em `src/components` e chamadas HTTP em `src/services`.
-- A sessão autenticada é enviada em `Authorization: Bearer <token>`.
-- Requisições de leitura podem ser canceladas ao desmontar uma tela para evitar atualizar estados antigos.
-- O estado da carteira selecionada é persistido por usuário no navegador.
-- O build de produção inclui CSP com scripts locais e conexões restritas à origem de `VITE_API_URL`. O arquivo `dist/_headers` configura os cabeçalhos em hosts compatíveis; nos demais, replique esses cabeçalhos na configuração do servidor/CDN. `npm run preview` aplica os mesmos cabeçalhos. Veja [SECURITY.md](../SECURITY.md).
+O build gera `manifest.json` e um service worker para instalação e abertura offline da interface. O cache contém arquivos estáticos. Os dados da aplicação dependem da API.
 
-Veja o [README da raiz](../README.md) para a configuração completa do backend e do banco de dados.
+Para verificar o modo offline localmente, execute `npm run build` e `npm run preview`, abra a aplicação e recarregue a página com o navegador em modo offline.
+
+Consulte o README principal para a [configuração do sistema](../README.md#configuração-local) e o [deploy](../README.md#deploy).
