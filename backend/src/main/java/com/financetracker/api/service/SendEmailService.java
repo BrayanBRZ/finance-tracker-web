@@ -35,7 +35,7 @@ public class SendEmailService {
     public SendEmailService(
             JavaMailSender mailSender,
             ResourceLoader resourceLoader,
-            @Value("${spring.mail.username}") String sender,
+            @Value("${app.mail.from}") String sender,
             @Value("${app.frontend.base-url}") String frontendBaseUrl) {
         this.mailSender = mailSender;
         this.resourceLoader = resourceLoader;
