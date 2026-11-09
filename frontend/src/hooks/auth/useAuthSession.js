@@ -29,13 +29,18 @@ export function useAuthSession() {
       return null
     }
 
+    if (!navigator.onLine) {
+      setSession(null)
+      return null
+    }
+
     try {
       const user = await getCurrentUser()
       const restoredSession = { ...storedSession, user }
       setSession(restoredSession)
       return restoredSession
     } catch {
-      clearApiSession(false)
+      if (navigator.onLine) clearApiSession(false)
       setSession(null)
       return null
     }
@@ -79,11 +84,13 @@ export function useAuthSession() {
     }
 
     void synchronize()
+    window.addEventListener('online', synchronize)
     window.addEventListener('storage', handleStorage)
     window.addEventListener(AUTH_SESSION_CHANGED_EVENT, handleStorage)
 
     return () => {
       active = false
+      window.removeEventListener('online', synchronize)
       window.removeEventListener('storage', handleStorage)
       window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, handleStorage)
     }

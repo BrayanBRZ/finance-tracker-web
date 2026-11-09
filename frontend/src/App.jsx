@@ -12,10 +12,12 @@ import AuthGuard from '@/components/guards/AuthGuard'
 import GuestGuard from '@/components/guards/GuestGuard'
 import { AppLayout } from '@/layouts/AppLayout'
 import { WalletProvider } from '@/context/WalletProvider'
+import { OfflineNotice } from '@/components/feedback/OfflineNotice'
 
 function App() {
   return (
     <BrowserRouter>
+      <OfflineNotice />
       <Routes>
         <Route element={<GuestGuard />}>
           <Route path="/login" element={<LoginPage />} />
