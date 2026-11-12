@@ -18,7 +18,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/** Created only inside SecurityFilterChain, avoiding duplicate servlet registration. */
 public class AuthRateLimitFilter extends OncePerRequestFilter {
     private static final Set<String> AUTH_OPERATIONS = Set.of(
             Routes.Auth.BASE + Routes.Auth.LOGIN,

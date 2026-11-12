@@ -1,0 +1,1552 @@
+{
+  "info": {
+    "name": "Finance Tracker — localhost (Bruno)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleção importável no Bruno via Import Collection > Postman Collection (v2.1). Base: http://localhost:8080. 30 operações reais dos controllers + 3 operações públicas de infraestrutura, com 3 exemplos adicionais nas mesmas rotas (36 requisições). Consulte backend/bruno/README.md. Cadastre e autentique o proprietário, crie categoria/carteira e depois transação. JWT e UUIDs são capturados temporariamente pelos scripts; não preservar scripts Postman ao importar, permita a conversão para Bruno. Exemplos de credenciais são fictícios. Execute pedidos individualmente: há exclusões, alteração de senha e SSE. Fonte: _docs, Routes.java, controllers, DTOs, services e SecurityConfig atuais."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string",
+      "description": "URL local sem barra final; /api/v1 já está nas requisições."
+    },
+    {
+      "key": "email",
+      "value": "bruno.owner@example.com",
+      "type": "string",
+      "description": "Conta fictícia do proprietário; cadastre antes de entrar."
+    },
+    {
+      "key": "password",
+      "value": "LocalTeste@123",
+      "type": "string",
+      "description": "Senha fictícia para testes locais."
+    },
+    {
+      "key": "newPassword",
+      "value": "LocalNova@456",
+      "type": "string",
+      "description": "Senha fictícia para alteração/recuperação."
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT capturado pelo login, temporariamente; nenhum token real versionado."
+    },
+    {
+      "key": "memberEmail",
+      "value": "bruno.member@example.com",
+      "type": "string",
+      "description": "Segunda conta fictícia para testar compartilhamento."
+    },
+    {
+      "key": "memberPassword",
+      "value": "LocalMembro@123",
+      "type": "string",
+      "description": "Senha fictícia da segunda conta."
+    },
+    {
+      "key": "memberAccessToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT temporário da segunda conta, usado ao sair da carteira."
+    },
+    {
+      "key": "memberUserId",
+      "value": "",
+      "type": "string",
+      "description": "UUID do usuário membro, não o ID de WalletMember."
+    },
+    {
+      "key": "walletId",
+      "value": "",
+      "type": "string",
+      "description": "UUID capturado ao criar carteira, ou preencha manualmente."
+    },
+    {
+      "key": "categoryId",
+      "value": "",
+      "type": "string",
+      "description": "UUID capturado ao criar categoria EXPENSE."
+    },
+    {
+      "key": "transactionId",
+      "value": "",
+      "type": "string",
+      "description": "UUID capturado ao criar transação."
+    },
+    {
+      "key": "resetToken",
+      "value": "",
+      "type": "string",
+      "description": "Token de uso único do e-mail ou debugToken exclusivamente local."
+    },
+    {
+      "key": "startDate",
+      "value": "2026-01-01",
+      "type": "string",
+      "description": "Data inicial inclusiva, ISO YYYY-MM-DD."
+    },
+    {
+      "key": "endDate",
+      "value": "2026-01-31",
+      "type": "string",
+      "description": "Data final inclusiva; até 366 dias para IA."
+    },
+    {
+      "key": "transactionDate",
+      "value": "2026-01-15",
+      "type": "string",
+      "description": "Data da transação, não pode estar no futuro."
+    }
+  ],
+  "item": [
+    {
+      "name": "00 Saúde e documentação",
+      "description": "Rotas públicas de infraestrutura.",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            },
+            "description": "200 quando UP; pode retornar 503 se banco/SMTP estiverem indisponíveis. Para testes sem SMTP: MANAGEMENT_HEALTH_MAIL_ENABLED=false no backend.",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "OpenAPI JSON",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v3/api-docs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v3",
+                "api-docs"
+              ]
+            },
+            "description": "200. Especificação OpenAPI gerada pelo SpringDoc.",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/html"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/swagger-ui.html",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "swagger-ui.html"
+              ]
+            },
+            "description": "Pode redirecionar para /swagger-ui/index.html; seguir redirecionamentos.",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 Autenticação",
+      "description": "Rotas públicas; sujeitas ao limite por IP + caminho. Cadastro retorna usuário, login retorna JWT.",
+      "item": [
+        {
+          "name": "Cadastrar usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "201; 409 se e-mail já cadastrado. Senha entre 8 caracteres e 72 bytes UTF-8. Não retorna accessToken.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuário Bruno\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Entrar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "200 com accessToken, tokenType e expiresIn (segundos); 401 se credenciais inválidas. Captura accessToken temporariamente.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.variables.set(\"accessToken\", pm.response.json().accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Solicitar recuperação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "200 com mensagem neutra. Use token recebido por e-mail ou habilite SPRING_PROFILES_ACTIVE=local e EXPOSE_RESET_TOKEN=true somente localmente para capturar debugToken. Sem ele, resetToken fica vazio; preencha manualmente.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.variables.set(\"resetToken\", pm.response.json().debugToken || \"\");",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Redefinir senha",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "200 com message; 400 se token inválido, expirado ou usado. Requer resetToken obtido antes. Após sucesso, usa newPassword como password temporária para próximo login.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"newPassword\": \"{{newPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.variables.set(\"password\", pm.variables.replaceIn(\"{{newPassword}}\"));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Perfil",
+      "description": "JWT do usuário principal.",
+      "item": [
+        {
+          "name": "Consultar meu perfil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me"
+              ]
+            },
+            "description": "200 com id (UUID), name, email, createdAt e updatedAt."
+          }
+        },
+        {
+          "name": "Atualizar meu perfil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me"
+              ]
+            },
+            "description": "200. name e email obrigatórios; exemplo preserva o e-mail usado no login. 409 se e-mail pertencer a outra conta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuário Bruno Atualizado\",\n  \"email\": \"{{email}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Alterar minha senha",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/me/password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me",
+                "password"
+              ]
+            },
+            "description": "200 com message; 422 se senha atual incorreta. Sujeito ao rate limiter. Após sucesso, usa newPassword como password temporária; faça novo login e escolha outra newPassword antes de repetir.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{password}}\",\n  \"newPassword\": \"{{newPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.variables.set(\"password\", pm.variables.replaceIn(\"{{newPassword}}\"));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Categorias",
+      "description": "Categorias pertencem ao usuário autenticado. type: INCOME ou EXPENSE.",
+      "item": [
+        {
+          "name": "Criar categoria",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories"
+              ]
+            },
+            "description": "201. Captura categoryId (UUID). Exemplo cria EXPENSE, compatível com a transação de exemplo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alimentação Bruno\",\n  \"type\": \"EXPENSE\",\n  \"color\": \"#F97316\",\n  \"icon\": \"utensils\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.variables.set(\"categoryId\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar categorias",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "EXPENSE",
+                  "disabled": true,
+                  "description": "Opcional: INCOME ou EXPENSE."
+                }
+              ]
+            },
+            "description": "200 com lista. Habilite type para filtrar; desativado lista todos os tipos."
+          }
+        },
+        {
+          "name": "Atualizar categoria",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories",
+                "{{categoryId}}"
+              ]
+            },
+            "description": "200. Exige categoryId do próprio usuário. name até 80 caracteres; color opcional em #RRGGBB; icon opcional até 120.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alimentação Bruno Atualizada\",\n  \"type\": \"EXPENSE\",\n  \"color\": \"#F97316\",\n  \"icon\": \"utensils\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Excluir categoria",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories",
+                "{{categoryId}}"
+              ]
+            },
+            "description": "204. Desvincula suas transações; não bloqueia exclusão por vínculos. Execute ao terminar os testes que usam categoryId."
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Carteiras",
+      "description": "Criar torna o usuário OWNER; somente membros consultam; só OWNER altera/exclui.",
+      "item": [
+        {
+          "name": "Criar carteira",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets"
+              ]
+            },
+            "description": "201. Captura walletId (UUID).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Carteira Bruno\",\n  \"description\": \"Dados descartáveis para testes locais\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.variables.set(\"walletId\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar minhas carteiras",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets"
+              ]
+            },
+            "description": "200. Carteiras das quais o usuário autenticado é membro."
+          }
+        },
+        {
+          "name": "Detalhar carteira",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}"
+              ]
+            },
+            "description": "200. Requer walletId existente e usuário membro."
+          }
+        },
+        {
+          "name": "Atualizar carteira",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}"
+              ]
+            },
+            "description": "200. Somente OWNER; name até 120 e description até 500 caracteres.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Carteira Bruno Atualizada\",\n  \"description\": \"Carteira de teste local\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Excluir carteira",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}"
+              ]
+            },
+            "description": "204. Somente OWNER. Remove carteira e dados associados; execute ao terminar os demais testes."
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Membros",
+      "description": "Prepare a segunda conta, adicione como proprietário e teste seus papéis. memberUserId é response.user.id.",
+      "item": [
+        {
+          "name": "Cadastrar segundo usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "201; se 409, faça login com a conta existente. Não sobrescreve credenciais do proprietário.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Membro Bruno\",\n  \"email\": \"{{memberEmail}}\",\n  \"password\": \"{{memberPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Entrar como segundo usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "200. Captura somente memberAccessToken; preserva accessToken do proprietário.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{memberEmail}}\",\n  \"password\": \"{{memberPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.variables.set(\"memberAccessToken\", pm.response.json().accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Adicionar membro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "members"
+              ]
+            },
+            "description": "201. Somente OWNER; segunda conta precisa existir; role EDITOR ou VIEWER, nunca OWNER. 409 se já membro. Captura UUID do usuário, não ID da associação.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{memberEmail}}\",\n  \"role\": \"EDITOR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.variables.set(\"memberUserId\", pm.response.json().user.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar membros",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "members"
+              ]
+            },
+            "description": "200. Qualquer membro pode listar. Cada item tem id da associação e user.id (UUID usado para alterar/remover)."
+          }
+        },
+        {
+          "name": "Alterar papel do membro",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/members/{{memberUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "members",
+                "{{memberUserId}}"
+              ]
+            },
+            "description": "200. Somente OWNER; EDITOR ou VIEWER. Não pode alterar o proprietário.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"VIEWER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Remover membro",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/members/{{memberUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "members",
+                "{{memberUserId}}"
+              ]
+            },
+            "description": "204. Somente OWNER; não pode remover o proprietário. Se executar antes de Sair da carteira, adicione novamente o membro."
+          }
+        },
+        {
+          "name": "Sair da carteira",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/members/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "members",
+                "me"
+              ]
+            },
+            "description": "204. Usa JWT da segunda conta, que deve ser membro EDITOR/VIEWER. OWNER não pode sair (422). Remove o acesso dessa conta; para repetir, adicione novamente como proprietário.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{memberAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Transações",
+      "description": "OWNER e EDITOR podem escrever; VIEWER pode consultar. Requer walletId; categoria deve pertencer ao autor e combinar com type.",
+      "item": [
+        {
+          "name": "Criar transação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "transactions"
+              ]
+            },
+            "description": "201. amount >= 0.01; date não futura; description até 500; categoryId opcional (pode enviar null). Captura transactionId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"EXPENSE\",\n  \"amount\": 150,\n  \"description\": \"Supermercado — teste Bruno\",\n  \"date\": \"{{transactionDate}}\",\n  \"categoryId\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.variables.set(\"transactionId\", pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar transações",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/transactions?page=0&size=20&sort=date,desc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Índice iniciado em zero."
+                },
+                {
+                  "key": "size",
+                  "value": "20",
+                  "description": "Entre 1 e 100."
+                },
+                {
+                  "key": "sort",
+                  "value": "date,desc",
+                  "description": "date, amount ou createdAt; asc ou desc."
+                },
+                {
+                  "key": "type",
+                  "value": "EXPENSE",
+                  "disabled": true,
+                  "description": "Opcional: INCOME ou EXPENSE."
+                },
+                {
+                  "key": "categoryId",
+                  "value": "{{categoryId}}",
+                  "disabled": true,
+                  "description": "Opcional: UUID da categoria."
+                },
+                {
+                  "key": "startDate",
+                  "value": "{{startDate}}",
+                  "description": "ISO YYYY-MM-DD",
+                  "disabled": true
+                },
+                {
+                  "key": "endDate",
+                  "value": "{{endDate}}",
+                  "description": "ISO YYYY-MM-DD",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "200 com content, page, size, totalElements e totalPages. Filtros opcionais estão desativados; habilite os desejados em Params."
+          }
+        },
+        {
+          "name": "Detalhar transação",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": "200. Transação deve pertencer à carteira indicada."
+          }
+        },
+        {
+          "name": "Atualizar transação",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": "200. OWNER ou EDITOR. Corpo completo com as mesmas validações de criação.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"EXPENSE\",\n  \"amount\": 175.5,\n  \"description\": \"Supermercado — valor atualizado\",\n  \"date\": \"{{transactionDate}}\",\n  \"categoryId\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Excluir transação",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/transactions/{{transactionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "transactions",
+                "{{transactionId}}"
+              ]
+            },
+            "description": "204. OWNER ou EDITOR. Notifica assinantes SSE; execute ao terminar consultas/atualizações."
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Resumo, PDF e IA",
+      "description": "Qualquer membro pode consultar. Datas ISO e intervalo inicial <= final.",
+      "item": [
+        {
+          "name": "Resumo financeiro",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/summary?startDate={{startDate}}&endDate={{endDate}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "{{startDate}}",
+                  "description": "ISO YYYY-MM-DD"
+                },
+                {
+                  "key": "endDate",
+                  "value": "{{endDate}}",
+                  "description": "ISO YYYY-MM-DD"
+                }
+              ]
+            },
+            "description": "200. Datas opcionais (desative ambas para todo o histórico). Retorna totalIncome, totalExpense, balance, transactionCount, byCategory, byMonth e byDay."
+          }
+        },
+        {
+          "name": "Baixar resumo PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/pdf"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/reports/summary.pdf?startDate={{startDate}}&endDate={{endDate}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "reports",
+                "summary.pdf"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "{{startDate}}",
+                  "description": "ISO YYYY-MM-DD"
+                },
+                {
+                  "key": "endDate",
+                  "value": "{{endDate}}",
+                  "description": "ISO YYYY-MM-DD"
+                }
+              ]
+            },
+            "description": "200 application/pdf com Content-Disposition attachment; salve como .pdf. startDate e endDate obrigatórias."
+          }
+        },
+        {
+          "name": "Gerar análise por IA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/insights",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "insights"
+              ]
+            },
+            "description": "Período inclusivo de até 366 dias. 200 com startDate, endDate, generatedAt, empty, cached e analysis. Período vazio não chama IA; com dados exige AI_ENABLED=true e GEMINI_API_KEY no backend (padrão retorna 503). Cache privado de 10 min; limite próprio pode retornar 429; também 409/502/503/504 conforme falha.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"{{startDate}}\",\n  \"endDate\": \"{{endDate}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Eventos SSE",
+      "description": "Conexão longa; execute separadamente e cancele ao terminar.",
+      "item": [
+        {
+          "name": "Acompanhar eventos da carteira",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/event-stream"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wallets/{{walletId}}/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wallets",
+                "{{walletId}}",
+                "events"
+              ]
+            },
+            "description": "200 text/event-stream, Bearer e usuário membro. ready ao conectar, heartbeat a cada 25 s e transaction-changed após criar/editar/excluir transação em outra requisição. Dura até 5 min; pode ficar pendente no cliente. Ajuste timeout; suporte à exibição incremental depende da versão do Bruno."
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Rate limiting",
+      "description": "Um único exemplo, sem modificar dados: login vazio é validado após o filtro de limite.",
+      "item": [
+        {
+          "name": "Login vazio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Com limite padrão e janela limpa, envie só esta requisição 11 vezes em menos de 60 s (Runner: 11 iterações, intervalo zero). Primeiras 10: 400 por campos ausentes. 11ª: 429 com Retry-After em segundos e Cache-Control: no-store. Após aguardar Retry-After, retorna 400 novamente. Não faz consulta de credenciais. Login principal/segundo usuário também consomem a mesma janela de IP+caminho; aguarde 60 s ou reinicie backend antes do exemplo. AUTH_RATE_LIMIT_MAX_REQUESTS e AUTH_RATE_LIMIT_WINDOW_SECONDS alteram os padrões.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

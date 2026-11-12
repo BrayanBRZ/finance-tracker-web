@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/** Fixed windows, bounded memory and limits per client/operation for one API instance. */
 @Component
 public class AuthRateLimiter {
     private final int maxRequests;
@@ -36,7 +35,6 @@ public class AuthRateLimiter {
         this.clock = clock;
     }
 
-    /** Returns zero when allowed, otherwise seconds until a retry is permitted. */
     public synchronized long retryAfter(String client, String operation) {
         Instant now = clock.instant();
         ClientOperation key = new ClientOperation(client, operation);
@@ -46,7 +44,6 @@ public class AuthRateLimiter {
             window = null;
         }
         if (window == null) {
-            // Clean up on insertion, keeping both storage and attacker-controlled keys bounded.
             windows.values().removeIf(value -> !value.expiresAt().isAfter(now));
             if (windows.size() >= maxEntries) {
                 return windowSeconds; // Fail closed rather than evicting active clients and bypassing limits.
@@ -62,6 +59,9 @@ public class AuthRateLimiter {
         return 0;
     }
 
-    private record ClientOperation(String client, String operation) {}
-    private record Window(Instant expiresAt, int requests) {}
+    private record ClientOperation(String client, String operation) {
+    }
+
+    private record Window(Instant expiresAt, int requests) {
+    }
 }
